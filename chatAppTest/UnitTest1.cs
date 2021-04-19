@@ -102,7 +102,7 @@ namespace chatAppTest
 			Content msgContent2 = new TextContent("Czeœæ");
 			Message sentMessage2 = chatSystem.sendMessage(savedConversation.getId(), "Jaœ Kowalski", sentMessage1.getId(), msgContent2);
 			Assert.IsNotNull(sentMessage2);
-			Assert.IsTrue(sentMessage2.getParent() == sentMessage1);
+			Assert.IsTrue(sentMessage2.getParent() == sentMessage1); //test comment
 		}
 	}
 
