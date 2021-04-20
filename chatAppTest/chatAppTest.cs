@@ -162,49 +162,59 @@ namespace chatAppTest
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
 			User user3 = chatSystem.addUser("Johannes von Neustadt");
 			Conversation savedConversation2 = chatSystem.addConversation("Ziomki", user1, user3);
-			int present = 0;
+			bool hasConversation1 = false;
+			bool hasConversation2 = false;
+			bool hasWrongConversation = false;
 			foreach (var conversation in chatSystem.getConversationsOfUser("Johannes von Neustadt"))
             {
 				if (conversation == savedConversation2)
                 {
-					present += 2;
+					hasConversation2 = true;
                 }
 				else
                 {
-					present -= 30;
+					hasWrongConversation = true;
                 }
             }
-			Assert.isTrue(present == 2);
-			present = 0;
+			Assert.isTrue(hasConversation2);
+			Assert.isFalse(hasWrongConversation);
+			hasConversation1 = false;
+			hasConversation2 = false;
+			hasWrongConversation = false;
 			foreach (var conversation in chatSystem.getConversationsOfUser("Kasia èdüb≥o"))
             {
 				if (conversation == savedConversation1)
                 {
-					present += 1;
+					hasConversation1 = true;
                 }
 				else if (conversation == savedConversation2)
                 {
-					present += 2;
+					hasConversation2 = true;
                 }
 				else
                 {
-					present -= 30;
+					hasWrongConversation = true;
                 }
             }
-			Assert.isTrue(present == 3);
-			present = 0;
+			Assert.isTrue(hasConversation1);
+			Assert.isTrue(hasConversation2);
+			Assert.isFalse(hasWrongConversation);
+			hasConversation1 = false;
+			hasConversation2 = false;
+			hasWrongConversation = false;
 			foreach (var conversation in chatSystem.getConversationsOfUser("Jaú Kowalski"))
             {
 				if (conversation == savedConversation1)
                 {
-					present += 1;
+					hasConversation1 = true;
                 }
 				else
                 {
-					present -= 30;
+					hasWrongConversation = true;
                 }
             }
-			Assert.isTrue(present == 1);
+			Assert.isTrue(hasConversation1);
+			Assert.isFalse(hasWrongConversation);
         }
 	}
 
@@ -266,7 +276,244 @@ namespace chatAppTest
 	[TestClass]
 	public class UserTest
 	{
+		public void getNameTest()
+        {
+			string name = "Jaú Kowalski";
+			User user1 = new User(name);
+			Assert.isTrue(name == user1.getName());
+        }
 
+		public void getConversationsTest()
+        {
+			ChatSystem chatSystem = new ServerChatSystem();
+			User user1 = chatSystem.addUser("Jaú Kowalski");
+			User user2 = chatSystem.addUser("Kasia èdüb≥o");
+			User user3 = chatSystem.addUser("Claus Somersby");
+			User user3 = chatSystem.addUser("Hania Kot");
+			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
+			Conversation savedConversation2 = chatSystem.addConversation("Konfa 2", user2, user3);
+			
+			bool hasConversation1 = false;
+			bool hasConversation2 = false;
+			bool hasWrongConversation = false;
+			foreach (var conversation in user1.getConversations())
+            {
+				if (conversation == savedConversation1)
+					hasConversation1 = true;
+				else
+					hasWrongConversation = true;
+            }
+			Assert.isTrue(hasConversation1);
+			Assert.isFalse(hasWrongConversation);
+			hasConversation1 = false;
+			hasConversation2 = false;
+			hasWrongConversation = false;
+			foreach (var conversation in user2.getConversations())
+            {
+				if (conversation == savedConversation1)
+					hasConversation1 = true;
+				else if (conversation == savedConversation2)
+					hasConversation2 = true;
+				else
+					hasWrongConversation = true;
+            }
+			Assert.isTrue(hasConversation1);
+			Assert.isTrue(hasConversation2);
+			Assert.isFalse(hasWrongConversation);
+			hasConversation1 = false;
+			hasConversation2 = false;
+			hasWrongConversation = false;
+			foreach (var conversation in user3.getConversations())
+            {
+				if (conversation == savedConversation2)
+					hasConversation2 = true;
+				else
+					hasWrongConversation = true;
+            }
+			Assert.isTrue(hasConversation2);
+			Assert.isFalse(hasWrongConversation);
+			hasConversation1 = false;
+			hasConversation2 = false;
+			hasWrongConversation = false;
+			foreach (var conversation in user4.getConversations())
+            {
+				hasWrongConversation = true;
+            }
+			Assert.isFalse(hasWrongConversation);
+        }
+
+		public void matchWithConversationTest()
+        {
+			Conversation conversation1 = new Conversation("Konfa 1", 1); //dopuszczamy moøliwoúÊ stworzenia pustej konwersacji do testÛw
+			Conversation conversation2 = new Conversation("Konfa 2", 2);
+			User user1 = new User("Pan A");
+			user user2 = new user("Pani B");
+			
+			bool hasConversation1 = false;
+			bool hasConversation2 = false;
+			bool hasWrongConversation = false;
+			foreach (var conversation in user1.getConversations())
+            {
+				hasWrongConversation = true;
+            }
+			Assert.isFalse(hasWrongConversation);
+			hasWrongConversation = false;
+			foreach (var conversation in user2.getConversations())
+            {
+				hasWrongConversation = true;
+            }
+			Assert.isFalse(hasWrongConversation);
+			hasWrongConversation = false;
+			bool hasUser1 = false;
+			bool hasUser2 = false;
+			bool hasWrongUser = false;
+			foreach (var user in conversation1.getUsers())
+            {
+				hasWrongUser = true;
+            }
+			Assert.isFalse(hasWrongUser);
+			hasWrongUser = false;
+			foreach (var user in conversation2.getUsers())
+            {
+				hasWrongUser = true;
+            }
+			Assert.isFalse(hasWrongUser);
+			hasWrongUser = false;
+
+			bool methodResult;
+			methodResult = user1.matchWithConversation(conversation1);
+			Assert.isTrue(methodResult);
+			methodResult = user1.matchWithConversation(conversation2);
+			Assert.isTrue(methodResult);
+			methodResult = user2.matchWithConversation(conversation1);
+			Assert.isTrue(methodResult);		
+
+			foreach (var conversation in user1.getConversations())
+            {
+				if (conversation == conversation1) 
+					hasConversation1 = true;
+				else if (conversation == conversation2)
+					hasConversation2 = true;
+				else
+					hasWrongConversation = true;
+            }
+			Assert.isTrue(hasConversation1);
+			Assert.isTrue(hasConversation2);
+			Assert.isFalse(hasWrongConversation);
+			hasConversation1 = false;
+			hasConversation2 = false;
+			hasWrongConversation = false;
+			foreach (var conversation in user2.getConversations())
+            {
+				if (conversation == conversation2)
+					hasConversation2 = true;
+				else
+					hasWrongConversation = true;
+            }
+			Assert.isTrue(hasConversation2);
+			Assert.isFalse(hasWrongConversation);
+
+			hasUser1 = false;
+			hasUser2 = false;
+			hasWrongUser = false;
+			foreach (var user in conversation1.getUsers())
+            {
+				if (user == user1)
+					hasUser1 = true;
+				else if (user == user2)
+					hasUser2 = true;
+				else
+					hasWrongUser = true;
+            }
+			Assert.isTrue(hasUser1);
+			Assert.isTrue(hasUser2);
+			Assert.isFalse(hasWrongUser);
+			hasUser1 = false;
+			hasUser2 = false;
+			hasWrongUser = false;
+			foreach (var user in conversation2.getUsers())
+            {
+				if (user == user1)
+					hasUser1 = true;
+				else
+					hasWrongUser = true;
+            }
+			Assert.isTrue(hasUser1);
+			Assert.isFalse(hasWrongUser);
+
+			methodResult = user2.matchWithConversation(conversation1);
+			Assert.isFalse(methodResult);
+        }
+
+		public void unmatchWithConversationTest()
+        {
+			Conversation conversation1 = new Conversation("Konfa 1", 1);
+			User user1 = new User("Pan A");
+
+			bool hasConversation1 = false;
+			bool hasWrongConversation = false;
+			foreach (var conversation in user1.getConversations())
+            {
+				hasWrongConversation = true;
+            }
+			Assert.isFalse(hasWrongConversation);
+			hasWrongConversation = false;
+			bool hasUser1 = false;
+			bool hasWrongUser = false;
+			foreach (var user in conversation1.getUsers())
+            {
+				hasWrongUser = true;
+            }
+			Assert.isFalse(hasWrongUser);
+			hasWrongUser = false;
+
+			user1.matchWithConversation(conversation1);
+
+			foreach (var conversation in user1.getConversations())
+            {
+				if (conversation == conversation1) 
+					hasConversation1 = true;
+				else
+					hasWrongConversation = true;
+            }
+			Assert.isTrue(hasConversation1);
+			Assert.isFalse(hasWrongConversation);
+			hasConversation1 = false;
+			hasWrongConversation = false;
+
+			hasUser1 = false;
+			hasWrongUser = false;
+			foreach (var user in conversation1.getUsers())
+            {
+				if (user == user1)
+					hasUser1 = true;
+				else
+					hasWrongUser = true;
+            }
+			Assert.isTrue(hasUser1);
+			Assert.isFalse(hasWrongUser);
+			hasUser1 = false;
+			hasWrongUser = false;
+
+			bool methodResult;
+			methodResult = user1.unmatchWithConversation(conversation1);
+			Assert.isTrue(methodResult);			
+
+			foreach (var conversation in user1.getConversations())
+            {
+				hasWrongConversation = true;
+            }
+			Assert.isFalse(hasWrongConversation);
+			hasWrongConversation = false;
+			foreach (var user in conversation1.getUsers())
+            {
+				hasWrongUser = true;
+            }
+			Assert.isFalse(hasWrongUser);
+			hasWrongUser = false;
+			methodResult = user1.unmatchWithConversation(conversation1);
+			Assert.isFalse(methodResult);	
+        }
 	}
 
 	[TestClass]
