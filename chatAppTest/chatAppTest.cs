@@ -96,7 +96,7 @@ namespace chatAppTest
 			User user2 = chatSystem.addUser("Kasia dŸb³o");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
 			Content msgContent1 = new TextContent("Heeejoooo");
-			DateTime datetime = new DateTime(now);
+			DateTime datetime = new DateTime(now);  //do poprawy na jakiœ legitny typ
 			Message sentMessage1 = chatSystem.sendMessage(savedConversation.getId(), "Jaœ Kowalski", -1, msgContent1, datetime);
 			Assert.IsNotNull(sentMessage1);
 			Assert.IsNull(sentMessage1.getParent());
@@ -474,6 +474,8 @@ namespace chatAppTest
 			Message addedMessage = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
 			Assert.isNull(addedMessage);
 			conversation1.matchWithUser(user1);
+			Message addedMessage = conversation1.addMessage(user1, 2, msgContent1, datetime, 1);
+			Assert.isNull(addedMessage);
 			Message addedMessage = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
 			Assert.isNotNull(addedMessage);
 			Assert.isTrue(user1 == addedMessage.getUser());
@@ -492,6 +494,22 @@ namespace chatAppTest
 			Assert.isTrue(msgContent2 == nextMessage.getContent());
 			Assert.isTrue(datetime2 == nextMessage.getTime());
 			Assert.isTrue(2 == nextMessage.getId());
+
+			bool hasMsg1 = false;
+			bool hasMsg2 = false;
+			bool hasWrongMessage = false;
+			foreach (var msg in conversation1.getMessages())
+            {
+				if (msg == addedMessage)
+					hasMsg1 = true;
+				else if (msg = nextMessage)
+					hasMsg2 = true;
+				else 
+					hasWrongMessage = true;
+            }
+			Assert.isTrue(hasMsg1);
+			Assert.isTrue(hasMsg2);
+			Assert.isFalse(hasWrongMessage);
         }
 
 		public void getMessageTest()
@@ -775,9 +793,65 @@ namespace chatAppTest
 	public class MessageTest
 	{
 		[TestMethod]
-		public void TestMethod1()
-		{
-		}
+		public void getIdTest()
+        {
+			User user1 = new User("Jaœ Kowalski");
+			DateTime datetime = new DateTime(now);
+			MessageContent messageContent1 = new TextContent("Siemka, co tam?");
+			MessageTest message1 = new MessageTest(user1, -1, messageContent1, datetime, 1);
+			Assert.isTrue(message1.getId() == 1);
+        }
+
+		public void getTimeTest()
+        {
+			User user1 = new User("Jaœ Kowalski");
+			DateTime datetime = new DateTime(now);
+			MessageContent messageContent1 = new TextContent("Siemka, co tam?");
+			MessageTest message1 = new MessageTest(user1, -1, messageContent1, datetime, 1);
+			Assert.isTrue(message1.getTime == datetime);
+        }
+
+		public void serializeTest()
+        {
+			Conversation conversation1 = new ConversationTest("Konfa 1", 1);
+			Conversation conversation2 = new ConversationTest("Konfa 2", 2); 
+			UserTest user1 = new User("Pszczó³ka Maja");
+			UserTest user2 = new User("Stary Trzmiel");
+			conversation1.matchWithUser(user1);
+			conversation2.matchWithUser(user1);
+			conversation1.matchWithUser(user2);
+			conversation2.matchWithUser(user2);
+			DateTime datetime = new DateTime(now);
+			MessageContent messageContent1 = new TextContent("Siemka, co tam?");
+			DateTime datetime2 = datetime + 4;
+			MessageContent messageContent2 = new TextContent("Ano spoko");
+			Message message1 = conversation1.addMessage(user1, -1, messageContent1, datetime, 1);		
+			Message message2 = conversation1.addMessage(user2, 1, messageContent2, datetime2, 2);
+
+			Message recreatedMessage1 = conversation2.addMessage(message1.serialize());
+			Message recreatedMessage2 = conversation2.addMessage(message2.serialize());
+
+			Assert.isTrue(recreatedMessage1.getId() == message1.getId());
+			Assert.isTrue(recreatedMessage1.getUser().getName() == message1.getUser().getName());
+			Assert.isNull(recreatedMessage1.getParent());
+			Assert.isTrue(recreatedMessage1.getContent().getData() == message1.getContent().getData());
+			Assert.isTrue(recreatedMessage1.getTime() == message1.getTime());
+
+			Assert.isTrue(recreatedMessage2.getId() == message2.getId());
+			Assert.isTrue(recreatedMessage2.getUser().getName() == message2.getUser().getName());
+			Assert.isTrue(recreatedMessage2.getParent() == recreatedMessage1);
+			Assert.isTrue(recreatedMessage2.getContent().getData() == message2.getContent().getData());
+			Assert.isTrue(recreatedMessage2.getTime() == message2.getTime());
+        }
+
+		public void getContentTest()
+        {
+			User user1 = new User("Jaœ Kowalski");
+			DateTime datetime = new DateTime(now);
+			MessageContent messageContent1 = new TextContent("Siemka, co tam?");
+			MessageTest message1 = new MessageTest(user1, -1, messageContent1, datetime, 1);
+			Assert.isTrue(message1.getContent() == messageContent1);
+        }
 	}
 	
 	[TestClass]
