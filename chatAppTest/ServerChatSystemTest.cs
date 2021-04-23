@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using ChatModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace chatAppTest
@@ -7,6 +8,7 @@ namespace chatAppTest
 	[TestClass]
 	public class ServerChatSystemTest
 	{
+		[TestMethod]
 		public void getUpdatesToUserTest() //do przejrzenia czy na pewno tak to robimy
 		{
 			ServerChatSystem chatSystem = new ServerChatSystem();
@@ -15,12 +17,12 @@ namespace chatAppTest
 			User user3 = chatSystem.addUser("Roch Kowal");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
 			Conversation savedConversation2 = chatSystem.addConversation("Konfa 2", user1, user3);
-			Content msgContent1 = new TextContent("Heeejoooo");
-			Content msgContent2 = new TextContent("Heeej");
+			MessageContent msgContent1 = new TextContent("Heeejoooo");
+			MessageContent msgContent2 = new TextContent("Heeej");
 			DateTime datetime = DateTime.Now;
 			Message sentMessage1 = chatSystem.sendMessage(savedConversation.getId(), "Jaú Kowalski", -1, msgContent1, datetime);
 			Message sentMessage2 = chatSystem.sendMessage(savedConversation2.getId(), "Jaú Kowalski", -1, msgContent2, datetime);
-			ICollection updates = chatSystem.getUpdatesOfUser("Kasia èdüb≥o"); //czy na pewno tak przechowujemy updaty?
+			User updates = chatSystem.getUpdatesOfUser("Kasia èdüb≥o"); //czy na pewno tak przechowujemy updaty?
 			bool containsConversation = false;
 			bool containsWrongConversation = false;
 			foreach (var update in updates.getConversations()) //czy aby tak?
@@ -57,6 +59,7 @@ namespace chatAppTest
 			Assert.IsFalse(containsWrongConversation);
 		}
 
+		[TestMethod]
 		public void getConversationsOfUserTest()
 		{
 			ServerChatSystem chatSystem = new ServerChatSystem();

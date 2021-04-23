@@ -1,4 +1,5 @@
 using System;
+using ChatModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace chatAppTest
@@ -14,33 +15,34 @@ namespace chatAppTest
 			Assert.IsTrue(name == conversation1.getName());
 		}
 
+		[TestMethod]
 		public void addMessageTest()
 		{
 			User user1 = new User("Roch Lancel");
 			User user2 = new User("Harry Potter");
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
-			Content msgContent1 = new TextContent("Heeejoooo");
+			MessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;
-			Message addedMessage = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
-			Assert.IsNull(addedMessage);
+			Message addedMessage1 = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
+			Assert.IsNull(addedMessage1);
 			conversation1.matchWithUser(user1);
-			Message addedMessage = conversation1.addMessage(user1, 2, msgContent1, datetime, 1);
-			Assert.IsNull(addedMessage);
-			Message addedMessage = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
-			Assert.IsNotNull(addedMessage);
-			Assert.IsTrue(user1 == addedMessage.getUser());
-			Assert.IsNull(addedMessage.getParent());
-			Assert.IsTrue(msgContent1 == addedMessage.getContent());
-			Assert.IsTrue(datetime == addedMessage.getTime());
-			Assert.IsTrue(1 == addedMessage.getId());
+			Message addedMessage2 = conversation1.addMessage(user1, 2, msgContent1, datetime, 1);
+			Assert.IsNull(addedMessage2);
+			Message addedMessage3 = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
+			Assert.IsNotNull(addedMessage3);
+			Assert.IsTrue(user1 == addedMessage1.getUser());
+			Assert.IsNull(addedMessage1.getParent());
+			Assert.IsTrue(msgContent1 == addedMessage1.getContent());
+			Assert.IsTrue(datetime == addedMessage1.getTime());
+			Assert.IsTrue(1 == addedMessage1.getId());
 
 			conversation1.matchWithUser(user2);
-			Content msgContent2 = new TextContent("Heeejoooo");
+			MessageContent msgContent2 = new TextContent("Heeejoooo");
 			DateTime datetime2 = DateTime.Now;
 			Message nextMessage = conversation1.addMessage(user2, 1, msgContent2, datetime2, 2);
 			Assert.IsNotNull(nextMessage);
 			Assert.IsTrue(user2 == nextMessage.getUser());
-			Assert.IsTrue(addedMessage == nextMessage.getParent());
+			Assert.IsTrue(addedMessage1 == nextMessage.getParent());
 			Assert.IsTrue(msgContent2 == nextMessage.getContent());
 			Assert.IsTrue(datetime2 == nextMessage.getTime());
 			Assert.IsTrue(2 == nextMessage.getId());
@@ -50,9 +52,9 @@ namespace chatAppTest
 			bool hasWrongMessage = false;
 			foreach (var msg in conversation1.getMessages())
 			{
-				if (msg == addedMessage)
+				if (msg == addedMessage1)
 					hasMsg1 = true;
-				else if (msg = nextMessage)
+				else if (msg == nextMessage)
 					hasMsg2 = true;
 				else
 					hasWrongMessage = true;
@@ -62,25 +64,27 @@ namespace chatAppTest
 			Assert.IsFalse(hasWrongMessage);
 		}
 
+		[TestMethod]
 		public void getMessageTest()
 		{
 			User user1 = new User("Roch Lancel");
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			conversation1.matchWithUser(user1);
 			Assert.IsNull(conversation1.getMessage(1));
-			Content msgContent1 = new TextContent("Heeejoooo");
+			MessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;
 			Message addedMessage = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
 			Assert.IsTrue(addedMessage == conversation1.getMessage(1));
 			Assert.IsNull(conversation1.getMessage(2));
 		}
 
+		[TestMethod]
 		public void matchWithUserTest()
 		{
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			Conversation conversation2 = new Conversation("Konfa 2", 2);
 			User user1 = new User("Pan A");
-			user user2 = new user("Pani B");
+			User user2 = new User("Pani B");
 
 			bool hasUser1 = false;
 			bool hasUser2 = false;
@@ -135,6 +139,7 @@ namespace chatAppTest
 			Assert.IsFalse(methodResult);
 		}
 
+		[TestMethod]
 		public void unmatchWithUserTest()
 		{
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
@@ -178,6 +183,7 @@ namespace chatAppTest
 			Assert.IsFalse(methodResult);
 		}
 
+		[TestMethod]
 		public void getUsersTest()
 		{
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
@@ -248,14 +254,15 @@ namespace chatAppTest
 			Assert.IsFalse(hasWrongUser);
 		}
 
+		[TestMethod]
 		public void serializeTest() //niekoniecznie tak ten test powinien wyglπdaÊ
 		{
-			ServerChatSystem serverChatSystem = new ServerChatSystem();
+			ServerChatSystem chatSystem = new ServerChatSystem();
 			User user1 = chatSystem.addUser("Jaú Kowalski");
 			User user2 = chatSystem.addUser("Kasia èdüb≥o");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
-			Content msgContent1 = new TextContent("Heeejoooo");
-			Content msgContent2 = new TextContent("Heeej");
+			MessageContent msgContent1 = new TextContent("Heeejoooo");
+			MessageContent msgContent2 = new TextContent("Heeej");
 			DateTime datetime = DateTime.Now;
 			Message sentMessage1 = chatSystem.sendMessage(savedConversation.getId(), "Jaú Kowalski", -1, msgContent1, datetime);
 			Message sentMessage2 = chatSystem.sendMessage(savedConversation.getId(), "Kasia èdüb≥o", sentMessage1.getId(), msgContent2, datetime);
@@ -294,14 +301,15 @@ namespace chatAppTest
 			Assert.IsFalse(wrongMsgPresent);
 		}
 
+		[TestMethod]
 		public void getUpdatesTest() //czy tak?
 		{
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			User user1 = new User("Mr. X");
 			User user2 = new User("Ms. Y");
-			Content msgContent1 = new TextContent("Heeejoooo");
-			Content msgContent2 = new TextContent("No czeúÊ");
-			Content msgContent3 = new TextContent("Co tam s≥ychaÊ?");
+			MessageContent msgContent1 = new TextContent("Heeejoooo");
+			MessageContent msgContent2 = new TextContent("No czeúÊ");
+			MessageContent msgContent3 = new TextContent("Co tam s≥ychaÊ?");
 			DateTime datetime = DateTime.Now;
 			DateTime datetime2 = datetime + TimeSpan.FromSeconds(5);
 			DateTime datetime3 = datetime + TimeSpan.FromSeconds(19);

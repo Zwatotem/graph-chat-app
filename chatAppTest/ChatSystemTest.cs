@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using ChatModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace chatAppTest
@@ -7,6 +8,7 @@ namespace chatAppTest
 	[TestClass]
 	public class ChatSystemTest
 	{
+		[TestMethod]
 		public void AddNewUserTest()
 		{
 			ChatSystem chatSystem = new ServerChatSystem();
@@ -17,6 +19,7 @@ namespace chatAppTest
 			Assert.IsNull(savedUser);
 		}
 
+		[TestMethod]
 		public void AddConversationTest()
 		{
 			ChatSystem chatSystem = new ServerChatSystem();
@@ -30,6 +33,7 @@ namespace chatAppTest
 			Assert.AreNotEqual(savedConversation1.getId(), savedConversation2.getId());
 		}
 
+		[TestMethod]
 		public void AddUserToConversation()
 		{
 			ChatSystem chatSystem = new ServerChatSystem();
@@ -37,9 +41,9 @@ namespace chatAppTest
 			User user2 = chatSystem.addUser("Kasia èdüb≥o");
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
 			User user3 = chatSystem.addUserToConversation("PszczÛ≥ka Maja");
-			ICollection collection = user3.getConversations();
+			var collection1 = user3.getConversations();
 			bool isThere = false;
-			foreach (var c in collection)
+			foreach (var c in collection1)
 			{
 				if (c == savedConversation1)
 				{
@@ -48,9 +52,9 @@ namespace chatAppTest
 			}
 			Assert.IsTrue(isThere);
 
-			collection = savedConversation1.getUsers();
+			var collection2 = savedConversation1.getUsers();
 			isThere = false;
-			foreach (var u in collection)
+			foreach (var u in collection2)
 			{
 				if (u == user3)
 				{
@@ -60,6 +64,7 @@ namespace chatAppTest
 			Assert.IsTrue(isThere);
 		}
 
+		[TestMethod]
 		public void LeaveConversation()
 		{
 			ChatSystem chatSystem = new ServerChatSystem();
@@ -67,18 +72,19 @@ namespace chatAppTest
 			User user2 = chatSystem.addUser("Kasia èdüb≥o");
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
 			chatSystem.leaveConversation("Kasia èdüb≥o", savedConversation1.getId());
-			ICollection users = savedConversation1.getUsers();
+			var users = savedConversation1.getUsers();
 			foreach (var u in users)
 			{
 				Assert.IsFalse(u == user2);
 			}
-			ICollection conversations = user2.getConversations();
+			var conversations = user2.getConversations();
 			foreach (var c in conversations)
 			{
 				Assert.IsFalse(c == savedConversation1);
 			}
 		}
 
+		[TestMethod]
 		public void GetConversationTest()
 		{
 			ChatSystem chatSystem = new ServerChatSystem();
@@ -89,18 +95,19 @@ namespace chatAppTest
 			Assert.IsTrue(returnedConversation == savedConversation);
 		}
 
+		[TestMethod]
 		public void sendMessageTest()
 		{
 			ChatSystem chatSystem = new ServerChatSystem();
 			User user1 = chatSystem.addUser("Jaú Kowalski");
 			User user2 = chatSystem.addUser("Kasia èdüb≥o");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
-			Content msgContent1 = new TextContent("Heeejoooo");
+			MessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;  //do poprawy na jakiú legitny typ
 			Message sentMessage1 = chatSystem.sendMessage(savedConversation.getId(), "Jaú Kowalski", -1, msgContent1, datetime);
 			Assert.IsNotNull(sentMessage1);
 			Assert.IsNull(sentMessage1.getParent());
-			Content msgContent2 = new TextContent("CzeúÊ");
+			MessageContent msgContent2 = new TextContent("CzeúÊ");
 			Message sentMessage2 = chatSystem.sendMessage(savedConversation.getId(), "Kasia èdüb≥o", sentMessage1.getId(), msgContent2, datetime);
 			Assert.IsNotNull(sentMessage2);
 			Assert.IsTrue(sentMessage2.getParent() == sentMessage1); //test comment

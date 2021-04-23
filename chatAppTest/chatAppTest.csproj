@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\graph-chat-app\graphChatApp.csproj" />
+    <ProjectReference Include="..\SharedClasses\ChatModel.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,3 +1,4 @@
+using ChatModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace chatAppTest
@@ -5,6 +6,7 @@ namespace chatAppTest
 	[TestClass]
 	public class UserTest
 	{
+		[TestMethod]
 		public void getNameTest()
 		{
 			string name = "Jaœ Kowalski";
@@ -12,6 +14,7 @@ namespace chatAppTest
 			Assert.IsTrue(name == user1.getName());
 		}
 
+		[TestMethod]
 		public void getConversationsTest()
 		{
 			ChatSystem chatSystem = new ServerChatSystem();
@@ -71,12 +74,13 @@ namespace chatAppTest
 			Assert.IsFalse(hasWrongConversation);
 		}
 
+		[TestMethod]
 		public void matchWithConversationTest()
 		{
 			Conversation conversation1 = new Conversation("Konfa 1", 1); //dopuszczamy mo¿liwoœæ stworzenia pustej konwersacji do testów
 			Conversation conversation2 = new Conversation("Konfa 2", 2);
 			User user1 = new User("Pan A");
-			user user2 = new user("Pani B");
+			User user2 = new User("Pani B");
 
 			bool hasConversation1 = false;
 			bool hasConversation2 = false;
@@ -131,6 +135,7 @@ namespace chatAppTest
 			Assert.IsFalse(methodResult);
 		}
 
+		[TestMethod]
 		public void unmatchWithConversationTest()
 		{
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
