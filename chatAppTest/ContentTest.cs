@@ -5,6 +5,6 @@ namespace chatAppTest
 	[TestClass]
 	public class ContentTest
 	{
-
+		// Probably stays empty
 	}
 }
