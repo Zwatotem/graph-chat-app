@@ -6,7 +6,7 @@ namespace ChatModel
 {
 	public class ServerChatSystem : ChatSystem
 	{
-		public User getUpdatesOfUser(string v)
+		public User getUpdatesToUser(string v, DateTime t)
 		{
 			throw new NotImplementedException();
 		}

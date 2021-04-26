@@ -9,7 +9,7 @@ namespace chatAppTest
 	public class ServerChatSystemTest
 	{
 		[TestMethod]
-		public void getUpdatesToUserTest() //do przejrzenia czy na pewno tak to robimy
+		public void getUpdatesToUserTest()
 		{
 			ServerChatSystem chatSystem = new ServerChatSystem();
 			User user1 = chatSystem.addNewUser("Jaú Kowalski");
@@ -22,17 +22,17 @@ namespace chatAppTest
 			DateTime datetime = DateTime.Now;
 			Message sentMessage1 = chatSystem.sendMessage(savedConversation.getId(), "Jaú Kowalski", -1, msgContent1, datetime);
 			Message sentMessage2 = chatSystem.sendMessage(savedConversation2.getId(), "Jaú Kowalski", -1, msgContent2, datetime);
-			User updates = chatSystem.getUpdatesOfUser("Kasia èdüb≥o"); //czy na pewno tak przechowujemy updaty?
+			User updates = chatSystem.getUpdatesToUser("Kasia èdüb≥o", datetime - TimeSpan.FromSeconds(3));
 			bool containsConversation = false;
 			bool containsWrongConversation = false;
-			foreach (var update in updates.getConversations()) //czy aby tak?
+			foreach (var conversation in updates.getConversations())
 			{
-				if (update.getId() == savedConversation.getId() && update.getName() == savedConversation.getName())
+				if (conversation.getId() == savedConversation.getId() && conversation.getName() == savedConversation.getName())
 				{
 					containsConversation = true;
 					bool containsMessage = false;
 					bool containsWrongMessage = false;
-					foreach (var message in update.getMessages())
+					foreach (var message in conversation.getMessages())
 					{
 						if (message.getId() == sentMessage1.getId())
 						{

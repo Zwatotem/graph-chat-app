@@ -255,7 +255,7 @@ namespace chatAppTest
 		}
 
 		[TestMethod]
-		public void serializeTest() //niekoniecznie tak ten test powinien wygl¹daæ
+		public void serializeTest()
 		{
 			ServerChatSystem chatSystem = new ServerChatSystem();
 			User user1 = chatSystem.addNewUser("Jaœ Kowalski");
@@ -302,7 +302,7 @@ namespace chatAppTest
 		}
 
 		[TestMethod]
-		public void getUpdatesTest() //czy tak?
+		public void getUpdatesTest()
 		{
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			User user1 = new User("Mr. X");
@@ -330,7 +330,7 @@ namespace chatAppTest
 					Assert.IsTrue(message.getContent().getData() == sentMessage2.getContent().getData());
 					Assert.IsTrue(message.getTime() == sentMessage2.getTime());
 				}
-				else if (message.getId() == sentMessage2.getId())
+				else if (message.getId() == sentMessage3.getId())
 				{
 					hasMessage3 = true;
 					Assert.IsTrue(message.getUser().getName() == sentMessage3.getUser().getName());

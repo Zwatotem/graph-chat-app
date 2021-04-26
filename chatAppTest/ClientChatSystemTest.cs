@@ -32,7 +32,7 @@ namespace chatAppTest
 
 			ClientChatSystem clientChatSystem = new ClientChatSystem();
 			clientChatSystem.addNewUser("Kasia èdüb≥o");
-			clientChatSystem.applyUpdates(chatSystem.getUpdatesOfUser("Kasia èdüb≥o"));
+			clientChatSystem.applyUpdates(chatSystem.getUpdatesToUser("Kasia èdüb≥o", datetime - TimeSpan.FromSeconds(3)));
 			bool conversationPresent = false;
 			foreach (var conversation in clientChatSystem.getUser("Kasia èdüb≥o").getConversations())
 			{
