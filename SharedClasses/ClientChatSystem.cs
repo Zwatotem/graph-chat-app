@@ -10,11 +10,6 @@ namespace ChatModel
 			throw new NotImplementedException();
 		}
 
-		public bool logInTest(string v)
-		{
-			throw new NotImplementedException();
-		}
-
 		public void applyUpdates(object p)
 		{
 			throw new NotImplementedException();
@@ -25,7 +20,7 @@ namespace ChatModel
 			throw new NotImplementedException();
 		}
 
-		public void logIn(string v)
+		public bool logIn(string v)
 		{
 			throw new NotImplementedException();
 		}

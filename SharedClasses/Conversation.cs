@@ -15,7 +15,7 @@ namespace ChatModel
 			this.v2 = v2;
 		}
 
-		public object getId()
+		public int getId()
 		{
 			throw new NotImplementedException();
 		}

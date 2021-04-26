@@ -18,10 +18,10 @@ namespace chatAppTest
 		public void getConversationsTest()
 		{
 			ChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addUser("Jaú Kowalski");
-			User user2 = chatSystem.addUser("Kasia èdüb≥o");
-			User user3 = chatSystem.addUser("Claus Somersby");
-			User user4 = chatSystem.addUser("Hania Kot");
+			User user1 = chatSystem.addNewUser("Jaú Kowalski");
+			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			User user3 = chatSystem.addNewUser("Claus Somersby");
+			User user4 = chatSystem.addNewUser("Hania Kot");
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
 			Conversation savedConversation2 = chatSystem.addConversation("Konfa 2", user2, user3);
 
@@ -77,7 +77,7 @@ namespace chatAppTest
 		[TestMethod]
 		public void matchWithConversationTest()
 		{
-			Conversation conversation1 = new Conversation("Konfa 1", 1); //dopuszczamy moøliwoúÊ stworzenia pustej konwersacji do testÛw
+			Conversation conversation1 = new Conversation("Konfa 1", 1); //dopuszczamy moøliwoúÊ stworzenia samodzielnej konwersacji do testÛw
 			Conversation conversation2 = new Conversation("Konfa 2", 2);
 			User user1 = new User("Pan A");
 			User user2 = new User("Pani B");
@@ -123,12 +123,12 @@ namespace chatAppTest
 			hasWrongConversation = false;
 			foreach (var conversation in user2.getConversations())
 			{
-				if (conversation == conversation2)
-					hasConversation2 = true;
+				if (conversation == conversation1)
+					hasConversation1 = true;
 				else
 					hasWrongConversation = true;
 			}
-			Assert.IsTrue(hasConversation2);
+			Assert.IsTrue(hasConversation1);
 			Assert.IsFalse(hasWrongConversation);
 
 			methodResult = user2.matchWithConversation(conversation1);

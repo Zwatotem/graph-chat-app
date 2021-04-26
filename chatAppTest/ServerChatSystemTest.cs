@@ -12,9 +12,9 @@ namespace chatAppTest
 		public void getUpdatesToUserTest() //do przejrzenia czy na pewno tak to robimy
 		{
 			ServerChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addUser("Jaú Kowalski");
-			User user2 = chatSystem.addUser("Kasia èdüb≥o");
-			User user3 = chatSystem.addUser("Roch Kowal");
+			User user1 = chatSystem.addNewUser("Jaú Kowalski");
+			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			User user3 = chatSystem.addNewUser("Roch Kowal");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
 			Conversation savedConversation2 = chatSystem.addConversation("Konfa 2", user1, user3);
 			MessageContent msgContent1 = new TextContent("Heeejoooo");
@@ -63,10 +63,10 @@ namespace chatAppTest
 		public void getConversationsOfUserTest()
 		{
 			ServerChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addUser("Jaú Kowalski");
-			User user2 = chatSystem.addUser("Kasia èdüb≥o");
+			User user1 = chatSystem.addNewUser("Jaú Kowalski");
+			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
-			User user3 = chatSystem.addUser("Johannes von Neustadt");
+			User user3 = chatSystem.addNewUser("Johannes von Neustadt");
 			Conversation savedConversation2 = chatSystem.addConversation("Ziomki", user1, user3);
 			bool hasConversation1 = false;
 			bool hasConversation2 = false;
@@ -87,7 +87,7 @@ namespace chatAppTest
 			hasConversation1 = false;
 			hasConversation2 = false;
 			hasWrongConversation = false;
-			foreach (var conversation in chatSystem.getConversationsOfUser("Kasia èdüb≥o"))
+			foreach (var conversation in chatSystem.getConversationsOfUser("Jaú Kowalski"))
 			{
 				if (conversation == savedConversation1)
 				{
@@ -108,7 +108,7 @@ namespace chatAppTest
 			hasConversation1 = false;
 			hasConversation2 = false;
 			hasWrongConversation = false;
-			foreach (var conversation in chatSystem.getConversationsOfUser("Jaú Kowalski"))
+			foreach (var conversation in chatSystem.getConversationsOfUser("Kasia èdüb≥o"))
 			{
 				if (conversation == savedConversation1)
 				{

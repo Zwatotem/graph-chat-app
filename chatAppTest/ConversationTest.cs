@@ -7,7 +7,7 @@ namespace chatAppTest
 	[TestClass]
 	public class ConversationTest
 	{
-		[TestMethod] //czy taka anotacja powinna byÊ przy wszystkich?
+		[TestMethod]
 		public void getNameTest()
 		{
 			string name = "Konwersacja 1";
@@ -30,11 +30,11 @@ namespace chatAppTest
 			Assert.IsNull(addedMessage2);
 			Message addedMessage3 = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
 			Assert.IsNotNull(addedMessage3);
-			Assert.IsTrue(user1 == addedMessage1.getUser());
-			Assert.IsNull(addedMessage1.getParent());
-			Assert.IsTrue(msgContent1 == addedMessage1.getContent());
-			Assert.IsTrue(datetime == addedMessage1.getTime());
-			Assert.IsTrue(1 == addedMessage1.getId());
+			Assert.IsTrue(user1 == addedMessage3.getUser());
+			Assert.IsNull(addedMessage3.getParent());
+			Assert.IsTrue(msgContent1 == addedMessage3.getContent());
+			Assert.IsTrue(datetime == addedMessage3.getTime());
+			Assert.IsTrue(1 == addedMessage3.getId());
 
 			conversation1.matchWithUser(user2);
 			MessageContent msgContent2 = new TextContent("Heeejoooo");
@@ -258,8 +258,8 @@ namespace chatAppTest
 		public void serializeTest() //niekoniecznie tak ten test powinien wyglπdaÊ
 		{
 			ServerChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addUser("Jaú Kowalski");
-			User user2 = chatSystem.addUser("Kasia èdüb≥o");
+			User user1 = chatSystem.addNewUser("Jaú Kowalski");
+			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
 			MessageContent msgContent1 = new TextContent("Heeejoooo");
 			MessageContent msgContent2 = new TextContent("Heeej");
@@ -268,8 +268,8 @@ namespace chatAppTest
 			Message sentMessage2 = chatSystem.sendMessage(savedConversation.getId(), "Kasia èdüb≥o", sentMessage1.getId(), msgContent2, datetime);
 
 			ClientChatSystem clientChatSystem = new ClientChatSystem();
-			User userClient1 = chatSystem.addUser("Jaú Kowalski");
-			User userClient2 = chatSystem.addUser("Kasia èdüb≥o");
+			User userClient1 = clientChatSystem.addNewUser("Jaú Kowalski");
+			User userClient2 = clientChatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedClientConversation = clientChatSystem.addConversation(savedConversation.serialize());
 
 			bool msg1Present = false;
@@ -280,7 +280,7 @@ namespace chatAppTest
 				if (message.getId() == sentMessage1.getId())
 				{
 					msg1Present = true;
-					Assert.IsTrue(message.getUser().getName() == sentMessage1.getUser().getName());
+					Assert.IsTrue(message.getUser() == userClient1);
 					Assert.IsNull(message.getParent());
 					Assert.IsTrue(message.getContent().getData() == sentMessage1.getContent().getData());
 					Assert.IsTrue(message.getTime().Equals(sentMessage1.getTime()));
@@ -288,7 +288,7 @@ namespace chatAppTest
 				else if (message.getId() == sentMessage2.getId())
 				{
 					msg2Present = true;
-					Assert.IsTrue(message.getUser().getName() == sentMessage2.getUser().getName());
+					Assert.IsTrue(message.getUser() == userClient2);
 					Assert.IsTrue(message.getParent().getId() == sentMessage1.getId());
 					Assert.IsTrue(message.getContent().getData() == sentMessage2.getContent().getData());
 					Assert.IsTrue(message.getTime().Equals(sentMessage2.getTime()));

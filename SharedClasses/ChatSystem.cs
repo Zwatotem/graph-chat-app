@@ -9,8 +9,8 @@ namespace ChatModel
 			throw new NotImplementedException();
 		}
 
-		public User addUser(string v)
-		{
+		public User getUser(string v)
+        {
 			throw new NotImplementedException();
 		}
 
@@ -19,7 +19,7 @@ namespace ChatModel
 			throw new NotImplementedException();
 		}
 
-		public User addUserToConversation(string v)
+		public User addUserToConversation(string v, int id)
 		{
 			throw new NotImplementedException();
 		}
