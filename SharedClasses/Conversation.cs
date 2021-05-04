@@ -6,43 +6,74 @@ namespace ChatModel
 {
 	public class Conversation
 	{
-		private string v1;
-		private int v2;
-
+		private string name;
+		private int id;
+		private List<User> users;
+		private Dictionary<int, Message> messages;
+		public string Name
+		{
+			get
+			{
+				return name;
+			}
+			set
+			{
+				name = value;
+			}
+		}
+		public int ID
+		{
+			get
+			{
+				return id;
+			}
+		}
 		public Conversation(string v1, int v2)
 		{
-			this.v1 = v1;
-			this.v2 = v2;
+			this.name = v1;
+			this.id = v2;
 		}
 
 		public int getId()
 		{
-			throw new NotImplementedException();
+			return id;
 		}
 
 		public ICollection<User> getUsers()
 		{
-			throw new NotImplementedException();
+			return users;
 		}
 
 		public string getName()
 		{
-			throw new NotImplementedException();
+			return name;
 		}
 
 		public IEnumerable<Message> getMessages()
 		{
-			throw new NotImplementedException();
+			return messages.Values;
 		}
 
 		public bool matchWithUser(User user1)
 		{
-			throw new NotImplementedException();
+			if (users.Contains(user1))
+				return false;
+			users.Add(user1);
+			return true;
 		}
 
 		public Message addMessage(User user1, int v1, MessageContent messageContent1, DateTime datetime, int v2)
 		{
-			throw new NotImplementedException();
+			if (messages.ContainsKey(v1) && !messages.ContainsKey(v2))
+			{
+				Message message = new Message(user1, messages[v1], messageContent1, datetime, v2);
+				messages.Add(v2, message);
+				return message;
+			}
+			else
+			{
+				return null;
+			}
 		}
 
 		public Message addMessage(object v)
@@ -52,12 +83,22 @@ namespace ChatModel
 
 		public Message getMessage(int v)
 		{
-			throw new NotImplementedException();
+			if(messages.ContainsKey(v))
+				return messages[v];
+			return null;
 		}
 
 		public bool unmatchWithUser(User user1)
 		{
-			throw new NotImplementedException();
+			if(users.Contains(user1))
+			{
+				users.Remove(user1);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		public string serialize()
