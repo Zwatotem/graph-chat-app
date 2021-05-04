@@ -13,7 +13,7 @@ namespace chatAppTest
 			User user1 = new User("Jaœ Kowalski");
 			DateTime datetime = DateTime.Now;
 			MessageContent messageContent1 = new TextContent("Siemka, co tam?");
-			Message message1 = new Message(user1, -1, messageContent1, datetime, 1);
+			Message message1 = new Message(user1, null, messageContent1, datetime, 1);
 			Assert.IsTrue(message1.getId() == 1);
 		}
 
@@ -23,7 +23,7 @@ namespace chatAppTest
 			User user1 = new User("Jaœ Kowalski");
 			DateTime datetime = DateTime.Now;
 			MessageContent messageContent1 = new TextContent("Siemka, co tam?");
-			Message message1 = new Message(user1, -1, messageContent1, datetime, 1);
+			Message message1 = new Message(user1, null, messageContent1, datetime, 1);
 			Assert.IsTrue(message1.getTime() == datetime);
 		}
 
@@ -67,7 +67,7 @@ namespace chatAppTest
 			User user1 = new User("Jaœ Kowalski");
 			DateTime datetime = DateTime.Now;
 			MessageContent messageContent1 = new TextContent("Siemka, co tam?");
-			Message message1 = new Message(user1, -1, messageContent1, datetime, 1);
+			Message message1 = new Message(user1, null, messageContent1, datetime, 1);
 			Assert.IsTrue(message1.getContent() == messageContent1);
 		}
 	}
