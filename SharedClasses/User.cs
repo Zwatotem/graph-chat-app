@@ -6,11 +6,11 @@ namespace ChatModel
 {
 	public class User
 	{
-		private string v;
+		private string name;
 
 		public User(string v)
 		{
-			this.v = v;
+			this.name = v;
 		}
 
 		public ICollection<Conversation> getConversations()

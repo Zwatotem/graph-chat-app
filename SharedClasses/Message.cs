@@ -44,7 +44,7 @@ namespace ChatModel
 
 		public int getId()
 		{
-			return ID;
+			return id;
 		}
 
 		public DateTime getTime()

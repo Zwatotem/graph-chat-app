@@ -32,6 +32,8 @@ namespace ChatModel
 		{
 			this.name = v1;
 			this.id = v2;
+			this.users = new List<User>();
+			this.messages = new Dictionary<int, Message>();
 		}
 
 		public int getId()
@@ -64,9 +66,9 @@ namespace ChatModel
 
 		public Message addMessage(User user1, int v1, MessageContent messageContent1, DateTime datetime, int v2)
 		{
-			if (messages.ContainsKey(v1) && !messages.ContainsKey(v2))
+			if ((messages.ContainsKey(v1) || v1 == -1) && users.Contains(user1) && !messages.ContainsKey(v2))
 			{
-				Message message = new Message(user1, messages[v1], messageContent1, datetime, v2);
+				Message message = new Message(user1, v1 == -1 ? null : messages[v1], messageContent1, datetime, v2);
 				messages.Add(v2, message);
 				return message;
 			}
@@ -83,14 +85,14 @@ namespace ChatModel
 
 		public Message getMessage(int v)
 		{
-			if(messages.ContainsKey(v))
+			if (messages.ContainsKey(v))
 				return messages[v];
 			return null;
 		}
 
 		public bool unmatchWithUser(User user1)
 		{
-			if(users.Contains(user1))
+			if (users.Contains(user1))
 			{
 				users.Remove(user1);
 				return true;

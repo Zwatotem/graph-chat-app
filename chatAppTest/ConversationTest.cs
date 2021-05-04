@@ -42,7 +42,7 @@ namespace chatAppTest
 			Message nextMessage = conversation1.addMessage(user2, 1, msgContent2, datetime2, 2);
 			Assert.IsNotNull(nextMessage);
 			Assert.IsTrue(user2 == nextMessage.getUser());
-			Assert.IsTrue(addedMessage1 == nextMessage.getParent());
+			Assert.IsTrue(addedMessage3 == nextMessage.getParent());
 			Assert.IsTrue(msgContent2 == nextMessage.getContent());
 			Assert.IsTrue(datetime2 == nextMessage.getTime());
 			Assert.IsTrue(2 == nextMessage.getId());
@@ -52,7 +52,7 @@ namespace chatAppTest
 			bool hasWrongMessage = false;
 			foreach (var msg in conversation1.getMessages())
 			{
-				if (msg == addedMessage1)
+				if (msg == addedMessage3)
 					hasMsg1 = true;
 				else if (msg == nextMessage)
 					hasMsg2 = true;
@@ -242,7 +242,7 @@ namespace chatAppTest
 					hasWrongUser = true;
 			}
 			Assert.IsTrue(hasUser1);
-			Assert.IsTrue(hasUser2);
+			Assert.IsFalse(hasUser2);
 			Assert.IsFalse(hasWrongUser);
 			hasUser1 = false;
 			hasUser2 = false;
