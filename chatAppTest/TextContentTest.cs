@@ -1,13 +1,13 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ChatModel;
 
-namespace chatAppTest //test comment
+namespace chatAppTest
 {
 	[TestClass]
 	public class TextContentTest
 	{
 		[TestMethod]
-		void GetDataTest()
+		public void getDataTest()
 		{
 			TextContent content = new TextContent("Alamakota");
 			Assert.AreSame(content.getData(),"Alamakota");

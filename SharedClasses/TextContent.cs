@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace ChatModel
 {
 	public class TextContent : MessageContent //class representing text content of a message, where text is stored in a string
