@@ -1,10 +1,12 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ChatModel;
+using System;
 
 namespace chatAppTest
 {
 	[TestClass]
-	public class ContentTest
+	public class MessageContentTest
 	{
-		// Probably stays empty
+		//probably stays empty
 	}
 }
