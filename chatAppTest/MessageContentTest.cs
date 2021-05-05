@@ -3,8 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace chatAppTest
 {
 	[TestClass]
-	public class ContentTest
+	public class MessageContentTest
 	{
-		// Probably stays empty
+		//probably stays empty
 	}
 }

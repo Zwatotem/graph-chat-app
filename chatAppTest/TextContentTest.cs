@@ -7,7 +7,7 @@ namespace chatAppTest
 	public class TextContentTest
 	{
 		[TestMethod]
-		void GetDataTest()
+		public void getDataTest()
 		{
 			TextContent content = new TextContent("Alamakota");
 			Assert.AreSame(content.getData(),"Alamakota");

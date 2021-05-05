@@ -1,23 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace ChatModel
 {
-	public class TextContent : MessageContent
+	public class TextContent : MessageContent //class representing text content of a message, where text is stored in a string
+													  //objects of this class are immutable
 	{
-		private string v;
+		private string dataString; //field storing the data
 
-		public TextContent(string v)
+		public TextContent(string dataString) //simple constructor
 		{
-			this.v = v;
+			this.dataString = dataString;
 		}
 
-		public object getData()
+		public object getData() //returns the text of a message
 		{
-			throw new NotImplementedException();
+			return dataString;
+		}
+
+		public object serialize() //serializes the object
+		{
+			return dataString;
 		}
 	}
 }
