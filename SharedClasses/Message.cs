@@ -4,21 +4,11 @@ namespace ChatModel
 {
 	public class Message
 	{
-		private Conversation containingConversation;
 		private User author;
-		private int v1;
 		private MessageContent content;
 		private DateTime sentTime;
 		private Message targetedMessage;
 		private int id;
-
-		public Conversation ContainingConversation
-		{
-			get
-			{
-				return containingConversation;
-			}
-		}
 
 		public int ID
 		{
@@ -28,10 +18,10 @@ namespace ChatModel
 			}
 		}
 
-		public Message(User user1, Message targeted, MessageContent messageContent1, DateTime datetime, int id)
+		public Message(User user, Message targeted, MessageContent messageContent, DateTime datetime, int id)
 		{
-			this.author = user1;
-			this.content = messageContent1;
+			this.author = user;
+			this.content = messageContent;
 			this.sentTime = datetime;
 			this.id = id;
 			this.targetedMessage = targeted;

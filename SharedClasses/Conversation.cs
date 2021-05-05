@@ -30,10 +30,10 @@ namespace ChatModel
 				return id;
 			}
 		}
-		public Conversation(string v1, int v2)
+		public Conversation(string name, int id)
 		{
-			this.name = v1;
-			this.id = v2;
+			this.name = name;
+			this.id = id;
 			this.users = new List<User>();
 			this.messages = new Dictionary<int, Message>();
 			this.smallestFreeId = 1;
@@ -59,21 +59,21 @@ namespace ChatModel
 			return messages.Values;
 		}
 
-		public bool matchWithUser(User user1)
+		public bool matchWithUser(User user)
 		{
-			if (users.Contains(user1))
+			if (users.Contains(user))
 				return false;
-			users.Add(user1);
+			users.Add(user);
 			return true;
 		}
 
-		public Message addMessage(User user1, int v1, MessageContent messageContent1, DateTime datetime)
+		public Message addMessage(User user, int parentID, MessageContent messageContent1, DateTime datetime)
 		{
-			int v2 = smallestFreeId;
-			if ((messages.ContainsKey(v1) || v1 == -1) && users.Contains(user1) && !messages.ContainsKey(v2))
+			int newID = smallestFreeId;
+			if ((messages.ContainsKey(parentID) || parentID == -1) && users.Contains(user) && !messages.ContainsKey(newID))
 			{
-				Message message = new Message(user1, v1 == -1 ? null : messages[v1], messageContent1, datetime, v2);
-				messages.Add(v2, message);
+				Message message = new Message(user, parentID == -1 ? null : messages[parentID], messageContent1, datetime, newID);
+				messages.Add(newID, message);
 				smallestFreeId++;
 				return message;
 			}
@@ -88,18 +88,18 @@ namespace ChatModel
 			throw new NotImplementedException();
 		}
 
-		public Message getMessage(int v)
+		public Message getMessage(int id)
 		{
-			if (messages.ContainsKey(v))
-				return messages[v];
+			if (messages.ContainsKey(id))
+				return messages[id];
 			return null;
 		}
 
-		public bool unmatchWithUser(User user1)
+		public bool unmatchWithUser(User user)
 		{
-			if (users.Contains(user1))
+			if (users.Contains(user))
 			{
-				users.Remove(user1);
+				users.Remove(user);
 				return true;
 			}
 			else
@@ -113,7 +113,7 @@ namespace ChatModel
 			throw new NotImplementedException();
 		}
 
-		public Conversation getUpdates(int v)
+		public Conversation getUpdates(int lastMessageId)
 		{
 			throw new NotImplementedException();
 		}
