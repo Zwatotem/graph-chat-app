@@ -20,7 +20,7 @@ namespace ChatModel
 			throw new NotImplementedException();
 		}
 
-		public ICollection<User> getUsers()
+		public List<User> getUsers()
 		{
 			throw new NotImplementedException();
 		}
@@ -36,6 +36,11 @@ namespace ChatModel
 		}
 
 		public bool matchWithUser(User user1)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Message addMessage(User user1, int v1, MessageContent messageContent1, DateTime datetime)
 		{
 			throw new NotImplementedException();
 		}
