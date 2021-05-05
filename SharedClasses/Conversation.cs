@@ -10,6 +10,8 @@ namespace ChatModel
 		private int id;
 		private List<User> users;
 		private Dictionary<int, Message> messages;
+		private int smallestFreeId;
+
 		public string Name
 		{
 			get
@@ -34,6 +36,7 @@ namespace ChatModel
 			this.id = v2;
 			this.users = new List<User>();
 			this.messages = new Dictionary<int, Message>();
+			this.smallestFreeId = 1;
 		}
 
 		public int getId()
@@ -41,7 +44,7 @@ namespace ChatModel
 			return id;
 		}
 
-		public ICollection<User> getUsers()
+		public List<User> getUsers()
 		{
 			return users;
 		}
@@ -51,7 +54,7 @@ namespace ChatModel
 			return name;
 		}
 
-		public IEnumerable<Message> getMessages()
+		public ICollection<Message> getMessages()
 		{
 			return messages.Values;
 		}
@@ -64,12 +67,14 @@ namespace ChatModel
 			return true;
 		}
 
-		public Message addMessage(User user1, int v1, MessageContent messageContent1, DateTime datetime, int v2)
+		public Message addMessage(User user1, int v1, MessageContent messageContent1, DateTime datetime)
 		{
+			int v2 = smallestFreeId;
 			if ((messages.ContainsKey(v1) || v1 == -1) && users.Contains(user1) && !messages.ContainsKey(v2))
 			{
 				Message message = new Message(user1, v1 == -1 ? null : messages[v1], messageContent1, datetime, v2);
 				messages.Add(v2, message);
+				smallestFreeId++;
 				return message;
 			}
 			else

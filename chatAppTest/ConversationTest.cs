@@ -23,12 +23,12 @@ namespace chatAppTest
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			MessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;
-			Message addedMessage1 = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
+			Message addedMessage1 = conversation1.addMessage(user1, -1, msgContent1, datetime);
 			Assert.IsNull(addedMessage1);
 			conversation1.matchWithUser(user1);
-			Message addedMessage2 = conversation1.addMessage(user1, 2, msgContent1, datetime, 1);
+			Message addedMessage2 = conversation1.addMessage(user1, 2, msgContent1, datetime);
 			Assert.IsNull(addedMessage2);
-			Message addedMessage3 = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
+			Message addedMessage3 = conversation1.addMessage(user1, -1, msgContent1, datetime);
 			Assert.IsNotNull(addedMessage3);
 			Assert.IsTrue(user1 == addedMessage3.getUser());
 			Assert.IsNull(addedMessage3.getParent());
@@ -39,7 +39,7 @@ namespace chatAppTest
 			conversation1.matchWithUser(user2);
 			MessageContent msgContent2 = new TextContent("Heeejoooo");
 			DateTime datetime2 = DateTime.Now;
-			Message nextMessage = conversation1.addMessage(user2, 1, msgContent2, datetime2, 2);
+			Message nextMessage = conversation1.addMessage(user2, 1, msgContent2, datetime2);
 			Assert.IsNotNull(nextMessage);
 			Assert.IsTrue(user2 == nextMessage.getUser());
 			Assert.IsTrue(addedMessage3 == nextMessage.getParent());
@@ -73,7 +73,7 @@ namespace chatAppTest
 			Assert.IsNull(conversation1.getMessage(1));
 			MessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;
-			Message addedMessage = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
+			Message addedMessage = conversation1.addMessage(user1, -1, msgContent1, datetime);
 			Assert.IsTrue(addedMessage == conversation1.getMessage(1));
 			Assert.IsNull(conversation1.getMessage(2));
 		}
@@ -313,9 +313,9 @@ namespace chatAppTest
 			DateTime datetime = DateTime.Now;
 			DateTime datetime2 = datetime + TimeSpan.FromSeconds(5);
 			DateTime datetime3 = datetime + TimeSpan.FromSeconds(19);
-			Message sentMessage1 = conversation1.addMessage(user1, -1, msgContent1, datetime, 1);
-			Message sentMessage2 = conversation1.addMessage(user2, 1, msgContent2, datetime2, 2);
-			Message sentMessage3 = conversation1.addMessage(user1, 2, msgContent3, datetime3, 3);
+			Message sentMessage1 = conversation1.addMessage(user1, -1, msgContent1, datetime);
+			Message sentMessage2 = conversation1.addMessage(user2, 1, msgContent2, datetime2);
+			Message sentMessage3 = conversation1.addMessage(user1, 2, msgContent3, datetime3);
 
 			bool hasMessage2 = false;
 			bool hasMessage3 = false;

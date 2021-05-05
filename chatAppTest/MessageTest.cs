@@ -42,8 +42,8 @@ namespace chatAppTest
 			MessageContent messageContent1 = new TextContent("Siemka, co tam?");
 			DateTime datetime2 = datetime + TimeSpan.FromSeconds(4);
 			MessageContent messageContent2 = new TextContent("Ano spoko");
-			Message message1 = conversation1.addMessage(user1, -1, messageContent1, datetime, 1);
-			Message message2 = conversation1.addMessage(user2, 1, messageContent2, datetime2, 2);
+			Message message1 = conversation1.addMessage(user1, -1, messageContent1, datetime);
+			Message message2 = conversation1.addMessage(user2, 1, messageContent2, datetime2);
 
 			Message recreatedMessage1 = conversation2.addMessage(message1.serialize());
 			Message recreatedMessage2 = conversation2.addMessage(message2.serialize());
