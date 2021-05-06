@@ -26,7 +26,7 @@ namespace ChatModel
 			return userName;
 		}
 
-		public ICollection<Conversation> getConversations() //returns the collection of all conversations in which the user takes part.
+		public List<Conversation> getConversations() //returns the collection of all conversations in which the user takes part.
 		{
 			return conversations;
 		}

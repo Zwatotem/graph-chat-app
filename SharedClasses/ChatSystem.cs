@@ -5,10 +5,10 @@ namespace ChatModel
 {
 	public abstract class ChatSystem //abstract class implementing shared properties of client and server chat systems
 	{
-		private Dictionary<int, Conversation> conversations; //dictionary of all conversations in the chat system, indexed by their unique id
-		private List<User> users; //list of all users in the chat system, each has an unique user name
-		private int smallestFreeId; //smallest unique id available to be assigned to a new conversation
-		private Stack<int> freedIds; //stack of conversation ids smaller than current smallest available that were freed be deleting conversations
+		protected Dictionary<int, Conversation> conversations; //dictionary of all conversations in the chat system, indexed by their unique id
+		protected List<User> users; //list of all users in the chat system, each has an unique user name
+		protected int smallestFreeId; //smallest unique id available to be assigned to a new conversation
+		protected Stack<int> freedIds; //stack of conversation ids smaller than current smallest available that were freed be deleting conversations
 
 		public ChatSystem() //simple constructor, initializing collections as empty and setting first available conversation id to 1
         {
@@ -94,6 +94,11 @@ namespace ChatModel
 				owner.matchWithConversation(newConversation); //and the conversation has to be assigned to them
             }
 			return newConversation; //returns created conversation
+		}
+
+		public Conversation addConversation(string v) //creates a copy of a conversation passed as paramter in serialized form (?)
+		{
+			throw new NotImplementedException();
 		}
 
 		public bool addUserToConversation(string userName, int id) //method to add a user with a given user name to a conversation with given id
