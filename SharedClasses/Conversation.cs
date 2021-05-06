@@ -6,48 +6,81 @@ namespace ChatModel
 {
 	public class Conversation
 	{
-		private string v1;
-		private int v2;
+		private string name;
+		private int id;
+		private List<User> users;
+		private Dictionary<int, Message> messages;
+		private int smallestFreeId;
 
-		public Conversation(string v1, int v2)
+		public string Name
 		{
-			this.v1 = v1;
-			this.v2 = v2;
+			get
+			{
+				return name;
+			}
+			set
+			{
+				name = value;
+			}
+		}
+		public int ID
+		{
+			get
+			{
+				return id;
+			}
+		}
+		public Conversation(string name, int id)
+		{
+			this.name = name;
+			this.id = id;
+			this.users = new List<User>();
+			this.messages = new Dictionary<int, Message>();
+			this.smallestFreeId = 1;
 		}
 
 		public int getId()
 		{
-			throw new NotImplementedException();
+			return id;
 		}
 
 		public List<User> getUsers()
 		{
-			throw new NotImplementedException();
+			return users;
 		}
 
 		public string getName()
 		{
-			throw new NotImplementedException();
+			return name;
 		}
 
-		public IEnumerable<Message> getMessages()
+		public ICollection<Message> getMessages()
 		{
-			throw new NotImplementedException();
+			return messages.Values;
 		}
 
-		public bool matchWithUser(User user1)
+		public bool matchWithUser(User user)
 		{
-			throw new NotImplementedException();
+			if (users.Contains(user))
+				return false;
+			users.Add(user);
+			return true;
 		}
 
-		public Message addMessage(User user1, int v1, MessageContent messageContent1, DateTime datetime)
+		public Message addMessage(User user, int parentID, MessageContent messageContent1, DateTime datetime)
 		{
-			throw new NotImplementedException();
-		}
-
-		public Message addMessage(User user1, int v1, MessageContent messageContent1, DateTime datetime, int v2)
-		{
-			throw new NotImplementedException();
+			int newID = smallestFreeId;
+			if ((messages.ContainsKey(parentID) || parentID == -1) && users.Contains(user) && !messages.ContainsKey(newID))
+			{
+				Message message = new Message(user, parentID == -1 ? null : messages[parentID], messageContent1, datetime, newID);
+				messages.Add(newID, message);
+				smallestFreeId++;
+				return message;
+			}
+			else
+			{
+				return null;
+			}
 		}
 
 		public Message addMessage(object v)
@@ -55,14 +88,24 @@ namespace ChatModel
 			throw new NotImplementedException();
 		}
 
-		public Message getMessage(int v)
+		public Message getMessage(int id)
 		{
-			throw new NotImplementedException();
+			if (messages.ContainsKey(id))
+				return messages[id];
+			return null;
 		}
 
-		public bool unmatchWithUser(User user1)
+		public bool unmatchWithUser(User user)
 		{
-			throw new NotImplementedException();
+			if (users.Contains(user))
+			{
+				users.Remove(user);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		public string serialize()
@@ -70,7 +113,7 @@ namespace ChatModel
 			throw new NotImplementedException();
 		}
 
-		public Conversation getUpdates(int v)
+		public Conversation getUpdates(int lastMessageId)
 		{
 			throw new NotImplementedException();
 		}

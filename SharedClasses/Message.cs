@@ -4,39 +4,47 @@ namespace ChatModel
 {
 	public class Message
 	{
-		private User user1;
-		private int v1;
-		private MessageContent messageContent1;
-		private DateTime datetime;
-		private int v2;
+		private User author;
+		private MessageContent content;
+		private DateTime sentTime;
+		private Message targetedMessage;
+		private int id;
 
-		public Message(User user1, int v1, MessageContent messageContent1, DateTime datetime, int v2)
+		public int ID
 		{
-			this.user1 = user1;
-			this.v1 = v1;
-			this.messageContent1 = messageContent1;
-			this.datetime = datetime;
-			this.v2 = v2;
+			get
+			{
+				return ID;
+			}
+		}
+
+		public Message(User user, Message targeted, MessageContent messageContent, DateTime datetime, int id)
+		{
+			this.author = user;
+			this.content = messageContent;
+			this.sentTime = datetime;
+			this.id = id;
+			this.targetedMessage = targeted;
 		}
 
 		public Message getParent()
 		{
-			throw new NotImplementedException();
+			return targetedMessage;
 		}
 
 		public int getId()
 		{
-			throw new NotImplementedException();
+			return id;
 		}
 
 		public DateTime getTime()
 		{
-			throw new NotImplementedException();
+			return sentTime;
 		}
 
 		public MessageContent getContent()
 		{
-			throw new NotImplementedException();
+			return content;
 		}
 
 		public object serialize()
@@ -46,7 +54,7 @@ namespace ChatModel
 
 		public User getUser()
 		{
-			throw new NotImplementedException();
+			return author;
 		}
 	}
 }
