@@ -1,5 +1,5 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ChatModel;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace chatAppTest
 {
@@ -10,7 +10,7 @@ namespace chatAppTest
 		public void getDataTest()
 		{
 			TextContent content = new TextContent("Alamakota");
-			Assert.AreSame(content.getData(),"Alamakota");
+			Assert.AreSame(content.getData(), "Alamakota");
 		}
 	}
 }

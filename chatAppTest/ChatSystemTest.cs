@@ -1,7 +1,6 @@
-using System;
-using System.Collections;
 using ChatModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace chatAppTest
 {
