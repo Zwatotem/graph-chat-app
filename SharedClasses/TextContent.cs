@@ -1,8 +1,7 @@
-﻿
-namespace ChatModel
+﻿namespace ChatModel
 {
 	public class TextContent : MessageContent //class representing text content of a message, where text is stored in a string
-													  //objects of this class are immutable
+											  //objects of this class are immutable
 	{
 		private string dataString; //field storing the data
 

@@ -14,12 +14,12 @@ namespace ChatModel
 		}
 
 		public string Name //first way to get userName
-        {
+		{
 			get
-            {
+			{
 				return userName;
-            }
-        }
+			}
+		}
 
 		public string getName() //second way to get userName
 		{
@@ -31,10 +31,10 @@ namespace ChatModel
 			return conversations;
 		}
 
-		
+
 
 		public bool matchWithConversation(Conversation conversation1) //method to assign a specific conversation to user
-		//return true is assignment successful. If the conversation1 is already assigned to user (or is null), returns false.
+																	  //return true is assignment successful. If the conversation1 is already assigned to user (or is null), returns false.
 		{
 			if (conversation1 == null || conversations.Contains(conversation1))
 				return false;
@@ -43,18 +43,18 @@ namespace ChatModel
 		}
 
 		public bool unmatchWithConversation(Conversation conversation1) //analogus method to remove a conversation from the list of conversations
-		//assigned to a user. Returns true is operation successful. Returns false if conversation1 is null or isn't matched with user 
-		//when calling the method.
+																		//assigned to a user. Returns true is operation successful. Returns false if conversation1 is null or isn't matched with user 
+																		//when calling the method.
 		{
 			if (conversation1 == null || !conversations.Contains(conversation1))
-            {
+			{
 				return false;
-            }
+			}
 			else
-            {
+			{
 				conversations.Remove(conversation1);
 				return true;
-            }
+			}
 		}
 	}
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace ChatModel
@@ -15,13 +14,13 @@ namespace ChatModel
 		}
 
 		public List<Conversation> getConversationsOfUser(string userName) //method to return a list of all conversations of user with user name
-		//passed as parameter. If successful returns the collection, else (eg. if there is no such user) returns null.
+																		  //passed as parameter. If successful returns the collection, else (eg. if there is no such user) returns null.
 		{
 			User user = getUser(userName); //gets reference to the user whose conversations are to be returned
 			if (user == null)
-            {
+			{
 				return null; //if there is no such user, return null
-            }
+			}
 			return user.getConversations(); //returns list the of conversations of specified user.
 		}
 	}
