@@ -280,18 +280,18 @@ namespace chatAppTest
 				if (message.getId() == sentMessage1.getId())
 				{
 					msg1Present = true;
-					Assert.IsTrue(message.getUser() == userClient1);
+					Assert.AreEqual(message.getUser().Name, userClient1.Name); // There is no way serialization keeps references
 					Assert.IsNull(message.getParent());
-					Assert.IsTrue(message.getContent().getData() == sentMessage1.getContent().getData());
-					Assert.IsTrue(message.getTime().Equals(sentMessage1.getTime()));
+					Assert.AreEqual(message.getContent().getData(), sentMessage1.getContent().getData());
+					Assert.AreEqual(message.getTime(), sentMessage1.getTime());
 				}
 				else if (message.getId() == sentMessage2.getId())
 				{
 					msg2Present = true;
-					Assert.IsTrue(message.getUser() == userClient2);
-					Assert.IsTrue(message.getParent().getId() == sentMessage1.getId());
-					Assert.IsTrue(message.getContent().getData() == sentMessage2.getContent().getData());
-					Assert.IsTrue(message.getTime().Equals(sentMessage2.getTime()));
+					Assert.AreEqual(message.getUser().Name, userClient2.Name);
+					Assert.AreEqual(message.getParent().getId(), sentMessage1.getId());
+					Assert.AreEqual(message.getContent().getData(), sentMessage2.getContent().getData());
+					Assert.AreEqual(message.getTime(), sentMessage2.getTime());
 				}
 				else
 					wrongMsgPresent = true;

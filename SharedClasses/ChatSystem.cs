@@ -5,8 +5,8 @@ namespace ChatModel
 {
 	public abstract class ChatSystem //abstract class implementing shared properties of client and server chat systems
 	{
-		private Dictionary<int, Conversation> conversations; //dictionary of all conversations in the chat system, indexed by their unique id
-		private List<User> users; //list of all users in the chat system, each has an unique user name
+		protected Dictionary<int, Conversation> conversations; //dictionary of all conversations in the chat system, indexed by their unique id
+		protected List<User> users; //list of all users in the chat system, each has an unique user name
 		private int smallestFreeId; //smallest unique id available to be assigned to a new conversation
 		private Stack<int> freedIds; //stack of conversation ids smaller than current smallest available that were freed be deleting conversations
 

@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace ChatModel
 {
 	public interface MessageContent //interface representing the content of a message (such as it's text)

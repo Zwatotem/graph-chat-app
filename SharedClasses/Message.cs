@@ -1,22 +1,31 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ChatModel
 {
+	[Serializable]
 	public class Message
 	{
 		private User author;
 		private MessageContent content;
 		private DateTime sentTime;
-		private Message targetedMessage;
+		[NonSerialized] private Message targetedMessage;
+		private int targetId; // Redundant value used to recover the message structure after deserialization
 		private int id;
 
-		public int ID
+		public Message TargetedMessage
 		{
-			get
+			get => targetedMessage;
+			set
 			{
-				return ID;
+				targetedMessage = value;
+				targetId = value == null ? -1 : value.ID;
 			}
 		}
+
+		public int ID { get => id; }
+		public int TargetId { get => targetId; }
 
 		public Message(User user, Message targeted, MessageContent messageContent, DateTime datetime, int id)
 		{
@@ -24,7 +33,7 @@ namespace ChatModel
 			this.content = messageContent;
 			this.sentTime = datetime;
 			this.id = id;
-			this.targetedMessage = targeted;
+			this.TargetedMessage = targeted;
 		}
 
 		public Message getParent()
@@ -47,9 +56,14 @@ namespace ChatModel
 			return content;
 		}
 
-		public object serialize()
+		public MemoryStream serialize()
 		{
-			throw new NotImplementedException();
+			MemoryStream stream = new MemoryStream();
+			var formatter = new BinaryFormatter();
+			formatter.Serialize(stream, this);
+			stream.Flush();
+			stream.Position = 0;
+			return stream;
 		}
 
 		public User getUser()

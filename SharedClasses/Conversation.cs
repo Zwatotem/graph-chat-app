@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ChatModel
 {
+	[Serializable]
 	public class Conversation
 	{
 		private string name;
@@ -83,9 +86,29 @@ namespace ChatModel
 			}
 		}
 
-		public Message addMessage(object v)
+		public Message addMessage(Stream stream)
 		{
-			throw new NotImplementedException();
+			var formatter = new BinaryFormatter();
+			Message mess = (Message)formatter.Deserialize(stream);
+			if (mess != null)
+			{
+				if (mess.ID >= smallestFreeId)
+				{
+					messages.Add(mess.ID, mess);
+					if (messages.ContainsKey(mess.TargetId))
+					{
+						mess.TargetedMessage = messages[mess.TargetId];
+					}
+					else
+					{
+						// Cannot find parent message
+						return null;
+					}
+					smallestFreeId = mess.ID;
+					return mess;
+				}
+			}
+			return null;
 		}
 
 		public Message getMessage(int id)
@@ -108,9 +131,14 @@ namespace ChatModel
 			}
 		}
 
-		public string serialize()
+		public MemoryStream serialize()
 		{
-			throw new NotImplementedException();
+			MemoryStream stream = new MemoryStream();
+			var formatter = new BinaryFormatter();
+			formatter.Serialize(stream, this);
+			stream.Flush();
+			stream.Position = 0;
+			return stream;
 		}
 
 		public Conversation getUpdates(int lastMessageId)

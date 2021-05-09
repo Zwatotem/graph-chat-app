@@ -48,17 +48,17 @@ namespace chatAppTest
 			Message recreatedMessage1 = conversation2.addMessage(message1.serialize());
 			Message recreatedMessage2 = conversation2.addMessage(message2.serialize());
 
-			Assert.IsTrue(recreatedMessage1.getId() == message1.getId());
-			Assert.IsTrue(recreatedMessage1.getUser().getName() == message1.getUser().getName());
+			Assert.AreEqual(recreatedMessage1.getId(), message1.getId()); // There is no way serialization keeps references
+			Assert.AreEqual(recreatedMessage1.getUser().getName(), message1.getUser().getName());
 			Assert.IsNull(recreatedMessage1.getParent());
-			Assert.IsTrue(recreatedMessage1.getContent().getData() == message1.getContent().getData());
-			Assert.IsTrue(recreatedMessage1.getTime() == message1.getTime());
+			Assert.AreEqual(recreatedMessage1.getContent().getData(), message1.getContent().getData());
+			Assert.AreEqual(recreatedMessage1.getTime(), message1.getTime());
 
-			Assert.IsTrue(recreatedMessage2.getId() == message2.getId());
-			Assert.IsTrue(recreatedMessage2.getUser().getName() == message2.getUser().getName());
-			Assert.IsTrue(recreatedMessage2.getParent() == recreatedMessage1);
-			Assert.IsTrue(recreatedMessage2.getContent().getData() == message2.getContent().getData());
-			Assert.IsTrue(recreatedMessage2.getTime() == message2.getTime());
+			Assert.AreEqual(recreatedMessage2.getId(), message2.getId());
+			Assert.AreEqual(recreatedMessage2.getUser().getName(), message2.getUser().getName());
+			Assert.AreEqual(recreatedMessage2.getParent(), recreatedMessage1);
+			Assert.AreEqual(recreatedMessage2.getContent().getData(), message2.getContent().getData());
+			Assert.AreEqual(recreatedMessage2.getTime(), message2.getTime());
 		}
 
 		[TestMethod]
