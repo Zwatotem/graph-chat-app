@@ -94,7 +94,12 @@ namespace ChatModel
 				if (mess.ID >= smallestFreeId)
 				{
 					messages.Add(mess.ID, mess);
-					if (messages.ContainsKey(mess.TargetId))
+					if (mess.TargetId == -1)
+                    {
+						mess.TargetedMessage = null;
+
+					}
+					else if (messages.ContainsKey(mess.TargetId))
 					{
 						mess.TargetedMessage = messages[mess.TargetId];
 					}
