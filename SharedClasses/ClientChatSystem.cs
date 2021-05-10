@@ -37,6 +37,11 @@ namespace ChatModel
 			return userName;
 		}
 
+		public void applyUpdates(User user1)
+        {
+			throw new NotImplementedException();
+		}
+
 		public Conversation addConversation(Stream stream)
 
 		{
