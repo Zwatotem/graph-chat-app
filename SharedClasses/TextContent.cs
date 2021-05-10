@@ -1,5 +1,10 @@
-﻿namespace ChatModel
+
+﻿
+using System;
+
+namespace ChatModel
 {
+	[Serializable]
 	public class TextContent : MessageContent //class representing text content of a message, where text is stored in a string
 											  //objects of this class are immutable
 	{

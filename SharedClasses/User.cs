@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ChatModel
 {
+	[Serializable]
 	public class User //class representing a user of the system
 	{
 		private string userName; //unique name of the user
-		private List<Conversation> conversations; //list of all conversations in which the user participates
+		[NonSerialized] private List<Conversation> conversations; //list of all conversations in which the user participates
 
 		public User(string userName) //constructor setting the name of the user
 		{
