@@ -7,7 +7,7 @@ namespace ChatServer
 {
     class Program
     {
-        static void Main(string[] args)
+        static void MainOld(string[] args)
         {
             byte[] bytes = new Byte[1024];
             IPAddress serverIpAddress = IPAddress.Parse("192.168.42.225");
@@ -23,25 +23,30 @@ namespace ChatServer
                     Socket handler = serverSocket.Accept();
                     string data = null;
                     // An incoming connection needs to be processed.  
-                    bool flag = true;
-                    while (flag)
+                    int headerLength = BitConverter.GetBytes(4).Length;
+                    byte[] headerBytes = new byte[headerLength];
+                    int bytesReceived = 0;
+                    while (bytesReceived < headerLength)
                     {
-                        int bytesRec = handler.Receive(bytes);
-                        Console.WriteLine("Received something...");
-                        data += Encoding.UTF8.GetString(bytes, 0, bytesRec);
-                        if (data.IndexOf("<EOF>") > -1)
-                        {
-                            data = data.Substring(0, data.Length - 5);
-                            break;
-                        }
+                        bytesReceived += handler.Receive(headerBytes, bytesReceived, headerLength - bytesReceived, SocketFlags.None);
                     }
-
+                    int messageLength = BitConverter.ToInt32(headerBytes);
+                    byte[] contentBytes = new byte[messageLength];
+                    bytesReceived = 0;
+                    while (bytesReceived < messageLength)
+                    {
+                        bytesReceived += handler.Receive(contentBytes, bytesReceived, messageLength - bytesReceived, SocketFlags.None);
+                    }
+                    data = Encoding.UTF8.GetString(contentBytes);
                     // Show the data on the console.  
                     Console.WriteLine("Text received : {0}", data);
 
                     // Echo the data back to the client.  
-                    byte[] msg = Encoding.ASCII.GetBytes(data);
-
+                    byte[] msg = BitConverter.GetBytes(2);
+                    handler.Send(msg);
+                    msg = new byte[2];
+                    msg[0] = 0;
+                    msg[1] = 1;
                     handler.Send(msg);
                     handler.Shutdown(SocketShutdown.Both);
                     handler.Close();

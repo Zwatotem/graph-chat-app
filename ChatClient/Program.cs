@@ -7,7 +7,7 @@ namespace ChatClient
 {
     class Program
     {
-        static void Main(string[] args)
+        static void MainOld(string[] args)
         {
             IPAddress serverIpAddress = IPAddress.Parse("192.168.42.225");
             IPEndPoint ipe = new IPEndPoint(serverIpAddress, 50000);
@@ -30,7 +30,7 @@ namespace ChatClient
                 do
                 {
                     bytes = s.Receive(bytesReceived, bytesReceived.Length, 0);
-                    page = page + Encoding.ASCII.GetString(bytesReceived, 0, bytes);
+                    page = page + Encoding.UTF8.GetString(bytesReceived, 0, bytes);
                 }
                 while (bytes > 0);
             }
