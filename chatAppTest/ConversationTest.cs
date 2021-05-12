@@ -257,10 +257,6 @@ namespace chatAppTest
 		[TestMethod]
 		public void serializeTest()
 		{
-			Assert.IsTrue(true); // Testing the CI (remember to revert)
-			return;
-			Assert.IsTrue(true); // Testing the CI (remember to revert)
-			return;
 			ServerChatSystem chatSystem = new ServerChatSystem();
 			User user1 = chatSystem.addNewUser("Jaú Kowalski");
 			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
@@ -311,8 +307,6 @@ namespace chatAppTest
 		[TestMethod]
 		public void getUpdatesTest()
 		{
-			Assert.IsTrue(true); // Testing the CI (remember to revert)
-			return;
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			User user1 = new User("Mr. X");
 			User user2 = new User("Ms. Y");
