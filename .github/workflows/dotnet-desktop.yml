@@ -56,7 +56,7 @@ jobs:
     env:
       Solution_Name: graph-chat-app                             # Replace with your solution name, i.e. MyWpfApp.sln.
       Test_Project_Path: chatAppTest\chatAppTest.csproj         # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      Application_Project_Path: graph-chat-app\graph-chat-app.csproj
+      Application_Project_Path: graph-chat-app\graphChatApp.csproj
 
     steps:
     - name: Checkout
