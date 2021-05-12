@@ -307,19 +307,33 @@ namespace chatAppTest
 		[TestMethod]
 		public void getUpdatesTest()
 		{
+			// Conversation
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
+
+			// Users
 			User user1 = new User("Mr. X");
 			User user2 = new User("Ms. Y");
+			// Matching
+			conversation1.matchWithUser(user1);
+			conversation1.matchWithUser(user2);
+			user1.matchWithConversation(conversation1);
+			user2.matchWithConversation(conversation1);
+
+			// Messages
+			//  Content
 			MessageContent msgContent1 = new TextContent("Heeejoooo");
 			MessageContent msgContent2 = new TextContent("No czeœæ");
 			MessageContent msgContent3 = new TextContent("Co tam s³ychaæ?");
+			//  Timestamps
 			DateTime datetime = DateTime.Now;
 			DateTime datetime2 = datetime + TimeSpan.FromSeconds(5);
 			DateTime datetime3 = datetime + TimeSpan.FromSeconds(19);
+			//  Sending
 			Message sentMessage1 = conversation1.addMessage(user1, -1, msgContent1, datetime);
 			Message sentMessage2 = conversation1.addMessage(user2, 1, msgContent2, datetime2);
 			Message sentMessage3 = conversation1.addMessage(user1, 2, msgContent3, datetime3);
 
+			// Checks
 			bool hasMessage2 = false;
 			bool hasMessage3 = false;
 			bool hasWrongMessage = false;

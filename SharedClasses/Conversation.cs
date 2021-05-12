@@ -8,7 +8,7 @@ using Util;
 namespace ChatModel
 {
 	[Serializable]
-	public class Conversation
+	public class Conversation : IConversation
 	{
 		private string name;
 		private int id;
@@ -156,6 +156,11 @@ namespace ChatModel
 			return null;
 		}
 
+		public Message addMessage(Message m)
+		{
+			return messages.TryAdd(m.ID, m) ? m : null;
+		}
+
 		public bool unmatchWithUser(User user)
 		{
 			if (Users.Contains(user))
@@ -169,7 +174,7 @@ namespace ChatModel
 			}
 		}
 
-		public MemoryStream serialize()
+		public Stream serialize()
 		{
 			MemoryStream stream = new MemoryStream();
 			var formatter = new BinaryFormatter();
@@ -179,9 +184,21 @@ namespace ChatModel
 			return stream;
 		}
 
-		public Conversation getUpdates(int lastMessageId)
+		public ConversationUpdates getUpdates(int lastMessageId)
 		{
-			throw new NotImplementedException();
+			var updates = new ConversationUpdates(Name, ID);
+			var lastMessageTime = getMessage(lastMessageId)?.getTime();
+			foreach (var message in messages.Values)
+			{
+				if (message.getTime() > lastMessageTime)
+				{
+					updates.addMessage(message);
+				}
+			}
+
+			updates.Users = getUsers();
+
+			return updates;
 		}
 	}
 }
