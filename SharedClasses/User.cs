@@ -7,7 +7,7 @@ namespace ChatModel
 	public class User //class representing a user of the system
 	{
 		private string userName; //unique name of the user
-		[NonSerialized] private List<Conversation> conversations; //list of all conversations in which the user participates
+		private List<Conversation> conversations; //list of all conversations in which the user participates
 
 		public User(string userName) //constructor setting the name of the user
 		{

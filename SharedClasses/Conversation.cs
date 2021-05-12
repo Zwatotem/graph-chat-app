@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ChatModel
@@ -16,22 +17,11 @@ namespace ChatModel
 
 		public string Name
 		{
-			get
-			{
-				return name;
-			}
-			set
-			{
-				name = value;
-			}
+			get => name;
+			set => name = value;
 		}
-		public int ID
-		{
-			get
-			{
-				return id;
-			}
-		}
+		public int ID => id;
+
 		public Conversation(string name, int id)
 		{
 			this.name = name;
@@ -97,6 +87,10 @@ namespace ChatModel
 					if (messages.ContainsKey(mess.TargetId))
 					{
 						mess.TargetedMessage = messages[mess.TargetId];
+					}
+					else if (mess.TargetId == -1)
+					{
+						mess.TargetedMessage = null;
 					}
 					else
 					{

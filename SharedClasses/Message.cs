@@ -10,7 +10,7 @@ namespace ChatModel
 		private User author;
 		private MessageContent content;
 		private DateTime sentTime;
-		[NonSerialized] private Message targetedMessage;
+		private Message targetedMessage;
 		private int targetId; // Redundant value used to recover the message structure after deserialization
 		private int id;
 

@@ -281,6 +281,7 @@ namespace chatAppTest
 				{
 					msg1Present = true;
 					Assert.AreEqual(message.getUser().Name, userClient1.Name); // There is no way serialization keeps references
+					Assert.AreSame(message.getUser(), savedClientConversation.getUsers().ToArray()[1]);
 					Assert.IsNull(message.getParent());
 					Assert.AreEqual(message.getContent().getData(), sentMessage1.getContent().getData());
 					Assert.AreEqual(message.getTime(), sentMessage1.getTime());

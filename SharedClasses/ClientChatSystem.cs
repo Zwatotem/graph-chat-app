@@ -43,7 +43,6 @@ namespace ChatModel
 		}
 
 		public Conversation addConversation(Stream stream)
-
 		{
 			BinaryFormatter formatter = new BinaryFormatter();
 			Conversation conv = (Conversation)formatter.Deserialize(stream);
