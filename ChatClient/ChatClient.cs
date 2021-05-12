@@ -78,6 +78,7 @@ namespace ChatClient
             catch (Exception ex)
             {
                 Console.WriteLine("Exception thrown in listener: {0}", ex.Message);
+                Console.WriteLine(ex.StackTrace);
             }
         }
 
@@ -101,6 +102,13 @@ namespace ChatClient
                         case 2: //logIn
                             requestLogIn();
                             break;
+                        case 3: //add conversation
+                            requestAddConversation();
+                            break;
+                        case 11: //test case
+                            chatSystem.getUser("klaus").getConversations().ForEach(c => Console.WriteLine(c.getName()));
+                            chatSystem.getUser("hans").getConversations().ForEach(c => Console.WriteLine(c.getName()));
+                            break;
                     }
                     actionNumber = Convert.ToInt32(Console.ReadLine());
                 }
@@ -109,6 +117,7 @@ namespace ChatClient
             catch (Exception ex)
             {
                 Console.WriteLine("Exception thrown: {0}", ex.Message);
+                Console.WriteLine(ex.StackTrace);
             }
             finally
             {
@@ -182,6 +191,63 @@ namespace ChatClient
             else
             {
                 Console.WriteLine("There is no such user");
+            }
+        }
+
+        public void requestAddConversation()
+        {
+            Console.WriteLine("DEBUG: attempt to {0}", "add conversation");
+            bool response = false;
+            List<byte> contentList = new List<byte>();
+            Console.Write("Enter proposed conversation name: ");
+            string conversationName = Console.ReadLine();
+            foreach (byte b in BitConverter.GetBytes(Encoding.UTF8.GetByteCount(conversationName))) {
+                contentList.Add(b);
+            }
+            foreach (byte b in Encoding.UTF8.GetBytes(conversationName))
+            {
+                contentList.Add(b);
+            }
+            Console.Write("With how many users? ");
+            int usersToAdd = Convert.ToInt32(Console.ReadLine());
+            for (int i = 0; i < usersToAdd; ++i)
+            {
+                Console.WriteLine("Give next user's name: ");
+                string userName = Console.ReadLine();
+                foreach (byte b in BitConverter.GetBytes(Encoding.UTF8.GetByteCount(userName)))
+                {
+                    contentList.Add(b);
+                }
+                foreach (byte b in Encoding.UTF8.GetBytes(userName))
+                {
+                    contentList.Add(b);
+                }
+            }
+            byte[] content = contentList.ToArray();
+            int contentLength = content.Length;
+            byte[] header = new byte[5];
+            header[0] = 3;
+            Array.Copy(BitConverter.GetBytes(contentLength), 0, header, 1, 4);
+            socket.Send(header);
+            socket.Send(content);
+            Console.WriteLine("DEBUG: sending {0} request", "add conversation");
+            lock (this)
+            {
+                while (!responseReady)
+                {
+                    Monitor.Wait(this);
+                }
+                response = responseStatus;
+                responseReady = false;
+                Monitor.Pulse(this);
+            }
+            if (response)
+            {
+                Console.WriteLine("Successfully added conversation: {0}", conversationName);
+            }
+            else
+            {
+                Console.WriteLine("At least one of given users does not exist");
             }
         }
 
