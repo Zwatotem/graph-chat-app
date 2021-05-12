@@ -290,7 +290,9 @@ namespace chatAppTest
 				{
 					msg2Present = true;
 					Assert.AreEqual(message.getUser().Name, userClient2.Name);
-					Assert.AreEqual(message.getParent().getId(), sentMessage1.getId());
+					Assert.IsNotNull(message.getParent().getId()); //to be deleted when test passes
+					Assert.AreEqual(message.TargetId, sentMessage1.getId()); //to be deleted but this passes
+					Assert.AreEqual(message.getParent().getId(), sentMessage1.getId()); //while this causes the test to fail
 					Assert.AreEqual(message.getContent().getData(), sentMessage2.getContent().getData());
 					Assert.AreEqual(message.getTime(), sentMessage2.getTime());
 				}
