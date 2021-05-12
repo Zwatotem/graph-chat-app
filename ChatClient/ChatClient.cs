@@ -3,6 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Collections.Generic;
+using System.IO;
 using ChatModel;
 
 namespace ChatClient
@@ -33,39 +35,41 @@ namespace ChatClient
             try
             {
                 Console.WriteLine("DEBUG: listener thread started");
-                int headerLength = BitConverter.GetBytes(4).Length;
+                int headerLength = BitConverter.GetBytes(4).Length + 1;
                 byte[] headerBytes = new byte[headerLength];
                 lock (this)
                 {
                     while (goOn)
                     {
                         int bytesReceived = 0;
-                        bool continueFlag = false;
-                        while (bytesReceived < headerLength)
-                        {
-                            bytesReceived += socket.Receive(headerBytes, bytesReceived, headerLength - bytesReceived, SocketFlags.None);
-                            if (bytesReceived == 0)
-                            {
-                                continueFlag = true;
-                                break;
-                            }
-                        }     
-                        if (continueFlag)
+                        if (socket.Available == 0)
                         {
                             continue;
                         }
-                        int messageLength = BitConverter.ToInt32(headerBytes);
+                        while (bytesReceived < headerLength)
+                        {
+                            bytesReceived += socket.Receive(headerBytes, bytesReceived, headerLength - bytesReceived, SocketFlags.None);
+                        }
+                        byte type = headerBytes[0];
+                        int messageLength = BitConverter.ToInt32(headerBytes, 1);
                         bytesReceived = 0;
                         while (bytesReceived < messageLength)
                         {
                             bytesReceived += socket.Receive(inBuffer, bytesReceived, messageLength - bytesReceived, SocketFlags.None);
                         } //do poprawy, bufor moze byc za maly
-                        if (inBuffer[0] == (byte)0)
+                        if (type == (byte)1)
                         {
-                            responseStatus = (inBuffer[1] == (byte)0) ? false : true;
+                            Console.WriteLine("DEBUG: listener received boolean response");
+                            responseStatus = (inBuffer[0] == (byte)0) ? false : true;
                             responseReady = true;
                             Monitor.Pulse(this);
                             Monitor.Wait(this);
+                        }
+                        else if (type == (byte)5)
+                        {
+                            Console.WriteLine("DEBUG: listener received serialized conversation");
+                            MemoryStream memStream = new MemoryStream(inBuffer, 0, messageLength);
+                            chatSystem.addConversation(memStream);
                         }
                     }
                     Console.WriteLine("DEBUG: listener thread terminating");
@@ -92,41 +96,15 @@ namespace ChatClient
                     switch (actionNumber)
                     {
                         case 1: //create new user
-                            bool response = false;
-                            string proposedName = null;
-                            while (!response)
-                            {
-                                proposedName = Console.ReadLine();
-                                string request = "newUser:" + proposedName;
-                                byte[] content = Encoding.UTF8.GetBytes(request);
-                                int contentLength = content.Length;
-                                byte[] header = BitConverter.GetBytes(contentLength);
-                                socket.Send(header);
-                                socket.Send(content);
-                                Console.WriteLine("DEBUG: request sent");
-                                lock (this)
-                                {
-                                    while (!responseReady)
-                                    {
-                                        Monitor.Wait(this);
-                                    }
-                                    response = responseStatus;
-                                    responseReady = false;
-                                    Monitor.Pulse(this);
-                                }
-                            }
-                            chatSystem.addNewUser(proposedName);
-                            Console.WriteLine("DEBUG: user added to chatSystem");
+                            requestCreateNewUser();
+                            break;
+                        case 2: //logIn
+                            requestLogIn();
                             break;
                     }
                     actionNumber = Convert.ToInt32(Console.ReadLine());
                 }
-                //send sth let server know about disconnect
-                string endMsgTxt = "disconnect:";
-                byte[] endMsg = Encoding.UTF8.GetBytes(endMsgTxt);
-                socket.Send(BitConverter.GetBytes(endMsg.Length));
-                socket.Send(endMsg);
-                goOn = false;
+                requestDisconnect();
             }
             catch (Exception ex)
             {
@@ -136,6 +114,85 @@ namespace ChatClient
             {
                 socket.Dispose();
             }
+        }
+
+        public void requestCreateNewUser()
+        {
+            Console.WriteLine("DEBUG: attempt to {0}", "add new user");
+            bool response = false;
+            string proposedName = null;
+            while (!response)
+            {
+                Console.Write("Enter proposed name: ");
+                proposedName = Console.ReadLine();
+                byte[] content = Encoding.UTF8.GetBytes(proposedName);
+                int contentLength = content.Length;
+                byte[] header = new byte[5];
+                header[0] = 1;
+                Array.Copy(BitConverter.GetBytes(contentLength), 0, header, 1, 4);
+                socket.Send(header);
+                socket.Send(content);
+                Console.WriteLine("DEBUG: sending {0} request", "add new user");
+                lock (this)
+                {
+                    while (!responseReady)
+                    {
+                        Monitor.Wait(this);
+                    }
+                    response = responseStatus;
+                    responseReady = false;
+                    Monitor.Pulse(this);
+                }
+            }
+            chatSystem.addNewUser(proposedName);
+            Console.WriteLine("Successfully added user: {0}", proposedName);
+        }
+
+        public void requestLogIn()
+        {
+            Console.WriteLine("DEBUG: attempt to {0}", "logIn");
+            bool response = false;
+            string userName = null;
+            Console.Write("Enter your user Name: ");
+            userName = Console.ReadLine();
+            byte[] content = Encoding.UTF8.GetBytes(userName);
+            int contentLength = content.Length;
+            byte[] header = new byte[5];
+            header[0] = 2;
+            Array.Copy(BitConverter.GetBytes(contentLength), 0, header, 1, 4);
+            socket.Send(header);
+            socket.Send(content);
+            Console.WriteLine("DEBUG: sending {0} request", "logIn");
+            lock (this)
+            {
+                while (!responseReady)
+                {
+                    Monitor.Wait(this);
+                }
+                response = responseStatus;
+                responseReady = false;
+                Monitor.Pulse(this);
+            }
+            if (response)
+            {
+                chatSystem.addNewUser(userName);
+                chatSystem.logIn(userName);
+                Console.WriteLine("Successfully loggedIn: {0}", userName);
+            }
+            else
+            {
+                Console.WriteLine("There is no such user");
+            }
+        }
+
+        public void requestDisconnect()
+        {
+            Console.WriteLine("DEBUG: attempt to {0}", "disconnect");
+            goOn = false;
+            byte[] request = new byte[5];
+            request[0] = 0;
+            Array.Copy(BitConverter.GetBytes(0), 0, request, 1, 4);
+            socket.Send(request);
         }
 
         public static void Main(string[] args)

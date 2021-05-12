@@ -88,10 +88,10 @@ namespace ChatServer
         public void listen()
         {
             Console.WriteLine("DEBUG: listener thread started");
-            int headerLength = BitConverter.GetBytes(4).Length;
+            int headerLength = BitConverter.GetBytes(4).Length + 1;
             byte[] headerBytes = new byte[headerLength];
             bool work = true;
-            while (work) //dodac warunek odebrania wiadomosci disconnect
+            while (work) //add check for ungracefull disconnect on client side
             {
                 int bytesReceived = 0;
                 bool continueFlag = false;
@@ -106,56 +106,89 @@ namespace ChatServer
                 }
                 if (continueFlag)
                 {
-                    continue;
-                }          
-                int messageLength = BitConverter.ToInt32(headerBytes);
-                byte[] inBuffer = new byte[messageLength];
-                bytesReceived = 0;
-                while (bytesReceived < messageLength)
-                {
-                    bytesReceived += socket.Receive(inBuffer, bytesReceived, messageLength - bytesReceived, SocketFlags.None);
+                    continue; //here goes the check probably
                 }
-                string message = Encoding.UTF8.GetString(inBuffer);
-                int pos = message.IndexOf(':');
-                string command = message.Substring(0, pos);
-                if (command == "newUser")
+                byte messageType = headerBytes[0];
+                int messageLength = BitConverter.ToInt32(headerBytes, 1);
+                switch (messageType)
                 {
-                    string proposedName = message.Substring(pos + 1);
-                    User newUser = chatSystem.addNewUser(proposedName);
-                    if (newUser == null)
-                    {
-                        byte[] msg = { 0, 0 };
-                        this.speak(msg);
-                    }
-                    else
-                    {
-                        byte[] msg = { 0, 1 };
-                        Console.WriteLine("DEBUG: user added: {0}", newUser.getName());
-                        this.speak(msg);
-                    }
-                }
-                else if (command == "disconnect")
-                {
-                    Console.WriteLine("DEBUG: closing socket");
-                    lock (this)
-                    {
-                        socket.Shutdown(SocketShutdown.Both);
-                        socket.Close();
-                    }
-                    work = false;
-                    chatServer.removeMe(this);
-                }
+                    case 0: //disconnect request
+                        Console.WriteLine("DEBUG: {0} request received", "disconnect");
+                        lock (this)
+                        {
+                            socket.Shutdown(SocketShutdown.Both);
+                            socket.Close();
+                        }
+                        work = false;
+                        chatServer.removeMe(this);
+                        break;
+                    case 1: //add new user request
+                        Console.WriteLine("DEBUG: {0} request received", "add new user");
+                        handleAddNewUser(messageLength);
+                        break;
+                    case 2: //login request
+                        handleLogIn(messageLength);
+                        break;
+                }             
             }
         }
 
-        public void speak(byte[] msg)
+        public void speak(byte type, byte[] msg)
         {
+            byte[] header = new byte[5];
+            header[0] = type;
+            Array.Copy(BitConverter.GetBytes(msg.Length), 0, header, 1, 4);
             lock (this)
             {
-                byte[] header = BitConverter.GetBytes(msg.Length);
                 socket.Send(header);
                 socket.Send(msg);
             }
+        }
+
+        private void handleAddNewUser(int lengthToRead)
+        {
+            byte[] buffer = receiveMessage(lengthToRead);
+            string proposedName = Encoding.UTF8.GetString(buffer);
+            Console.WriteLine("DEBUG: trying to add new user");
+            User newUser = chatSystem.addNewUser(proposedName);       
+            byte[] reply = new byte[1];
+            reply[0] = (newUser == null) ? (byte)0 : (byte)1;
+            speak(1, reply);
+        }
+
+        private void handleLogIn(int lengthToRead)
+        {
+            byte[] buffer = receiveMessage(lengthToRead);
+            string userName = Encoding.UTF8.GetString(buffer);
+            Console.WriteLine("DEBUG: requested logIn");
+            User user = chatSystem.getUser(userName);
+            byte[] reply = new byte[1];
+            if (user == null)
+            {
+                reply[0] = 0;
+            }
+            else
+            {
+                reply[0] = 1;
+                handledUserName = userName;
+                foreach (var conversation in user.getConversations())
+                {
+                    byte[] msg = conversation.serialize().ToArray();
+                    speak(5, msg);
+                }
+            }
+            speak(1, reply);
+        }
+
+        private byte[] receiveMessage(int length)
+        {
+            byte[] buffer = new byte[length];
+            int bytesReceived = 0;
+            while (bytesReceived < length)
+            {
+                bytesReceived += socket.Receive(buffer, bytesReceived, length - bytesReceived, SocketFlags.None);
+            }
+            return buffer;
         }
     }
 }
