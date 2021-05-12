@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using Util;
 
 namespace ChatModel
 {
@@ -11,9 +12,30 @@ namespace ChatModel
 	{
 		private string name;
 		private int id;
-		private List<User> users;
+		private List<Refrence<User>> users;
 		private Dictionary<int, Message> messages;
 		private int smallestFreeId;
+
+		public List<User> Users
+		{
+			get
+			{
+				var list = new List<User>();
+				foreach (var user in users)
+				{
+					list.Add(user);
+				}
+				return list;
+			}
+			set
+			{
+				users = new List<Refrence<User>>();
+				foreach (var user in value)
+				{
+					users.Add(user);
+				}
+			}
+		}
 
 		public string Name
 		{
@@ -26,7 +48,7 @@ namespace ChatModel
 		{
 			this.name = name;
 			this.id = id;
-			this.users = new List<User>();
+			this.users = new List<Refrence<User>>();
 			this.messages = new Dictionary<int, Message>();
 			this.smallestFreeId = 1;
 		}
@@ -38,7 +60,12 @@ namespace ChatModel
 
 		public List<User> getUsers()
 		{
-			return users;
+			return Users;
+		}
+
+		public Refrence<User> getUserRef(User user)
+		{
+			return users.Find(r => r.Reference == user);
 		}
 
 		public string getName()
@@ -53,18 +80,31 @@ namespace ChatModel
 
 		public bool matchWithUser(User user)
 		{
-			if (users.Contains(user))
+			if (Users.Contains(user))
 				return false;
-			users.Add(user);
+			users.Add(new Refrence<User>(user));
 			return true;
+		}
+
+		public bool reMatchWithUser(User user)
+		{
+			var internalUser = Users.Find(u => u.Name == user.Name);
+			if (internalUser != null)
+			{
+				var userRef = getUserRef(internalUser);
+				internalUser.unmatchWithConversation(this);
+				userRef.Reference = user;
+				return true;
+			}
+			return false;
 		}
 
 		public Message addMessage(User user, int parentID, MessageContent messageContent1, DateTime datetime)
 		{
 			int newID = smallestFreeId;
-			if ((messages.ContainsKey(parentID) || parentID == -1) && users.Contains(user) && !messages.ContainsKey(newID))
+			if ((messages.ContainsKey(parentID) || parentID == -1) && Users.Contains(user) && !messages.ContainsKey(newID))
 			{
-				Message message = new Message(user, parentID == -1 ? null : messages[parentID], messageContent1, datetime, newID);
+				Message message = new Message(getUserRef(user), parentID == -1 ? null : messages[parentID], messageContent1, datetime, newID);
 				messages.Add(newID, message);
 				smallestFreeId++;
 				return message;
@@ -85,7 +125,7 @@ namespace ChatModel
 				{
 					messages.Add(mess.ID, mess);
 					if (mess.TargetId == -1)
-                    {
+					{
 						mess.TargetedMessage = null;
 
 					}
@@ -118,9 +158,9 @@ namespace ChatModel
 
 		public bool unmatchWithUser(User user)
 		{
-			if (users.Contains(user))
+			if (Users.Contains(user))
 			{
-				users.Remove(user);
+				users.RemoveAll(r => r.Reference == user);
 				return true;
 			}
 			else
