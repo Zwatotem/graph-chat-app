@@ -6,90 +6,90 @@
 # This workflow will build, test, sign and package a WPF or Windows Forms desktop application
 # built on .NET Core.
 # To learn how to migrate your existing application to .NET Core,
-# refer to httpsdocs.microsoft.comen-usdotnetdesktop-wpfmigrationconvert-project-from-net-framework
+# refer to https://docs.microsoft.com/en-us/dotnet/desktop-wpf/migration/convert-project-from-net-framework
 #
-# To configure this workflow
+# To configure this workflow:
 #
 # 1. Configure environment variables
 # GitHub sets default environment variables for every workflow run.
-# Replace the variables relative to your project in the env section below.
+# Replace the variables relative to your project in the "env" section below.
 #
 # 2. Signing
 # Generate a signing certificate in the Windows Application
 # Packaging Project or add an existing signing certificate to the project.
 # Next, use PowerShell to encode the .pfx file using Base64 encoding
-# by running the following Powershell script to generate the output string
+# by running the following Powershell script to generate the output string:
 #
-# $pfx_cert = Get-Content '.SigningCertificate.pfx' -Encoding Byte
-# [System.Convert]ToBase64String($pfx_cert)  Out-File 'SigningCertificate_Encoded.txt'
+# $pfx_cert = Get-Content '.\SigningCertificate.pfx' -Encoding Byte
+# [System.Convert]::ToBase64String($pfx_cert) | Out-File 'SigningCertificate_Encoded.txt'
 #
 # Open the output file, SigningCertificate_Encoded.txt, and copy the
 # string inside. Then, add the string to the repo as a GitHub secret
-# and name it Base64_Encoded_Pfx.
+# and name it "Base64_Encoded_Pfx."
 # For more information on how to configure your signing certificate for
-# this workflow, refer to httpsgithub.commicrosoftgithub-actions-for-desktop-apps#signing
+# this workflow, refer to https://github.com/microsoft/github-actions-for-desktop-apps#signing
 #
-# Finally, add the signing certificate password to the repo as a secret and name it Pfx_Key.
-# See Build the Windows Application Packaging project below to see how the secret is used.
+# Finally, add the signing certificate password to the repo as a secret and name it "Pfx_Key".
+# See "Build the Windows Application Packaging project" below to see how the secret is used.
 #
-# For more information on GitHub Actions, refer to httpsgithub.comfeaturesactions
-# For a complete CICD sample to get started with GitHub Action workflows for Desktop Applications,
-# refer to httpsgithub.commicrosoftgithub-actions-for-desktop-apps
+# For more information on GitHub Actions, refer to https://github.com/features/actions
+# For a complete CI/CD sample to get started with GitHub Action workflows for Desktop Applications,
+# refer to https://github.com/microsoft/github-actions-for-desktop-apps
 
-name .NET Core Desktop
+name: .NET Core Desktop
 
-on
-  push
-  pull_request
+on:
+  push:
+  pull_request:
 
-jobs
+jobs:
 
-  build
+  build:
 
-    strategy
-      matrix
-        configuration [Debug, Release]
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
 
-    runs-on windows-latest  # For a list of available runner types, refer to
-                             # httpshelp.github.comenactionsreferenceworkflow-syntax-for-github-actions#jobsjob_idruns-on
+    runs-on: windows-latest  # For a list of available runner types, refer to
+                             # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
-    env
-      Solution_Name graph-chat-app                             # Replace with your solution name, i.e. MyWpfApp.sln.
-      Test_Project_Path chatAppTestchatAppTest.csproj         # Replace with the path to your test project, i.e. MyWpfApp.TestsMyWpfApp.Tests.csproj.
-      Application_Project_Path graph-chat-appgraphChatApp.csproj
+    env:
+      Solution_Name: graph-chat-app                             # Replace with your solution name, i.e. MyWpfApp.sln.
+      Test_Project_Path: chatAppTest\chatAppTest.csproj         # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      Application_Project_Path: graph-chat-app\graphChatApp.csproj
 
-    steps
-    - name Checkout
-      uses actionscheckout@v2
-      with
-        fetch-depth 0
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     # Install the .NET Core workload
-    - name Install .NET Core
-      uses actionssetup-dotnet@v1
-      with
-        dotnet-version 5.0.x
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
 
-    # Add  MSBuild to the PATH httpsgithub.commicrosoftsetup-msbuild
-    - name Setup MSBuild.exe
-      uses microsoftsetup-msbuild@v1.0.2
+    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
 
     # Execute all unit tests in the solution
-    - name Execute unit tests
-      run dotnet test
+    - name: Execute unit tests
+      run: dotnet test
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
-    - name Restore the application
-      run msbuild $envSolution_Name tRestore pConfiguration=$envConfiguration
-      env
-        Configuration ${{ matrix.configuration }}
+    - name: Restore the application
+      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+      env:
+        Configuration: ${{ matrix.configuration }}
 
-    - name Build the application
-      run msbuild $envApplication_Project_Path pConfiguration=$envConfiguration
+    - name: Build the application
+      run: msbuild $env:Application_Project_Path /p:Configuration=$env:Configuration
 
-    # Upload the MSIX package httpsgithub.commarketplaceactionsupload-artifact
-    - name Upload build artifacts
-      uses actionsupload-artifact@v2
-      with
-        name Windows executable
-        path ${{ env.Application_Project_Path }}AppPackages
+    # Upload the MSIX package: https://github.com/marketplace/actions/upload-artifact
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Windows executable
+        path: ${{ env.Application_Project_Path }}\AppPackages
