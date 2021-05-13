@@ -50,25 +50,23 @@ namespace ChatModel
 			{
 				return null;
 			}
-			var newUsers = new List<User>();
+			var newUsers = new List<User>(); // List of overlapping User objects
 			foreach (var user in conv.getUsers())
 			{
 				Predicate<User> p = (u => u.Name == user.Name);
 				if (users.Exists(p))
 				{
-					newUsers.Add(users.Find(p));
+					newUsers.Add(users.Find(p)); // Collect the users we'll inject to the new Conversation
 				}
 				else
 				{
-					users.Add(user); // Won't use add new user, to save the reference
+					users.Add(user); // Won't use addNewUser(), to keep conv's reference
 				}
 			}
 			foreach(var user in newUsers)
 			{
 				// Replace 'new' users with ones, that we already have
-				Predicate<User> p = (u => u.Name == user.Name);
-				conv.unmatchWithUser(conv.getUsers().Find(p));
-				conv.matchWithUser(user);
+				conv.reMatchWithUser(user);
 				user.matchWithConversation(conv);
 			}
 			conversations.Add(conv.ID, conv);
