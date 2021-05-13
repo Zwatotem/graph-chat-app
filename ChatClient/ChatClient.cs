@@ -105,6 +105,9 @@ namespace ChatClient
                         case 3: //add conversation
                             requestAddConversation();
                             break;
+                        case 4: //add user to conversation
+                            requestAddUserToConversation();
+                            break;
                         case 11: //test case
                             chatSystem.getUser("klaus").getConversations().ForEach(c => Console.WriteLine(c.getName()));
                             chatSystem.getUser("hans").getConversations().ForEach(c => Console.WriteLine(c.getName()));
@@ -249,6 +252,11 @@ namespace ChatClient
             {
                 Console.WriteLine("At least one of given users does not exist");
             }
+        }
+
+        public void requestAddUserToConversation()
+        {
+
         }
 
         public void requestDisconnect()

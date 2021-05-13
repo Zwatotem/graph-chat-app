@@ -40,6 +40,7 @@ namespace ChatServer
                 while (true)
                 {
                     Socket newSocket = socket.Accept();
+                    Console.WriteLine(((IPEndPoint)newSocket.LocalEndPoint).Port);
                     HandlerThread newHandler = new HandlerThread(chatSystem, newSocket, this);
                     handlers.Add(newHandler);
                 }
@@ -134,6 +135,10 @@ namespace ChatServer
                         Console.WriteLine("DEBUG: {0} request received", "add new conversation");
                         handleAddConversation(messageLength);
                         break;
+                    case 4: //add user to conversation request
+                        Console.WriteLine("DEBUG: {0} request received", "add user to conversation");
+                        handleAddUserToConversation(messageLength);
+                        break;
                 }             
             }
         }
@@ -217,6 +222,30 @@ namespace ChatServer
                 {
                     handler.speak(5, msg);
                 }
+            }
+            speak(1, reply);
+        }
+
+        public void handleAddUserToConversation(int lengthToRead)
+        {
+            byte[] buffer = receiveMessage(lengthToRead);
+            int conversationId = BitConverter.ToInt32(buffer, 0);
+            Conversation conversation = chatSystem.getConversation(conversationId);
+            string nameToAdd = Encoding.UTF8.GetString(buffer, 4, buffer.Length - 4);
+            Console.WriteLine("DEBUG: trying to add user to conversation");
+            byte[] reply = new byte[1];
+            if(chatSystem.addUserToConversation(nameToAdd, conversationId))
+            {
+                reply[0] = 1;
+                byte[] msg = buffer;
+                foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.handledUserName)))
+                {
+                    handler.speak(4, msg);
+                }
+            }
+            else
+            {
+                reply[0] = 0;
             }
             speak(1, reply);
         }
