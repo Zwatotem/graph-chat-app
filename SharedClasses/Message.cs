@@ -1,18 +1,36 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using Util;
 
 namespace ChatModel
 {
 	[Serializable]
 	public class Message
 	{
+		private Refrence<User> authorRef; // Helper for merging user lists after Conversation deserialization
 		private User author;
 		private MessageContent content;
 		private DateTime sentTime;
-		[NonSerialized] private Message targetedMessage;
+		private Message targetedMessage;
 		private int targetId; // Redundant value used to recover the message structure after deserialization
 		private int id;
+
+		public User Author
+		{
+			get
+			{
+				if (authorRef.Reference == null) // Author was probably removed from the conversation
+				{
+					return author;
+				}
+				else if (authorRef.Reference != author) // Conversation was merged with a new ChatSystem
+				{
+					author = authorRef.Reference;
+				}
+				return author;
+			}
+		}
 
 		public Message TargetedMessage
 		{
@@ -30,6 +48,15 @@ namespace ChatModel
 		public Message(User user, Message targeted, MessageContent messageContent, DateTime datetime, int id)
 		{
 			this.author = user;
+			this.content = messageContent;
+			this.sentTime = datetime;
+			this.id = id;
+			this.TargetedMessage = targeted;
+		}
+
+		public Message(Refrence<User> user, Message targeted, MessageContent messageContent, DateTime datetime, int id)
+		{
+			this.authorRef = user;
 			this.content = messageContent;
 			this.sentTime = datetime;
 			this.id = id;
@@ -68,7 +95,7 @@ namespace ChatModel
 
 		public User getUser()
 		{
-			return author;
+			return Author;
 		}
 	}
 }

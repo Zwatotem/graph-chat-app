@@ -93,3 +93,4 @@ jobs:
       with:
         name: Windows executable
         path: ${{ env.Application_Project_Path }}\AppPackages
+
