@@ -61,9 +61,34 @@ namespace ChatModel
 			return null;
 		}
 
-		public Message addMessage(Message m)
+		/// <summary>
+		/// Adds a specified message to the conversation.
+		/// </summary>
+		/// <remarks>
+		/// <strong>The specified message will be added despite not matching a valid parent.</strong>
+		/// </remarks>
+		/// <param name="m">Message object to add</param>
+		/// <returns>Message that was added, or <c>null</c>null in case of error.</returns>
+		public Message addMessageUnsafe(Message m)
 		{
-			return messages.TryAdd(m.ID, m) ? m : null;
+			var result = messages.TryAdd(m.ID, m);
+			if (result)
+			{
+				m.AuthorRef = users.Find(u => u.Name == m.Author.Name);
+			}
+			m.TargetedMessage = messages.GetValueOrDefault(m.TargetId, null);
+			return result ? m : null;
+		}
+
+		/// <summary>
+		/// Fixes the internal structure of messages
+		/// </summary>
+		public void converge()
+		{
+			foreach (Message message in messages.Values)
+			{
+				message.TargetedMessage = messages.GetValueOrDefault(message.TargetId, null);
+			}
 		}
 
 		public Stream serialize()

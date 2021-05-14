@@ -12,7 +12,7 @@ namespace ChatModel
 		string getName();
 		ICollection<Message> getMessages();
 		Message getMessage(int id);
-		Message addMessage(Message m);
+		Message addMessageUnsafe(Message m);
 		Stream serialize();
 	}
 }
