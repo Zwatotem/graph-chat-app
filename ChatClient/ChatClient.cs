@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
 using ChatModel;
@@ -13,6 +14,8 @@ namespace ChatClient
     {
         private IPEndPoint serverEndPoint;
         private Socket socket;
+        private ReaderWriterLock readWriteLock;
+        private int lockTimeout;
         private ClientChatSystem chatSystem;
         private byte[] inBuffer;
         private bool responseReady;
@@ -23,6 +26,8 @@ namespace ChatClient
         ChatClient(string serverIpText, int portNumber)
         {
             serverEndPoint = new IPEndPoint(IPAddress.Parse(serverIpText), portNumber);
+            readWriteLock = new ReaderWriterLock();
+            lockTimeout = 10000;
             chatSystem = new ClientChatSystem();
             Console.WriteLine("DEBUG: chatSystem created");
             inBuffer = new Byte[1024 * 1024];
@@ -71,7 +76,17 @@ namespace ChatClient
                             int conversationId = BitConverter.ToInt32(inBuffer, 0);
                             Conversation conversation = chatSystem.getConversation(conversationId);
                             string nameToRemove = Encoding.UTF8.GetString(inBuffer, 4, messageLength - 4);
-                            if (!chatSystem.leaveConversation(nameToRemove, conversationId))
+                            bool result = false;
+                            try
+                            {
+                                readWriteLock.AcquireWriterLock(lockTimeout);
+                                result = chatSystem.leaveConversation(nameToRemove, conversationId);
+                            }
+                            finally
+                            {
+                                readWriteLock.ReleaseWriterLock();
+                            }
+                            if (!result)
                             {
                                 Console.WriteLine("ERROR: something unexpected in {0}", "user to remove");
                             }
@@ -84,9 +99,26 @@ namespace ChatClient
                             string nameToAdd = Encoding.UTF8.GetString(inBuffer, 4, messageLength - 4);
                             if (chatSystem.getUser(nameToAdd) == null)
                             {
-                                chatSystem.addNewUser(nameToAdd);
+                                try
+                                {
+                                    readWriteLock.AcquireWriterLock(lockTimeout);
+                                    chatSystem.addNewUser(nameToAdd);
+                                } finally
+                                {
+                                    readWriteLock.ReleaseWriterLock();
+                                }                             
                             }
-                            if(!chatSystem.addUserToConversation(nameToAdd, conversationId))
+                            bool result = false;
+                            try
+                            {
+                                readWriteLock.AcquireWriterLock(lockTimeout);
+                                result = chatSystem.addUserToConversation(nameToAdd, conversationId);
+                            }
+                            finally
+                            {
+                                readWriteLock.ReleaseWriterLock();
+                            }
+                            if (!result)
                             {
                                 Console.WriteLine("ERROR: something unexpected in {0}", "user to add");
                             }
@@ -95,7 +127,17 @@ namespace ChatClient
                         {
                             Console.WriteLine("DEBUG: listener received serialized conversation");
                             MemoryStream memStream = new MemoryStream(inBuffer, 0, messageLength);
-                            if(chatSystem.addConversation(memStream) == null)
+                            Conversation result;
+                            try
+                            {
+                                readWriteLock.AcquireWriterLock(lockTimeout);
+                                result = chatSystem.addConversation(memStream);
+                            }
+                            finally
+                            {
+                                readWriteLock.ReleaseWriterLock();
+                            }
+                            if (result == null)
                             {
                                 Console.WriteLine("ERROR: something unexpected in {0}", "serialized conversation");
                             }
@@ -106,7 +148,20 @@ namespace ChatClient
                             int conversationId = BitConverter.ToInt32(inBuffer, 0);
                             MemoryStream memStream = new MemoryStream(inBuffer, 4, messageLength - 4);
                             Conversation conversation = chatSystem.getConversation(conversationId);
-                            if (conversation == null || conversation.addMessage(memStream) == null) 
+                            Message result = null;
+                            if (conversation != null)
+                            {
+                                try
+                                {
+                                    readWriteLock.AcquireWriterLock(lockTimeout);
+                                    result = conversation.addMessage(memStream);
+                                }
+                                finally
+                                {
+                                    readWriteLock.ReleaseWriterLock();
+                                }
+                            }
+                            if (conversation == null || result == null)
                             {
                                 Console.WriteLine("ERROR: something unexpected in {0}", "serialized message");
                             }
@@ -176,42 +231,51 @@ namespace ChatClient
             }
         }
 
-        public void requestCreateNewUser()
-        {
+        public async void requestCreateNewUser()
+        {            
             Console.WriteLine("DEBUG: attempt to {0}", "add new user");
-            bool response = false;
             string proposedName = null;
-            while (!response)
+            Console.Write("Enter proposed name: ");
+            proposedName = Console.ReadLine();
+            byte[] content = Encoding.UTF8.GetBytes(proposedName);
+            int contentLength = content.Length;
+            byte[] header = new byte[5];
+            header[0] = 1;
+            Array.Copy(BitConverter.GetBytes(contentLength), 0, header, 1, 4);
+            socket.Send(header);
+            socket.Send(content);
+            Console.WriteLine("DEBUG: sending {0} request", "add new user");
+            bool response = await Task.Run(() =>
             {
-                Console.Write("Enter proposed name: ");
-                proposedName = Console.ReadLine();
-                byte[] content = Encoding.UTF8.GetBytes(proposedName);
-                int contentLength = content.Length;
-                byte[] header = new byte[5];
-                header[0] = 1;
-                Array.Copy(BitConverter.GetBytes(contentLength), 0, header, 1, 4);
-                socket.Send(header);
-                socket.Send(content);
-                Console.WriteLine("DEBUG: sending {0} request", "add new user");
                 lock (this)
                 {
                     while (!responseReady)
                     {
                         Monitor.Wait(this);
                     }
-                    response = responseStatus;
+                    bool rsp = responseStatus;
                     responseReady = false;
+                    if (rsp)
+                    {
+                        chatSystem.addNewUser(proposedName);
+                    }
                     Monitor.Pulse(this);
+                    return rsp;
                 }
+            });
+            if (response)
+            {
+                Console.WriteLine("Successfully added user: {0}", proposedName);
             }
-            chatSystem.addNewUser(proposedName);
-            Console.WriteLine("Successfully added user: {0}", proposedName);
+            else
+            {
+                Console.WriteLine("Username already taken: {0}", proposedName);
+            }
         }
 
-        public void requestLogIn()
+        public async void requestLogIn()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "logIn");
-            bool response = false;
             string userName = null;
             Console.Write("Enter your user Name: ");
             userName = Console.ReadLine();
@@ -223,20 +287,27 @@ namespace ChatClient
             socket.Send(header);
             socket.Send(content);
             Console.WriteLine("DEBUG: sending {0} request", "logIn");
-            lock (this)
+            bool response = await Task.Run(() =>
             {
-                while (!responseReady)
+                lock (this)
                 {
-                    Monitor.Wait(this);
+                    while (!responseReady)
+                    {
+                        Monitor.Wait(this);
+                    }
+                    bool rsp = responseStatus;
+                    responseReady = false;
+                    if (rsp)
+                    {
+                        chatSystem.addNewUser(userName);
+                        chatSystem.logIn(userName);
+                    }
+                    Monitor.Pulse(this);
+                    return rsp;
                 }
-                response = responseStatus;
-                responseReady = false;
-                Monitor.Pulse(this);
-            }
+            });
             if (response)
             {
-                chatSystem.addNewUser(userName);
-                chatSystem.logIn(userName);
                 Console.WriteLine("Successfully loggedIn: {0}", userName);
             }
             else
@@ -245,14 +316,14 @@ namespace ChatClient
             }
         }
 
-        public void requestAddConversation()
+        public async void requestAddConversation()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "add conversation");
-            bool response = false;
             List<byte> contentList = new List<byte>();
             Console.Write("Enter proposed conversation name: ");
             string conversationName = Console.ReadLine();
-            foreach (byte b in BitConverter.GetBytes(Encoding.UTF8.GetByteCount(conversationName))) {
+            foreach (byte b in BitConverter.GetBytes(Encoding.UTF8.GetByteCount(conversationName)))
+            {
                 contentList.Add(b);
             }
             foreach (byte b in Encoding.UTF8.GetBytes(conversationName))
@@ -282,16 +353,20 @@ namespace ChatClient
             socket.Send(header);
             socket.Send(content);
             Console.WriteLine("DEBUG: sending {0} request", "add conversation");
-            lock (this)
+            bool response = await Task.Run(() =>
             {
-                while (!responseReady)
+                lock (this)
                 {
-                    Monitor.Wait(this);
+                    while (!responseReady)
+                    {
+                        Monitor.Wait(this);
+                    }
+                    bool rsp = responseStatus;
+                    responseReady = false;
+                    Monitor.Pulse(this);
+                    return rsp;
                 }
-                response = responseStatus;
-                responseReady = false;
-                Monitor.Pulse(this);
-            }
+            });
             if (response)
             {
                 Console.WriteLine("Successfully added conversation: {0}", conversationName);
@@ -302,18 +377,34 @@ namespace ChatClient
             }
         }
 
-        public void requestAddUserToConversation()
+        public async void requestAddUserToConversation()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "add user to conversation");
-            bool response = false;
-            string yourName = chatSystem.getUserName();
-            if (yourName == null)
+            string yourName = null;
+            bool loggedIn = await Task.Run(() =>
             {
-                Console.WriteLine("You must be logged in first!");
+                try
+                {
+                    readWriteLock.AcquireReaderLock(lockTimeout);
+                    yourName = chatSystem.getUserName();
+                    if (yourName == null)
+                    {
+                        Console.WriteLine("You must be logged in first!");
+                        return false;
+                    }
+                    Console.WriteLine("Here is the list of your conversations:");
+                    chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+                }
+                finally
+                {
+                    readWriteLock.ReleaseReaderLock();
+                }
+                return true;
+            });
+            if (!loggedIn)
+            {
                 return;
             }
-            Console.WriteLine("Here is the list of your conversations:");
-            chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
             Console.Write("Give the id of conversation to which you want to add user: ");
             int conversationId = Convert.ToInt32(Console.ReadLine());
             Console.Write("Give the user name of the user you want to add: ");
@@ -328,16 +419,20 @@ namespace ChatClient
             socket.Send(header);
             socket.Send(content);
             Console.WriteLine("DEBUG: sending {0} request", "add user to conversation");
-            lock (this)
+            bool response = await Task.Run(() =>
             {
-                while (!responseReady)
+                lock (this)
                 {
-                    Monitor.Wait(this);
+                    while (!responseReady)
+                    {
+                        Monitor.Wait(this);
+                    }
+                    bool rsp = responseStatus;
+                    responseReady = false;
+                    Monitor.Pulse(this);
+                    return rsp;
                 }
-                response = responseStatus;
-                responseReady = false;
-                Monitor.Pulse(this);
-            }
+            });
             if (response)
             {
                 Console.WriteLine("Successfully added user to conversation: {0}", userName);
@@ -348,18 +443,34 @@ namespace ChatClient
             }
         }
 
-        public void requestLeaveConversation()
+        public async void requestLeaveConversation()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "leave conversation");
-            bool response = false;
-            string yourName = chatSystem.getUserName();
-            if (yourName == null)
+            string yourName = null;
+            bool loggedIn = await Task.Run(() =>
             {
-                Console.WriteLine("You must be logged in first!");
+                try
+                {
+                    readWriteLock.AcquireReaderLock(lockTimeout);
+                    yourName = chatSystem.getUserName();
+                    if (yourName == null)
+                    {
+                        Console.WriteLine("You must be logged in first!");
+                        return false;
+                    }
+                    Console.WriteLine("Here is the list of your conversations:");
+                    chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+                }
+                finally
+                {
+                    readWriteLock.ReleaseReaderLock();
+                }
+                return true;
+            });
+            if (!loggedIn)
+            {
                 return;
             }
-            Console.WriteLine("Here is the list of your conversations:");
-            chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
             Console.Write("Give the id of conversation you want to leave: ");
             int conversationId = Convert.ToInt32(Console.ReadLine());
             byte[] content = BitConverter.GetBytes(conversationId);
@@ -369,19 +480,26 @@ namespace ChatClient
             socket.Send(header);
             socket.Send(content);
             Console.WriteLine("DEBUG: sending {0} request", "leave conversation");
-            lock (this)
+            bool response = await Task.Run(() =>
             {
-                while (!responseReady)
+                lock (this)
                 {
-                    Monitor.Wait(this);
+                    while (!responseReady)
+                    {
+                        Monitor.Wait(this);
+                    }
+                    bool rsp = responseStatus;
+                    responseReady = false;
+                    if (rsp)
+                    {
+                        chatSystem.leaveConversation(yourName, conversationId);
+                    }
+                    Monitor.Pulse(this);
+                    return rsp;
                 }
-                response = responseStatus;
-                responseReady = false;
-                Monitor.Pulse(this);
-            }
+            });
             if (response)
-            {
-                chatSystem.leaveConversation(yourName, conversationId);
+            {             
                 Console.WriteLine("Successfully left conversation");
             }
             else
@@ -390,25 +508,52 @@ namespace ChatClient
             }
         }
 
-        public void requestSendTextMessage()
+        public async void requestSendTextMessage()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "send message");
-            bool response = false;
-            string yourName = chatSystem.getUserName();
-            if (yourName == null)
+            string yourName = null;
+            bool loggedIn = await Task.Run(() =>
             {
-                Console.WriteLine("You must be logged in first!");
+                try
+                {
+                    readWriteLock.AcquireReaderLock(lockTimeout);
+                    yourName = chatSystem.getUserName();
+                    if (yourName == null)
+                    {
+                        Console.WriteLine("You must be logged in first!");
+                        return false;
+                    }
+                    Console.WriteLine("Here is the list of your conversations:");
+                    chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+                }
+                finally
+                {
+                    readWriteLock.ReleaseReaderLock();
+                }
+                return true;
+            });
+            if (!loggedIn)
+            {
                 return;
             }
-            Console.WriteLine("Here is the list of your conversations:");
-            chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
             Console.Write("Give the id of conversation where you want to send message: ");
             int conversationId = Convert.ToInt32(Console.ReadLine());
             Console.WriteLine("Here is the list of messages in your conversations:");
-            foreach(var message in chatSystem.getConversation(conversationId).getMessages())
+            await Task.Run(() =>
             {
-                Console.WriteLine("{0}: {1}", message.ID, message.getContent().getData());
-            }
+                try
+                {
+                    readWriteLock.AcquireReaderLock(lockTimeout);
+                    foreach (var message in chatSystem.getConversation(conversationId).getMessages())
+                    {
+                        Console.WriteLine("{0}: {1}", message.ID, message.getContent().getData());
+                    }
+                }
+                finally
+                {
+                    readWriteLock.ReleaseReaderLock();
+                }
+            });      
             Console.Write("Give the id of the message you want to target: ");
             int messageId = Convert.ToInt32(Console.ReadLine());
             Console.WriteLine("Enter the text of the message:");
@@ -425,16 +570,20 @@ namespace ChatClient
             socket.Send(header);
             socket.Send(content);
             Console.WriteLine("DEBUG: sending {0} request", "send message");
-            lock (this)
+            bool response = await Task.Run(() =>
             {
-                while (!responseReady)
+                lock (this)
                 {
-                    Monitor.Wait(this);
+                    while (!responseReady)
+                    {
+                        Monitor.Wait(this);
+                    }
+                    bool rsp = responseStatus;
+                    responseReady = false;
+                    Monitor.Pulse(this);
+                    return rsp;
                 }
-                response = responseStatus;
-                responseReady = false;
-                Monitor.Pulse(this);
-            }
+            });
             if (response)
             {
                 Console.WriteLine("Successfully sent message");

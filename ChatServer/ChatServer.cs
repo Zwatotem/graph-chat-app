@@ -40,7 +40,7 @@ namespace ChatServer
                 while (true)
                 {
                     Socket newSocket = socket.Accept();
-                    Console.WriteLine(((IPEndPoint)newSocket.LocalEndPoint).Port);
+                    //Console.WriteLine(((IPEndPoint)newSocket.LocalEndPoint).Port);
                     HandlerThread newHandler = new HandlerThread(chatSystem, newSocket, this);
                     handlers.Add(newHandler);
                 }
