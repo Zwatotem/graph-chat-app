@@ -41,7 +41,7 @@ namespace ChatServer
                 {
                     while (handlers.Count == 5)
                     {
-                        Thread.Yield();
+                        Thread.Sleep(1000);
                     }
                     Socket newSocket = socket.Accept();
                     //Console.WriteLine(((IPEndPoint)newSocket.LocalEndPoint).Port);
@@ -265,12 +265,12 @@ namespace ChatServer
             Console.WriteLine("DEBUG: trying to add user to conversation");
             byte[] reply = new byte[1];
             lock (chatServer)
-            {
-                Conversation conversation = chatSystem.getConversation(conversationId);
+            {               
                 if (chatSystem.addUserToConversation(nameToAdd, conversationId))
                 {
                     reply[0] = 1;
                     byte[] msg = buffer;
+                    Conversation conversation = chatSystem.getConversation(conversationId);
                     foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.handledUserName)))
                     {
                         if (handler.handledUserName == nameToAdd)
@@ -300,8 +300,7 @@ namespace ChatServer
             Console.WriteLine("DEBUG: trying to remove user from conversation");
             byte[] reply = new byte[1];
             lock (chatServer)
-            {
-                Conversation conversation = chatSystem.getConversation(conversationId);
+            {              
                 if (chatSystem.leaveConversation(userName, conversationId))
                 {
                     reply[0] = 1;
@@ -309,6 +308,7 @@ namespace ChatServer
                     byte[] msg = new byte[messageLength];
                     Array.Copy(buffer, 0, msg, 0, 4);
                     Array.Copy(Encoding.UTF8.GetBytes(userName), 0, msg, 4, messageLength - 4);
+                    Conversation conversation = chatSystem.getConversation(conversationId);
                     foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.handledUserName)))
                     {
                         handler.speak(3, msg);
