@@ -53,6 +53,10 @@ namespace ChatModel
 			this.smallestFreeId = 1;
 		}
 
+		public Conversation(ConversationUpdates conv)
+		{
+		}
+
 		public int getId()
 		{
 			return id;
@@ -97,6 +101,11 @@ namespace ChatModel
 				return true;
 			}
 			return false;
+		}
+
+		internal void applyUpdates(ConversationUpdates conv)
+		{
+			throw new NotImplementedException();
 		}
 
 		public Message addMessage(User user, int parentID, MessageContent messageContent1, DateTime datetime)
@@ -156,7 +165,7 @@ namespace ChatModel
 			return null;
 		}
 
-		public Message addMessage(Message m)
+		public Message addMessageUnsafe(Message m)
 		{
 			return messages.TryAdd(m.ID, m) ? m : null;
 		}
@@ -186,18 +195,24 @@ namespace ChatModel
 
 		public ConversationUpdates getUpdates(int lastMessageId)
 		{
-			var updates = new ConversationUpdates(Name, ID);
 			var lastMessageTime = getMessage(lastMessageId)?.getTime();
-			foreach (var message in messages.Values)
-			{
-				if (message.getTime() > lastMessageTime)
-				{
-					updates.addMessage(message);
-				}
-			}
+			return getUpdates(lastMessageTime);
+		}
+
+		public ConversationUpdates getUpdates(DateTime? time)
+		{
+			var updates = new ConversationUpdates(Name, ID);
 
 			updates.Users = getUsers();
 
+			foreach (var message in messages.Values)
+			{
+				if (message.getTime() > time)
+				{
+					updates.addMessageUnsafe(new Message(message));
+				}
+			}
+			updates.converge();
 			return updates;
 		}
 	}

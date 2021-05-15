@@ -32,6 +32,14 @@ namespace ChatModel
 			}
 		}
 
+		public Refrence<User> AuthorRef
+		{
+			set
+			{
+				authorRef = value;
+			}
+		}
+
 		public Message TargetedMessage
 		{
 			get => targetedMessage;
@@ -61,6 +69,20 @@ namespace ChatModel
 			this.sentTime = datetime;
 			this.id = id;
 			this.TargetedMessage = targeted;
+		}
+
+		/// <summary>
+		/// Constructs new message by doing shallow copy of the object provided
+		/// </summary>
+		/// <param name="other">Template message for construction</param>
+		public Message(Message other)
+		{
+			this.authorRef = other.authorRef;
+			this.author = other.author;
+			this.content = other.content;
+			this.sentTime = other.sentTime;
+			this.id = other.id;
+			this.TargetedMessage = other.TargetedMessage;
 		}
 
 		public Message getParent()
