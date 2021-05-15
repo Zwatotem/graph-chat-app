@@ -39,10 +39,17 @@ namespace ChatServer
                 socket.Listen(5);
                 while (true)
                 {
+                    while (handlers.Count == 5)
+                    {
+                        Thread.Yield();
+                    }
                     Socket newSocket = socket.Accept();
                     //Console.WriteLine(((IPEndPoint)newSocket.LocalEndPoint).Port);
                     HandlerThread newHandler = new HandlerThread(chatSystem, newSocket, this);
-                    handlers.Add(newHandler);
+                    lock (this)
+                    {
+                        handlers.Add(newHandler);
+                    }
                 }
             }
             catch (Exception ex)
@@ -115,13 +122,16 @@ namespace ChatServer
                 {
                     case 0: //disconnect request
                         Console.WriteLine("DEBUG: {0} request received", "disconnect");
+                        lock (chatServer)
+                        {
+                            chatServer.removeMe(this);
+                        }
                         lock (this)
                         {
                             socket.Shutdown(SocketShutdown.Both);
                             socket.Close();
                         }
-                        work = false;
-                        chatServer.removeMe(this);
+                        work = false;                       
                         break;
                     case 1: //add new user request
                         Console.WriteLine("DEBUG: {0} request received", "add new user");
@@ -158,8 +168,11 @@ namespace ChatServer
             Array.Copy(BitConverter.GetBytes(msg.Length), 0, header, 1, 4);
             lock (this)
             {
-                socket.Send(header);
-                socket.Send(msg);
+                if (socket.Connected)
+                {
+                    socket.Send(header);
+                    socket.Send(msg);
+                }
             }
         }
 
@@ -168,7 +181,11 @@ namespace ChatServer
             byte[] buffer = receiveMessage(lengthToRead);
             string proposedName = Encoding.UTF8.GetString(buffer);
             Console.WriteLine("DEBUG: trying to add new user");
-            User newUser = chatSystem.addNewUser(proposedName);       
+            User newUser = null;
+            lock (chatServer)
+            {
+                newUser = chatSystem.addNewUser(proposedName);
+            } 
             byte[] reply = new byte[1];
             reply[0] = (newUser == null) ? (byte)0 : (byte)1;
             speak(1, reply);
@@ -179,20 +196,23 @@ namespace ChatServer
             byte[] buffer = receiveMessage(lengthToRead);
             string userName = Encoding.UTF8.GetString(buffer);
             Console.WriteLine("DEBUG: requested logIn");
-            User user = chatSystem.getUser(userName);
             byte[] reply = new byte[1];
-            if (user == null)
+            lock (chatServer)
             {
-                reply[0] = 0;
-            }
-            else
-            {
-                reply[0] = 1;
-                handledUserName = userName;
-                foreach (var conversation in user.getConversations())
+                User user = chatSystem.getUser(userName);
+                if (user == null || chatServer.Handlers.Exists(h => h.handledUserName == userName))
                 {
-                    byte[] msg = conversation.serialize().ToArray();
-                    speak(5, msg);
+                    reply[0] = 0;
+                }
+                else
+                {
+                    reply[0] = 1;
+                    handledUserName = userName;
+                    foreach (var conversation in user.getConversations())
+                    {
+                        byte[] msg = conversation.serialize().ToArray();
+                        speak(5, msg);
+                    }
                 }
             }
             speak(1, reply);
@@ -216,19 +236,22 @@ namespace ChatServer
                 index += stringLength;
             }
             Console.WriteLine("DEBUG: trying to add conversation");
-            Conversation newConversation = chatSystem.addConversation(proposedConversationName, namesOfParticipants.ToArray());
             byte[] reply = new byte[1];
-            if (newConversation == null)
+            lock (chatServer)
             {
-                reply[0] = 0;
-            }
-            else
-            {
-                reply[0] = 1;
-                byte[] msg = newConversation.serialize().ToArray();
-                foreach (var handler in chatServer.Handlers.FindAll(h => namesOfParticipants.Contains(h.handledUserName)))
+                Conversation newConversation = chatSystem.addConversation(proposedConversationName, namesOfParticipants.ToArray());
+                if (newConversation == null)
                 {
-                    handler.speak(5, msg);
+                    reply[0] = 0;
+                }
+                else
+                {
+                    reply[0] = 1;
+                    byte[] msg = newConversation.serialize().ToArray();
+                    foreach (var handler in chatServer.Handlers.FindAll(h => namesOfParticipants.Contains(h.handledUserName)))
+                    {
+                        handler.speak(5, msg);
+                    }
                 }
             }
             speak(1, reply);
@@ -237,31 +260,34 @@ namespace ChatServer
         public void handleAddUserToConversation(int lengthToRead)
         {
             byte[] buffer = receiveMessage(lengthToRead);
-            int conversationId = BitConverter.ToInt32(buffer, 0);
-            Conversation conversation = chatSystem.getConversation(conversationId);
+            int conversationId = BitConverter.ToInt32(buffer, 0);           
             string nameToAdd = Encoding.UTF8.GetString(buffer, 4, buffer.Length - 4);
             Console.WriteLine("DEBUG: trying to add user to conversation");
             byte[] reply = new byte[1];
-            if (chatSystem.addUserToConversation(nameToAdd, conversationId))
+            lock (chatServer)
             {
-                reply[0] = 1;
-                byte[] msg = buffer;
-                foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.handledUserName)))
+                Conversation conversation = chatSystem.getConversation(conversationId);
+                if (chatSystem.addUserToConversation(nameToAdd, conversationId))
                 {
-                    if (handler.handledUserName == nameToAdd)
+                    reply[0] = 1;
+                    byte[] msg = buffer;
+                    foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.handledUserName)))
                     {
-                        byte[] update = conversation.serialize().ToArray();
-                        handler.speak(5, update);
-                    }
-                    else
-                    {
-                        handler.speak(4, msg);
+                        if (handler.handledUserName == nameToAdd)
+                        {
+                            byte[] update = conversation.serialize().ToArray();
+                            handler.speak(5, update);
+                        }
+                        else
+                        {
+                            handler.speak(4, msg);
+                        }
                     }
                 }
-            }
-            else
-            {
-                reply[0] = 0;
+                else
+                {
+                    reply[0] = 0;
+                }
             }
             speak(1, reply);
         }
@@ -269,26 +295,29 @@ namespace ChatServer
         public void handleLeaveConversation(int lengthToRead)
         {
             byte[] buffer = receiveMessage(lengthToRead);
-            int conversationId = BitConverter.ToInt32(buffer, 0);
-            Conversation conversation = chatSystem.getConversation(conversationId);
+            int conversationId = BitConverter.ToInt32(buffer, 0);           
             string userName = handledUserName;
             Console.WriteLine("DEBUG: trying to remove user from conversation");
             byte[] reply = new byte[1];
-            if (chatSystem.leaveConversation(userName, conversationId))
+            lock (chatServer)
             {
-                reply[0] = 1;
-                int messageLength = 4 + Encoding.UTF8.GetByteCount(userName);
-                byte[] msg = new byte[messageLength];
-                Array.Copy(buffer, 0, msg, 0, 4);
-                Array.Copy(Encoding.UTF8.GetBytes(userName), 0, msg, 4, messageLength - 4);
-                foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.handledUserName)))
+                Conversation conversation = chatSystem.getConversation(conversationId);
+                if (chatSystem.leaveConversation(userName, conversationId))
                 {
-                    handler.speak(3, msg);
+                    reply[0] = 1;
+                    int messageLength = 4 + Encoding.UTF8.GetByteCount(userName);
+                    byte[] msg = new byte[messageLength];
+                    Array.Copy(buffer, 0, msg, 0, 4);
+                    Array.Copy(Encoding.UTF8.GetBytes(userName), 0, msg, 4, messageLength - 4);
+                    foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.handledUserName)))
+                    {
+                        handler.speak(3, msg);
+                    }
                 }
-            }
-            else
-            {
-                reply[0] = 0;
+                else
+                {
+                    reply[0] = 0;
+                }
             }
             speak(1, reply);
         }
@@ -296,8 +325,7 @@ namespace ChatServer
         public void handleSendMessage(int lengthToRead)
         {
             byte[] buffer = receiveMessage(lengthToRead);
-            int conversationId = BitConverter.ToInt32(buffer, 0);
-            Conversation conversation = chatSystem.getConversation(conversationId);
+            int conversationId = BitConverter.ToInt32(buffer, 0);           
             int targetedMessageId = BitConverter.ToInt32(buffer, 4);          
             MessageContent content = ContentFactory.getContent(buffer, 8);
             byte[] reply = new byte[1];
@@ -306,24 +334,28 @@ namespace ChatServer
                 reply[0] = 0;
             }
             else
-            {
+            {               
                 Console.WriteLine("DEBUG: trying to send message");
-                Message sentMessage = chatSystem.sendMessage(conversationId, handledUserName, targetedMessageId, content, DateTime.Now);
-                if (sentMessage != null)
+                lock (chatServer)
                 {
-                    reply[0] = 1;
-                    byte[] serializedBytes = sentMessage.serialize().ToArray(); //serialization must work properly for this one
-                    byte[] msg = new byte[serializedBytes.Length + 4];
-                    Array.Copy(BitConverter.GetBytes(conversationId), 0, msg, 0, 4);
-                    Array.Copy(serializedBytes, 0, msg, 4, serializedBytes.Length);
-                    foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.handledUserName)))
+                    Message sentMessage = chatSystem.sendMessage(conversationId, handledUserName, targetedMessageId, content, DateTime.Now);
+                    if (sentMessage != null)
                     {
-                        handler.speak(6, msg);
+                        reply[0] = 1;
+                        byte[] serializedBytes = sentMessage.serialize().ToArray(); //serialization must work properly for this one
+                        byte[] msg = new byte[serializedBytes.Length + 4];
+                        Array.Copy(BitConverter.GetBytes(conversationId), 0, msg, 0, 4);
+                        Array.Copy(serializedBytes, 0, msg, 4, serializedBytes.Length);
+                        Conversation conversation = chatSystem.getConversation(conversationId);
+                        foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.handledUserName)))
+                        {
+                            handler.speak(6, msg);
+                        }
                     }
-                }
-                else
-                {
-                    reply[0] = 0;
+                    else
+                    {
+                        reply[0] = 0;
+                    }
                 }
             }
             speak(1, reply);
