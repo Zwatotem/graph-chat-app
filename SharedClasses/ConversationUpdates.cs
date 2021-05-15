@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using Util;
 
 namespace ChatModel
 {
@@ -11,26 +13,42 @@ namespace ChatModel
 	{
 		private string name;
 		private int id;
-		private List<User> users;
+		private List<Refrence<User>> users;
 		private Dictionary<int, Message> messages;
+		private int smallestFreeId;
 
+		public List<User> Users
+		{
+			get
+			{
+				var list = new List<User>();
+				foreach (var user in users)
+				{
+					list.Add(user);
+				}
+				return list;
+			}
+			set
+			{
+				users = new List<Refrence<User>>();
+				foreach (var user in value)
+				{
+					users.Add(user);
+				}
+			}
+		}
 		public string Name
 		{
 			get => name;
 			set => name = value;
 		}
 		public int ID => id;
-		public List<User> Users
-		{
-			get => users;
-			set => users = value;
-		}
 
 		public ConversationUpdates(string name, int id)
 		{
 			this.name = name;
 			this.id = id;
-			this.users = new List<User>();
+			this.users = new List<Refrence<User>>();
 			this.messages = new Dictionary<int, Message>();
 		}
 
@@ -40,6 +58,11 @@ namespace ChatModel
 		}
 
 		public List<User> getUsers()
+		{
+			return Users;
+		}
+
+		public List<Refrence<User>> getUsersFull()
 		{
 			return users;
 		}
@@ -52,6 +75,11 @@ namespace ChatModel
 		public ICollection<Message> getMessages()
 		{
 			return messages.Values;
+		}
+
+		public Dictionary<int, Message> getMessagesFull()
+		{
+			return messages;
 		}
 
 		public Message getMessage(int id)
@@ -74,7 +102,7 @@ namespace ChatModel
 			var result = messages.TryAdd(m.ID, m);
 			if (result)
 			{
-				m.AuthorRef = users.Find(u => u.Name == m.Author.Name);
+				m.AuthorRef = users.Find(u => u.Reference.Name == m.Author.Name);
 			}
 			m.TargetedMessage = messages.GetValueOrDefault(m.TargetId, null);
 			return result ? m : null;
@@ -93,7 +121,12 @@ namespace ChatModel
 
 		public Stream serialize()
 		{
-			throw new NotImplementedException();
+			MemoryStream stream = new MemoryStream();
+			var formatter = new BinaryFormatter();
+			formatter.Serialize(stream, this);
+			stream.Flush();
+			stream.Position = 0;
+			return stream;
 		}
 	}
 }

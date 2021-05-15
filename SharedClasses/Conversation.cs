@@ -55,6 +55,21 @@ namespace ChatModel
 
 		public Conversation(ConversationUpdates conv)
 		{
+			this.id = conv.ID;
+			this.name = conv.Name;
+			this.Users = conv.Users;
+			this.messages = conv.getMessagesFull();
+			this.smallestFreeId = 0;
+			foreach (var k in messages.Keys)
+			{
+				smallestFreeId = k > smallestFreeId ? k : smallestFreeId;
+			}
+			smallestFreeId++;
+			foreach (var message in messages.Values)
+			{
+				message.AuthorRef = users.Find(u => u.Reference.Name == message.Author.Name);
+			}
+			converge();
 		}
 
 		public int getId()
@@ -105,7 +120,18 @@ namespace ChatModel
 
 		internal void applyUpdates(ConversationUpdates conv)
 		{
-			throw new NotImplementedException();
+			users.AddRange(conv.getUsersFull());
+			List<int> newMssgIDs = new List<int>();
+			foreach (var mess in conv.getMessages())
+			{
+				addMessageUnsafe(mess);
+				newMssgIDs.Add(mess.ID);
+			}
+			foreach (int id in newMssgIDs)
+			{
+				messages[id].TargetedMessage = messages[id].TargetId == -1 ? null : messages[messages[id].TargetId];
+				messages[id].AuthorRef = users.Find(u => u.Reference.Name == messages[id].Author.Name);
+			}
 		}
 
 		public Message addMessage(User user, int parentID, MessageContent messageContent1, DateTime datetime)
@@ -165,9 +191,34 @@ namespace ChatModel
 			return null;
 		}
 
+		/// <summary>
+		/// Adds a specified message to the conversation.
+		/// </summary>
+		/// <remarks>
+		/// <strong>The specified message will be added despite not matching a valid parent.</strong>
+		/// </remarks>
+		/// <param name="m">Message object to add</param>
+		/// <returns>Message that was added, or <c>null</c>null in case of error.</returns>
 		public Message addMessageUnsafe(Message m)
 		{
-			return messages.TryAdd(m.ID, m) ? m : null;
+			var result = messages.TryAdd(m.ID, m);
+			if (result)
+			{
+				m.AuthorRef = users.Find(u => u.Reference.Name == m.Author.Name);
+			}
+			m.TargetedMessage = messages.GetValueOrDefault(m.TargetId, null);
+			return result ? m : null;
+		}
+
+		/// <summary>
+		/// Fixes the internal structure of messages
+		/// </summary>
+		public void converge()
+		{
+			foreach (Message message in messages.Values)
+			{
+				message.TargetedMessage = messages.GetValueOrDefault(message.TargetId, null);
+			}
 		}
 
 		public bool unmatchWithUser(User user)

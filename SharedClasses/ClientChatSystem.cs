@@ -37,9 +37,52 @@ namespace ChatModel
 			return userName;
 		}
 
-		public void applyUpdates(User user1)
-        {
-			throw new NotImplementedException();
+		public void applyUpdates(UserUpdates updates)
+		{
+			foreach (var convUpdate in updates)
+			{
+				if (!conversations.ContainsKey(convUpdate.ID))
+				{
+					var newUsers = new List<User>(); // List of overlapping User objects
+					conversations.Add(convUpdate.ID, new Conversation(convUpdate));
+					foreach (var user in convUpdate.getUsers())
+					{
+						Predicate<User> p = (u => u.Name == user.Name);
+						if (users.Exists(p))
+						{
+							newUsers.Add(users.Find(p)); // Collect the users we'll inject to the new Conversation
+						}
+						else
+						{
+							users.Add(user); // Won't use addNewUser(), to keep conv's reference
+						}
+					}
+					foreach (var user in newUsers)
+					{
+						// Replace 'new' users with ones, that we already have
+						conversations[convUpdate.ID].reMatchWithUser(user);
+						user.matchWithConversation(conversations[convUpdate.ID]);
+					}
+					if (freedIds.Contains(convUpdate.ID))
+					{
+						var stackNoID = new List<int>(freedIds);
+						stackNoID.Remove(smallestFreeId);
+						freedIds = new Stack<int>(stackNoID);
+					}
+					else
+					{
+						for (int i = smallestFreeId; i < convUpdate.ID; i++)
+						{
+							freedIds.Push(i);
+						}
+						smallestFreeId = convUpdate.ID + 1;
+					}
+				}
+				else
+				{
+					conversations[convUpdate.ID].applyUpdates(convUpdate);
+				}
+			}
 		}
 
 		public Conversation addConversation(Stream stream)
@@ -63,7 +106,7 @@ namespace ChatModel
 					users.Add(user); // Won't use addNewUser(), to keep conv's reference
 				}
 			}
-			foreach(var user in newUsers)
+			foreach (var user in newUsers)
 			{
 				// Replace 'new' users with ones, that we already have
 				conv.reMatchWithUser(user);
