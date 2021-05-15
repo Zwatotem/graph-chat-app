@@ -115,7 +115,9 @@ namespace ChatModel
 		{
 			MemoryStream stream = new MemoryStream();
 			var formatter = new BinaryFormatter();
-			formatter.Serialize(stream, this);
+			Message copy = new Message(this);
+			copy.targetedMessage = null;
+			formatter.Serialize(stream, copy);
 			stream.Flush();
 			stream.Position = 0;
 			return stream;
