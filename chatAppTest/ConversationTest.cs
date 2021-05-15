@@ -343,7 +343,7 @@ namespace chatAppTest
 				{
 					hasMessage2 = true;
 					Assert.IsTrue(message.getUser().getName() == sentMessage2.getUser().getName());
-					Assert.IsTrue(message.getParent().getId() == 1);
+					Assert.IsTrue(message.TargetId == 1);
 					Assert.IsTrue(message.getContent().getData() == sentMessage2.getContent().getData());
 					Assert.IsTrue(message.getTime() == sentMessage2.getTime());
 				}

@@ -59,7 +59,7 @@ namespace ChatModel
 			this.name = conv.Name;
 			this.Users = conv.Users;
 			this.messages = conv.getMessagesFull();
-			this.smallestFreeId = 0;
+			this.smallestFreeId = 1;
 			foreach (var k in messages.Keys)
 			{
 				smallestFreeId = k > smallestFreeId ? k : smallestFreeId;

@@ -104,7 +104,7 @@ namespace ChatModel
 			{
 				m.AuthorRef = users.Find(u => u.Reference.Name == m.Author.Name);
 			}
-			m.TargetedMessage = messages.GetValueOrDefault(m.TargetId, null);
+			m.setParentUnsafe(messages.GetValueOrDefault(m.TargetId, null));
 			return result ? m : null;
 		}
 
@@ -115,7 +115,7 @@ namespace ChatModel
 		{
 			foreach (Message message in messages.Values)
 			{
-				message.TargetedMessage = messages.GetValueOrDefault(message.TargetId, null);
+				message.setParentUnsafe(messages.GetValueOrDefault(message.TargetId, null));
 			}
 		}
 

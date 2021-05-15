@@ -82,12 +82,18 @@ namespace ChatModel
 			this.content = other.content;
 			this.sentTime = other.sentTime;
 			this.id = other.id;
-			this.TargetedMessage = other.TargetedMessage;
+			this.targetId = other.targetId;
+			this.targetedMessage = other.targetedMessage;
 		}
 
 		public Message getParent()
 		{
 			return targetedMessage;
+		}
+
+		public void setParentUnsafe(Message t)
+		{
+			targetedMessage = t;
 		}
 
 		public int getId()
