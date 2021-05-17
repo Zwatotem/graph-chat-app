@@ -234,7 +234,7 @@ namespace ChatModel
 			}
 		}
 
-		public Stream serialize()
+		public MemoryStream serialize()
 		{
 			MemoryStream stream = new MemoryStream();
 			var formatter = new BinaryFormatter();

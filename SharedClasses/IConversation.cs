@@ -13,6 +13,6 @@ namespace ChatModel
 		ICollection<Message> getMessages();
 		Message getMessage(int id);
 		Message addMessageUnsafe(Message m);
-		Stream serialize();
+		MemoryStream serialize();
 	}
 }
