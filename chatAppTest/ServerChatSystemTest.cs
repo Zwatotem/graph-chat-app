@@ -21,10 +21,10 @@ namespace chatAppTest
 			DateTime datetime = DateTime.Now;
 			Message sentMessage1 = chatSystem.sendMessage(savedConversation.getId(), "Jaú Kowalski", -1, msgContent1, datetime);
 			Message sentMessage2 = chatSystem.sendMessage(savedConversation2.getId(), "Jaú Kowalski", -1, msgContent2, datetime);
-			User updates = chatSystem.getUpdatesToUser("Kasia èdüb≥o", datetime - TimeSpan.FromSeconds(3));
+			UserUpdates updates = chatSystem.getUpdatesToUser("Kasia èdüb≥o", datetime - TimeSpan.FromSeconds(3));
 			bool containsConversation = false;
 			bool containsWrongConversation = false;
-			foreach (var conversation in updates.getConversations())
+			foreach (var conversation in updates)
 			{
 				if (conversation.getId() == savedConversation.getId() && conversation.getName() == savedConversation.getName())
 				{

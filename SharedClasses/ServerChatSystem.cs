@@ -8,9 +8,15 @@ namespace ChatModel
 
 		public ServerChatSystem() : base() { } //no-arg constructor calling ChatSystem constructor
 
-		public User getUpdatesToUser(string v, DateTime t)
+		public UserUpdates getUpdatesToUser(string userName, DateTime t)
 		{
-			throw new NotImplementedException();
+			var user = users.Find(u => u.Name == userName);
+			var updates = new UserUpdates();
+			foreach (var conv in user.getConversations())
+			{
+				updates.addConversation(conv.getUpdates(t));
+			}
+			return updates;
 		}
 
 		public List<Conversation> getConversationsOfUser(string userName) //method to return a list of all conversations of user with user name

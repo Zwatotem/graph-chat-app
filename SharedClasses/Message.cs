@@ -32,6 +32,14 @@ namespace ChatModel
 			}
 		}
 
+		public Refrence<User> AuthorRef
+		{
+			set
+			{
+				authorRef = value;
+			}
+		}
+
 		public Message TargetedMessage
 		{
 			get => targetedMessage;
@@ -63,9 +71,29 @@ namespace ChatModel
 			this.TargetedMessage = targeted;
 		}
 
+		/// <summary>
+		/// Constructs new message by doing shallow copy of the object provided
+		/// </summary>
+		/// <param name="other">Template message for construction</param>
+		public Message(Message other)
+		{
+			this.authorRef = other.authorRef;
+			this.author = other.author;
+			this.content = other.content;
+			this.sentTime = other.sentTime;
+			this.id = other.id;
+			this.targetId = other.targetId;
+			this.targetedMessage = other.targetedMessage;
+		}
+
 		public Message getParent()
 		{
 			return targetedMessage;
+		}
+
+		public void setParentUnsafe(Message t)
+		{
+			targetedMessage = t;
 		}
 
 		public int getId()
@@ -87,7 +115,9 @@ namespace ChatModel
 		{
 			MemoryStream stream = new MemoryStream();
 			var formatter = new BinaryFormatter();
-			formatter.Serialize(stream, this);
+			Message copy = new Message(this);
+			copy.targetedMessage = null;
+			formatter.Serialize(stream, copy);
 			stream.Flush();
 			stream.Position = 0;
 			return stream;
