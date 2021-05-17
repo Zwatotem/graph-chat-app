@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace ChatModel
 {
@@ -97,7 +98,7 @@ namespace ChatModel
 			return newConversation; //returns created conversation
 		}
 
-		public Conversation addConversation(string v) //creates a copy of a conversation passed as paramter in serialized form (?)
+		public Conversation addConversation(Stream stream) //creates a copy of a conversation passed as paramter in serialized form (?)
 		{
 			throw new NotImplementedException();
 		}

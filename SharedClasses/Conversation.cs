@@ -3,17 +3,39 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using Util;
 
 namespace ChatModel
 {
 	[Serializable]
-	public class Conversation
+	public class Conversation : IConversation
 	{
 		private string name;
 		private int id;
-		private List<User> users;
+		private List<Refrence<User>> users;
 		private Dictionary<int, Message> messages;
 		private int smallestFreeId;
+
+		public List<User> Users
+		{
+			get
+			{
+				var list = new List<User>();
+				foreach (var user in users)
+				{
+					list.Add(user);
+				}
+				return list;
+			}
+			set
+			{
+				users = new List<Refrence<User>>();
+				foreach (var user in value)
+				{
+					users.Add(user);
+				}
+			}
+		}
 
 		public string Name
 		{
@@ -26,9 +48,28 @@ namespace ChatModel
 		{
 			this.name = name;
 			this.id = id;
-			this.users = new List<User>();
+			this.users = new List<Refrence<User>>();
 			this.messages = new Dictionary<int, Message>();
 			this.smallestFreeId = 1;
+		}
+
+		public Conversation(ConversationUpdates conv)
+		{
+			this.id = conv.ID;
+			this.name = conv.Name;
+			this.Users = conv.Users;
+			this.messages = conv.getMessagesFull();
+			this.smallestFreeId = 1;
+			foreach (var k in messages.Keys)
+			{
+				smallestFreeId = k > smallestFreeId ? k : smallestFreeId;
+			}
+			smallestFreeId++;
+			foreach (var message in messages.Values)
+			{
+				message.AuthorRef = users.Find(u => u.Reference.Name == message.Author.Name);
+			}
+			converge();
 		}
 
 		public int getId()
@@ -38,7 +79,12 @@ namespace ChatModel
 
 		public List<User> getUsers()
 		{
-			return users;
+			return Users;
+		}
+
+		public Refrence<User> getUserRef(User user)
+		{
+			return users.Find(r => r.Reference == user);
 		}
 
 		public string getName()
@@ -53,18 +99,47 @@ namespace ChatModel
 
 		public bool matchWithUser(User user)
 		{
-			if (users.Contains(user))
+			if (Users.Contains(user))
 				return false;
-			users.Add(user);
+			users.Add(new Refrence<User>(user));
 			return true;
+		}
+
+		public bool reMatchWithUser(User user)
+		{
+			var internalUser = Users.Find(u => u.Name == user.Name);
+			if (internalUser != null)
+			{
+				var userRef = getUserRef(internalUser);
+				internalUser.unmatchWithConversation(this);
+				userRef.Reference = user;
+				return true;
+			}
+			return false;
+		}
+
+		internal void applyUpdates(ConversationUpdates conv)
+		{
+			users.AddRange(conv.getUsersFull());
+			List<int> newMssgIDs = new List<int>();
+			foreach (var mess in conv.getMessages())
+			{
+				addMessageUnsafe(mess);
+				newMssgIDs.Add(mess.ID);
+			}
+			foreach (int id in newMssgIDs)
+			{
+				messages[id].TargetedMessage = messages[id].TargetId == -1 ? null : messages[messages[id].TargetId];
+				messages[id].AuthorRef = users.Find(u => u.Reference.Name == messages[id].Author.Name);
+			}
 		}
 
 		public Message addMessage(User user, int parentID, MessageContent messageContent1, DateTime datetime)
 		{
 			int newID = smallestFreeId;
-			if ((messages.ContainsKey(parentID) || parentID == -1) && users.Contains(user) && !messages.ContainsKey(newID))
+			if ((messages.ContainsKey(parentID) || parentID == -1) && Users.Contains(user) && !messages.ContainsKey(newID))
 			{
-				Message message = new Message(user, parentID == -1 ? null : messages[parentID], messageContent1, datetime, newID);
+				Message message = new Message(getUserRef(user), parentID == -1 ? null : messages[parentID], messageContent1, datetime, newID);
 				messages.Add(newID, message);
 				smallestFreeId++;
 				return message;
@@ -85,7 +160,7 @@ namespace ChatModel
 				{
 					messages.Add(mess.ID, mess);
 					if (mess.TargetId == -1)
-                    {
+					{
 						mess.TargetedMessage = null;
 
 					}
@@ -116,11 +191,41 @@ namespace ChatModel
 			return null;
 		}
 
+		/// <summary>
+		/// Adds a specified message to the conversation.
+		/// </summary>
+		/// <remarks>
+		/// <strong>The specified message will be added despite not matching a valid parent.</strong>
+		/// </remarks>
+		/// <param name="m">Message object to add</param>
+		/// <returns>Message that was added, or <c>null</c>null in case of error.</returns>
+		public Message addMessageUnsafe(Message m)
+		{
+			var result = messages.TryAdd(m.ID, m);
+			if (result)
+			{
+				m.AuthorRef = users.Find(u => u.Reference.Name == m.Author.Name);
+			}
+			m.TargetedMessage = messages.GetValueOrDefault(m.TargetId, null);
+			return result ? m : null;
+		}
+
+		/// <summary>
+		/// Fixes the internal structure of messages
+		/// </summary>
+		public void converge()
+		{
+			foreach (Message message in messages.Values)
+			{
+				message.TargetedMessage = messages.GetValueOrDefault(message.TargetId, null);
+			}
+		}
+
 		public bool unmatchWithUser(User user)
 		{
-			if (users.Contains(user))
+			if (Users.Contains(user))
 			{
-				users.Remove(user);
+				users.RemoveAll(r => r.Reference == user);
 				return true;
 			}
 			else
@@ -129,7 +234,7 @@ namespace ChatModel
 			}
 		}
 
-		public MemoryStream serialize()
+		public Stream serialize()
 		{
 			MemoryStream stream = new MemoryStream();
 			var formatter = new BinaryFormatter();
@@ -139,9 +244,27 @@ namespace ChatModel
 			return stream;
 		}
 
-		public Conversation getUpdates(int lastMessageId)
+		public ConversationUpdates getUpdates(int lastMessageId)
 		{
-			throw new NotImplementedException();
+			var lastMessageTime = getMessage(lastMessageId)?.getTime();
+			return getUpdates(lastMessageTime);
+		}
+
+		public ConversationUpdates getUpdates(DateTime? time)
+		{
+			var updates = new ConversationUpdates(Name, ID);
+
+			updates.Users = getUsers();
+
+			foreach (var message in messages.Values)
+			{
+				if (message.getTime() > time)
+				{
+					updates.addMessageUnsafe(new Message(message));
+				}
+			}
+			updates.converge();
+			return updates;
 		}
 	}
 }
