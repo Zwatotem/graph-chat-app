@@ -7,8 +7,8 @@ using ChatModel;
 
 namespace ChatServer
 {
-    public interface IHandleRequestStrategy
+    public interface IHandleStrategy
     {
-        void handleMessage(ChatServer chatServer, ChatSystem chatSystem, HandlerThread handlerThread, byte[] messageBytes);
+        void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes);
     }
 }

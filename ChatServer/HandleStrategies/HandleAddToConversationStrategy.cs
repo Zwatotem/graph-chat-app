@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using ChatModel;
 
-namespace ChatServer
+namespace ChatServer.HandleStrategies
 {
-    class HandleAddToConversationStrategy : IHandleRequestStrategy
+    class HandleAddToConversationStrategy : IHandleStrategy
     {
-        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, HandlerThread handlerThread, byte[] messageBytes)
+        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "add user to conversation");
             int conversationId = BitConverter.ToInt32(messageBytes, 0);
@@ -28,11 +28,11 @@ namespace ChatServer
                         if (handler.HandledUserName == nameToAdd)
                         {
                             byte[] update = conversation.serialize().ToArray();
-                            handler.speak(5, update);
+                            handler.sendMessage(5, update);
                         }
                         else
                         {
-                            handler.speak(4, msg);
+                            handler.sendMessage(4, msg);
                         }
                     }
                 }
@@ -41,7 +41,7 @@ namespace ChatServer
                     reply[0] = 0;
                 }
             }
-            handlerThread.speak(1, reply);
+            handlerThread.sendMessage(1, reply);
         }
     }
 }

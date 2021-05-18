@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using ChatModel;
 
-namespace ChatServer
+namespace ChatServer.HandleStrategies
 {
-    class HandleLoginStrategy : IHandleRequestStrategy
+    class HandleLoginStrategy : IHandleStrategy
     {
-        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, HandlerThread handlerThread, byte[] messageBytes)
+        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "logIn");
             string userName = Encoding.UTF8.GetString(messageBytes);
@@ -29,11 +29,11 @@ namespace ChatServer
                     foreach (var conversation in user.getConversations())
                     {
                         byte[] msg = conversation.serialize().ToArray();
-                        handlerThread.speak(5, msg);
+                        handlerThread.sendMessage(5, msg);
                     }
                 }
             }
-            handlerThread.speak(1, reply);
+            handlerThread.sendMessage(1, reply);
         }
     }
 }

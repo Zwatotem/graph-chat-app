@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using ChatModel;
 
-namespace ChatServer
+namespace ChatServer.HandleStrategies
 {
-    class HandleNewConversationStrategy : IHandleRequestStrategy
+    class HandleNewConversationStrategy : IHandleStrategy
     {
-        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, HandlerThread handlerThread, byte[] messageBytes)
+        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "add new conversation");
             List<string> namesOfParticipants = new List<string>();
@@ -40,11 +40,11 @@ namespace ChatServer
                     byte[] msg = newConversation.serialize().ToArray();
                     foreach (var handler in chatServer.Handlers.FindAll(h => namesOfParticipants.Contains(h.HandledUserName)))
                     {
-                        handler.speak(5, msg);
+                        handler.sendMessage(5, msg);
                     }
                 }
             }
-            handlerThread.speak(1, reply);
+            handlerThread.sendMessage(1, reply);
         }
     }
 }

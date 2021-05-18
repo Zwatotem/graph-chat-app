@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using ChatModel;
 
-namespace ChatServer
+namespace ChatServer.HandleStrategies
 {
-    class HandleLeaveConversationStrategy : IHandleRequestStrategy
+    class HandleLeaveConversationStrategy : IHandleStrategy
     {
-        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, HandlerThread handlerThread, byte[] messageBytes)
+        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "leave conversation");
             int conversationId = BitConverter.ToInt32(messageBytes, 0);
@@ -28,7 +28,7 @@ namespace ChatServer
                     Conversation conversation = chatSystem.getConversation(conversationId);
                     foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.HandledUserName)))
                     {
-                        handler.speak(3, msg);
+                        handler.sendMessage(3, msg);
                     }
                 }
                 else
@@ -36,7 +36,7 @@ namespace ChatServer
                     reply[0] = 0;
                 }
             }
-            handlerThread.speak(1, reply);
+            handlerThread.sendMessage(1, reply);
         }
     }
 }

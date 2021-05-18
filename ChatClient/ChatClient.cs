@@ -230,6 +230,8 @@ namespace ChatClient
             }
             finally
             {
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
                 socket.Dispose();
             }
         }

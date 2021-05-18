@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ChatServer.HandleStrategies;
 
 namespace ChatServer
 {
@@ -13,6 +14,9 @@ namespace ChatServer
             IRequestHandler createdRequestHandler = null;
             switch(typeByte)
             {
+                case 0:
+                    createdRequestHandler = new ConcreteRequestHandler(new HandleDisconnectStrategy());
+                    break;
                 case 1:
                     createdRequestHandler = new ConcreteRequestHandler(new HandleNewUserStrategy());
                     break;
@@ -32,7 +36,7 @@ namespace ChatServer
                     createdRequestHandler = new ConcreteRequestHandler(new HandleSendMessageStrategy());
                     break;
                 default:
-                    createdRequestHandler = new ConcreteRequestHandler(new HandleUnknownRequest());
+                    createdRequestHandler = new ConcreteRequestHandler(new HandleUnknownStrategy());
                     break;
             }
             return createdRequestHandler;

@@ -9,14 +9,14 @@ namespace ChatServer
 {
     public class ConcreteRequestHandler : IRequestHandler
     {
-        private IHandleRequestStrategy handleStrategy;
+        private IHandleStrategy handleStrategy;
 
-        public ConcreteRequestHandler(IHandleRequestStrategy handleStrategy)
+        public ConcreteRequestHandler(IHandleStrategy handleStrategy)
         {
             this.handleStrategy = handleStrategy;
         }
 
-        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, HandlerThread handlerThread, byte[] messageBytes)
+        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes)
         {
             this.handleStrategy.handleMessage(chatServer, chatSystem, handlerThread, messageBytes);
         }

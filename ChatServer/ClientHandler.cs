@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Net.Sockets;
 using ChatModel;
+using ChatServer.HandleStrategies;
 
 namespace ChatServer
 {
-    public class HandlerThread
+    public class ClientHandler
     {
         private Socket socket;
         private string handledUserName;
@@ -18,6 +19,7 @@ namespace ChatServer
         private ChatServer chatServer;
         private bool work;
         private IRequestHandlerCreator requestHandlerCreator;
+        private int requestHeaderLength;
 
         public string HandledUserName
         {
@@ -31,7 +33,7 @@ namespace ChatServer
             }
         }
 
-        public HandlerThread(ServerChatSystem chatSystem, Socket socket, ChatServer chatServer)
+        public ClientHandler(ServerChatSystem chatSystem, Socket socket, ChatServer chatServer, int headerLength)
         {
             Console.WriteLine("DEBUG: handler object created");
             this.chatSystem = chatSystem;
@@ -41,47 +43,40 @@ namespace ChatServer
             this.listenerThread.Start();
             this.work = true;
             this.requestHandlerCreator = new ConcreteRequestHandlerCreator();
+            this.requestHeaderLength = headerLength;
 
         }
 
         public void listen()
         {
             Console.WriteLine("DEBUG: listener thread started");
-            int headerLength = BitConverter.GetBytes(4).Length + 1;
-            byte[] headerBytes = new byte[headerLength];
-            while (work) //add check for ungracefull disconnect on client side
+            while (work)
             {
-                int bytesReceived = 0;
-                bool continueFlag = false;
-                while (bytesReceived < headerLength)
+                byte typeByte = 0;
+                byte[] messageBytes = null;
+                try
                 {
-                    bytesReceived += socket.Receive(headerBytes, bytesReceived, headerLength - bytesReceived, SocketFlags.None);
-                    if (bytesReceived == 0)
-                    {
-                        continueFlag = true;
-                        break;
-                    }
+                    byte[] headerBytes = receiveMessage(requestHeaderLength);
+                    typeByte = headerBytes[0];
+                    int messageLength = BitConverter.ToInt32(headerBytes, 1);
+                    messageBytes = receiveMessage(messageLength);
                 }
-                if (continueFlag)
+                catch (SocketException ex)
                 {
-                    continue; //here goes the check probably
+                    Console.WriteLine("DEBUG: SocketException thrown: {0}", ex.Message);
+                    typeByte = 0;
                 }
-                byte typeByte = headerBytes[0];
-                int messageLength = BitConverter.ToInt32(headerBytes, 1);
-                if (typeByte == 0)
-                {
-                    shutdown();
-                }
-                else
-                {
-                    IRequestHandler requestHandler = requestHandlerCreator.createRequestHandler(typeByte);
-                    requestHandler.handleMessage(chatServer, chatSystem, this, receiveMessage(messageLength));
-                }
+                IRequestHandler requestHandler = requestHandlerCreator.createRequestHandler(typeByte);
+                requestHandler.handleMessage(chatServer, chatSystem, this, messageBytes);
             }
         }
 
         private byte[] receiveMessage(int length)
         {
+            if (length == 0)
+            {
+                return null;
+            }
             byte[] buffer = new byte[length];
             int bytesReceived = 0;
             while (bytesReceived < length)
@@ -91,7 +86,7 @@ namespace ChatServer
             return buffer;
         }
 
-        public void speak(byte type, byte[] msg)
+        public void sendMessage(byte type, byte[] msg)
         {
             byte[] header = new byte[5];
             header[0] = type;
@@ -108,17 +103,17 @@ namespace ChatServer
 
         public void shutdown()
         {
-            Console.WriteLine("DEBUG: {0} request received", "disconnect");
+            work = false;
             lock (chatServer)
             {
-                chatServer.removeMe(this);
+                chatServer.removeHandler(this);
             }
             lock (this)
             {
                 socket.Shutdown(SocketShutdown.Both);
                 socket.Close();
-            }
-            work = false;
+                socket.Dispose();
+            }           
         }
     }
 }

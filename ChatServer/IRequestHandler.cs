@@ -9,6 +9,6 @@ namespace ChatServer
 {
     public interface IRequestHandler
     {
-        void handleMessage(ChatServer chatServer, ChatSystem chatSystem, HandlerThread handlerThread, byte[] messageBytes);
+        void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes);
     }
 }
