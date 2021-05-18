@@ -234,7 +234,7 @@ namespace ChatClient
             }
         }
 
-        public async void requestCreateNewUser()
+        public void requestCreateNewUser()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "add new user");
             string proposedName = null;
@@ -273,7 +273,7 @@ namespace ChatClient
             }
         }
 
-        public async void requestLogIn()
+        public void requestLogIn()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "logIn");
             string userName = null;
@@ -313,7 +313,7 @@ namespace ChatClient
             }
         }
 
-        public async void requestAddConversation()
+        public void requestAddConversation()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "add conversation");
             List<byte> contentList = new List<byte>();
@@ -371,7 +371,7 @@ namespace ChatClient
             }
         }
 
-        public async void requestAddUserToConversation()
+        public void requestAddUserToConversation()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "add user to conversation");
             string yourName = null;
@@ -426,7 +426,7 @@ namespace ChatClient
             }
         }
 
-        public async void requestLeaveConversation()
+        public void requestLeaveConversation()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "leave conversation");
             string yourName = null;
@@ -480,7 +480,7 @@ namespace ChatClient
             }
         }
 
-        public async void requestSendTextMessage()
+        public void requestSendTextMessage()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "send message");
             string yourName = null;
