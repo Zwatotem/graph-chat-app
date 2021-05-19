@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ChatModel;
 
 namespace ChatServer.HandleStrategies
 {
     class HandleSendMessageStrategy : IHandleStrategy
     {
-        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, ChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "send message");
             int conversationId = BitConverter.ToInt32(messageBytes, 0);
@@ -23,7 +20,7 @@ namespace ChatServer.HandleStrategies
             else
             {
                 Console.WriteLine("DEBUG: trying to send message");
-                lock (chatServer)
+                lock (allHandlers)
                 {
                     Message sentMessage = chatSystem.sendMessage(conversationId, handlerThread.HandledUserName, targetedMessageId, content, DateTime.Now);
                     if (sentMessage != null)
@@ -34,7 +31,7 @@ namespace ChatServer.HandleStrategies
                         Array.Copy(BitConverter.GetBytes(conversationId), 0, msg, 0, 4);
                         Array.Copy(serializedBytes, 0, msg, 4, serializedBytes.Length);
                         Conversation conversation = chatSystem.getConversation(conversationId);
-                        foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.HandledUserName)))
+                        foreach (var handler in allHandlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.HandledUserName)))
                         {
                             handler.sendMessage(6, msg);
                         }

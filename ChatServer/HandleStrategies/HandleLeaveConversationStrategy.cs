@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ChatModel;
 
 namespace ChatServer.HandleStrategies
 {
     class HandleLeaveConversationStrategy : IHandleStrategy
     {
-        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, ChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "leave conversation");
             int conversationId = BitConverter.ToInt32(messageBytes, 0);
             string userName = handlerThread.HandledUserName;
             Console.WriteLine("DEBUG: trying to remove user from conversation");
             byte[] reply = new byte[1];
-            lock (chatServer)
+            lock (allHandlers)
             {
                 if (chatSystem.leaveConversation(userName, conversationId))
                 {
@@ -26,7 +24,7 @@ namespace ChatServer.HandleStrategies
                     Array.Copy(messageBytes, 0, msg, 0, 4);
                     Array.Copy(Encoding.UTF8.GetBytes(userName), 0, msg, 4, messageLength - 4);
                     Conversation conversation = chatSystem.getConversation(conversationId);
-                    foreach (var handler in chatServer.Handlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.HandledUserName)))
+                    foreach (var handler in allHandlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.HandledUserName)))
                     {
                         handler.sendMessage(3, msg);
                     }

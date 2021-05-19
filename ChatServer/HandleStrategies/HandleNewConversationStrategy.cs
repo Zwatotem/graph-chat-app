@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ChatModel;
 
 namespace ChatServer.HandleStrategies
 {
     class HandleNewConversationStrategy : IHandleStrategy
     {
-        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, ChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "add new conversation");
             List<string> namesOfParticipants = new List<string>();
@@ -27,7 +25,7 @@ namespace ChatServer.HandleStrategies
             }
             Console.WriteLine("DEBUG: trying to add conversation");
             byte[] reply = new byte[1];
-            lock (chatServer)
+            lock (allHandlers)
             {
                 Conversation newConversation = chatSystem.addConversation(proposedConversationName, namesOfParticipants.ToArray());
                 if (newConversation == null)
@@ -38,7 +36,7 @@ namespace ChatServer.HandleStrategies
                 {
                     reply[0] = 1;
                     byte[] msg = newConversation.serialize().ToArray();
-                    foreach (var handler in chatServer.Handlers.FindAll(h => namesOfParticipants.Contains(h.HandledUserName)))
+                    foreach (var handler in allHandlers.FindAll(h => namesOfParticipants.Contains(h.HandledUserName)))
                     {
                         handler.sendMessage(5, msg);
                     }

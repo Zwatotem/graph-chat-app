@@ -7,49 +7,67 @@ using ChatModel;
 
 namespace ChatServer
 {
-    public class ChatServer
+    public class ConcreteChatServer : IChatServer
     {
         private IPEndPoint ipEndPoint;
         private Socket socket;
         private ServerChatSystem chatSystem;
-        private List<ClientHandler> handlers;
+        private List<IClientHandler> handlers;
         private int maxUsers;
+        private bool working;
 
-        public ChatServer(string ipString, int portNumber, int capacity)
+        public ConcreteChatServer(string ipString, int portNumber, int capacity)
         {
             ipEndPoint = new IPEndPoint(IPAddress.Parse(ipString), portNumber);
             chatSystem = new ServerChatSystem();
-            handlers = new List<ClientHandler>();
+            handlers = new List<IClientHandler>();
             maxUsers = capacity;
+            working = false;
         }
 
-        public List<ClientHandler> Handlers
+        public void startServer()
         {
-            get
+            if (!working)
             {
-                return handlers;
-            }
+                working = true;
+                Thread accepterThread = new Thread(acceptConnections);
+                accepterThread.Start();
+            }           
         }
 
-        public void acceptConnections()
+        public bool isWorking()
+        {
+            return working;
+        }
+
+        public void shutdown()
+        {
+            working = false;
+            socket.Close();
+        }
+
+        private void acceptConnections()
         {
             try
             {
+                Console.WriteLine("DEBUG: Accepting connections...");
                 socket = new Socket(ipEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 socket.Bind(ipEndPoint);
                 socket.Listen(maxUsers);
-                while (true)
+                while (working)
                 {
-                    while (handlers.Count == maxUsers)
+                    if (handlers.Count == maxUsers)
                     {
                         Thread.Sleep(1000);
+                        continue;
                     }
                     Socket newSocket = socket.Accept();
-                    ClientHandler newHandler = new ClientHandler(chatSystem, newSocket, this, 5);
+                    IClientHandler newHandler = new ConcreteClientHandler(chatSystem, newSocket, handlers, 5);
                     lock (this)
                     {
                         handlers.Add(newHandler);
                     }
+                    newHandler.startWorking();
                 }
             }
             catch (Exception ex)
@@ -57,21 +75,10 @@ namespace ChatServer
                 Console.WriteLine("DEBUG: Exception thrown: {0}", ex.Message);
             }
             finally
-            {              
+            {
                 socket.Dispose();
             }
         }
-
-        public void removeHandler(ClientHandler handler)
-        {
-            handlers.Remove(handler);
-        }
-
-        public static void Main(string[] args)
-        {
-            ChatServer chatServer = new ChatServer("192.168.42.225", 50000, 5);
-            chatServer.acceptConnections();
-        }
     }
 }
-    
+

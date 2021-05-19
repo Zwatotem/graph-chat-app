@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using ChatModel;
 
 namespace ChatServer
@@ -16,9 +12,9 @@ namespace ChatServer
             this.handleStrategy = handleStrategy;
         }
 
-        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, ChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
-            this.handleStrategy.handleMessage(chatServer, chatSystem, handlerThread, messageBytes);
+            this.handleStrategy.handleRequest(allHandlers, chatSystem, handlerThread, messageBytes);
         }
     }
 }

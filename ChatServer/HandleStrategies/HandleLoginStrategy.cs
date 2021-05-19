@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ChatModel;
 
 namespace ChatServer.HandleStrategies
 {
     class HandleLoginStrategy : IHandleStrategy
     {
-        public void handleMessage(ChatServer chatServer, ChatSystem chatSystem, ClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, ChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "logIn");
             string userName = Encoding.UTF8.GetString(messageBytes);
             Console.WriteLine("DEBUG: requested logIn");
             byte[] reply = new byte[1];
-            lock (chatServer)
+            lock (allHandlers)
             {
                 User user = chatSystem.getUser(userName);
-                if (handlerThread.HandledUserName != null || user == null || chatServer.Handlers.Exists(h => h.HandledUserName == userName))
+                if (handlerThread.HandledUserName != null || user == null || allHandlers.Exists(h => h.HandledUserName == userName))
                 {
                     reply[0] = 0;
                 }
