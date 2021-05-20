@@ -1,92 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
-using Util;
+using ChatModel.Util;
 
 namespace ChatModel
 {
-	public class ConversationUpdates : IConversation
+	public class ConversationUpdates : BaseConversation
 	{
-		private string name;
-		private int id;
-		private List<Refrence<User>> users;
-		private Dictionary<int, Message> messages;
-		private int smallestFreeId;
-
-		public List<User> Users
-		{
-			get
-			{
-				var list = new List<User>();
-				foreach (var user in users)
-				{
-					list.Add(user);
-				}
-				return list;
-			}
-			set
-			{
-				users = new List<Refrence<User>>();
-				foreach (var user in value)
-				{
-					users.Add(user);
-				}
-			}
-		}
-		public string Name
-		{
-			get => name;
-			set => name = value;
-		}
-		public int ID => id;
-
-		public ConversationUpdates(string name, int id)
-		{
-			this.name = name;
-			this.id = id;
-			this.users = new List<Refrence<User>>();
-			this.messages = new Dictionary<int, Message>();
-		}
-
-		public int getId()
-		{
-			return id;
-		}
-
-		public List<User> getUsers()
-		{
-			return Users;
-		}
+		public ConversationUpdates(string name, int id) : base(name, id) { }
 
 		public List<Refrence<User>> getUsersFull()
 		{
 			return users;
 		}
 
-		public string getName()
-		{
-			return name;
-		}
-
-		public ICollection<Message> getMessages()
-		{
-			return messages.Values;
-		}
-
 		public Dictionary<int, Message> getMessagesFull()
 		{
 			return messages;
-		}
-
-		public Message getMessage(int id)
-		{
-			if (messages.ContainsKey(id))
-				return messages[id];
-			return null;
 		}
 
 		/// <summary>
@@ -119,14 +48,9 @@ namespace ChatModel
 			}
 		}
 
-		public MemoryStream serialize()
+		public MemoryStream serialize(ISerializer serializer)
 		{
-			MemoryStream stream = new MemoryStream();
-			var formatter = new BinaryFormatter();
-			formatter.Serialize(stream, this);
-			stream.Flush();
-			stream.Position = 0;
-			return stream;
+			return serializer.serialize(this);
 		}
 	}
 }

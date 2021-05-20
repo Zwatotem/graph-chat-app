@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using ChatModel.Util;
 
 namespace ChatModel
 {
@@ -45,7 +45,7 @@ namespace ChatModel
 				{
 					var newUsers = new List<User>(); // List of overlapping User objects
 					conversations.Add(convUpdate.ID, new Conversation(convUpdate));
-					foreach (var user in convUpdate.getUsers())
+					foreach (var user in convUpdate.Users)
 					{
 						Predicate<User> p = (u => u.Name == user.Name);
 						if (users.Exists(p))
@@ -85,16 +85,15 @@ namespace ChatModel
 			}
 		}
 
-		public Conversation addConversation(Stream stream)
+		public Conversation addConversation(Stream stream, IDeserializer deserializer)
 		{
-			BinaryFormatter formatter = new BinaryFormatter();
-			Conversation conv = (Conversation)formatter.Deserialize(stream);
+			Conversation conv = (Conversation)deserializer.deserialize(stream);
 			if (conversations.ContainsKey(conv.ID))
 			{
 				return null;
 			}
 			var newUsers = new List<User>(); // List of overlapping User objects
-			foreach (var user in conv.getUsers())
+			foreach (var user in conv.Users)
 			{
 				Predicate<User> p = (u => u.Name == user.Name);
 				if (users.Exists(p))

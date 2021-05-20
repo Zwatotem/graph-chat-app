@@ -98,11 +98,6 @@ namespace ChatModel
 			return newConversation; //returns created conversation
 		}
 
-		public Conversation addConversation(Stream stream) //creates a copy of a conversation passed as paramter in serialized form (?)
-		{
-			throw new NotImplementedException();
-		}
-
 		public bool addUserToConversation(string userName, int id) //method to add a user with a given user name to a conversation with given id
 																   //returns true if operation successful, false if there is no such user or conversation or if the user is already assigned to it.
 		{
@@ -143,7 +138,7 @@ namespace ChatModel
 			}
 			else
 			{
-				if (conversation.getUsers().Count == 0) //if there would be no users in the conversation left
+				if (conversation.Users.Count == 0) //if there would be no users in the conversation left
 				{
 					conversations.Remove(id); //deletes the conversation
 					if (id == smallestFreeId - 1) //if the id of deleted conversation was only one smaller than smallestFreeId
@@ -160,7 +155,7 @@ namespace ChatModel
 		}
 
 
-		public Message sendMessage(int id, string userName, int messageId, MessageContent messageContent, DateTime sentTime) //method to send a message
+		public Message sendMessage(int id, string userName, int messageId, IMessageContent messageContent, DateTime sentTime) //method to send a message
 																															 //to conversation with a given id, from a user with a given userName, replying to a message with a given id, with given content
 																															 //and time of being sent. If successful returns reference to created message, else returns null.
 		{
@@ -169,7 +164,7 @@ namespace ChatModel
 			{
 				return null; //if there is no such conversation, indicate failure of the operation
 			}
-			User author = conversation.getUsers().Find(u => u.Name == userName); //getting reference to a user in the conversation with given name
+			User author = conversation.Users.Find(u => u.Name == userName); //getting reference to a user in the conversation with given name
 			if (author == null)
 			{
 				return null; //if there is no such user, indicate failure of the operation

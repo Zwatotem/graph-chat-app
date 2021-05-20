@@ -29,7 +29,7 @@ namespace chatAppTest
 			Assert.IsNotNull(savedConversation1);
 			Conversation savedConversation2 = chatSystem.addConversation("Konfa 1", user1, user2, user3);
 			Assert.IsNotNull(savedConversation2);
-			Assert.AreNotEqual(savedConversation1.getId(), savedConversation2.getId());
+			Assert.AreNotEqual(savedConversation1.ID, savedConversation2.ID);
 		}
 
 		[TestMethod]
@@ -40,7 +40,7 @@ namespace chatAppTest
 			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
 			User user3 = chatSystem.addNewUser("PszczÛ≥ka Maja");
-			chatSystem.addUserToConversation("PszczÛ≥ka Maja", savedConversation1.getId());
+			chatSystem.addUserToConversation("PszczÛ≥ka Maja", savedConversation1.ID);
 			var collection1 = user3.getConversations();
 			bool isThere = false;
 			foreach (var c in collection1)
@@ -52,7 +52,7 @@ namespace chatAppTest
 			}
 			Assert.IsTrue(isThere);
 
-			var collection2 = savedConversation1.getUsers();
+			var collection2 = savedConversation1.Users;
 			isThere = false;
 			foreach (var u in collection2)
 			{
@@ -71,8 +71,8 @@ namespace chatAppTest
 			User user1 = chatSystem.addNewUser("Jaú Kowalski");
 			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
-			chatSystem.leaveConversation("Kasia èdüb≥o", savedConversation1.getId());
-			var users = savedConversation1.getUsers();
+			chatSystem.leaveConversation("Kasia èdüb≥o", savedConversation1.ID);
+			var users = savedConversation1.Users;
 			foreach (var u in users)
 			{
 				Assert.IsFalse(u == user2);
@@ -91,7 +91,7 @@ namespace chatAppTest
 			User user1 = chatSystem.addNewUser("Jaú Kowalski");
 			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
-			Conversation returnedConversation = chatSystem.getConversation(savedConversation.getId());
+			Conversation returnedConversation = chatSystem.getConversation(savedConversation.ID);
 			Assert.IsTrue(returnedConversation == savedConversation);
 		}
 
@@ -102,21 +102,21 @@ namespace chatAppTest
 			User user1 = chatSystem.addNewUser("Jaú Kowalski");
 			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
-			MessageContent msgContent1 = new TextContent("Heeejoooo");
+			IMessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;
-			Message sentMessage1 = chatSystem.sendMessage(savedConversation.getId(), "Jaú Kowalski", -1, msgContent1, datetime);
+			Message sentMessage1 = chatSystem.sendMessage(savedConversation.ID, "Jaú Kowalski", -1, msgContent1, datetime);
 			Assert.IsNotNull(sentMessage1);
-			Assert.IsNull(sentMessage1.getParent());
-			Assert.IsTrue(sentMessage1.getUser() == user1);
-			Assert.IsTrue(sentMessage1.getContent() == msgContent1);
-			Assert.IsTrue(sentMessage1.getTime() == datetime);
-			MessageContent msgContent2 = new TextContent("CzeúÊ");
-			Message sentMessage2 = chatSystem.sendMessage(savedConversation.getId(), "Kasia èdüb≥o", sentMessage1.getId(), msgContent2, datetime);
+			Assert.IsNull(sentMessage1.Parent);
+			Assert.IsTrue(sentMessage1.Author == user1);
+			Assert.IsTrue(sentMessage1.Content == msgContent1);
+			Assert.IsTrue(sentMessage1.SentTime == datetime);
+			IMessageContent msgContent2 = new TextContent("CzeúÊ");
+			Message sentMessage2 = chatSystem.sendMessage(savedConversation.ID, "Kasia èdüb≥o", sentMessage1.ID, msgContent2, datetime);
 			Assert.IsNotNull(sentMessage2);
-			Assert.IsTrue(sentMessage2.getParent() == sentMessage1);
-			Assert.IsTrue(sentMessage2.getUser() == user2);
-			Assert.IsTrue(sentMessage2.getContent() == msgContent2);
-			Assert.IsTrue(sentMessage2.getTime() == datetime);
+			Assert.IsTrue(sentMessage2.Parent == sentMessage1);
+			Assert.IsTrue(sentMessage2.Author == user2);
+			Assert.IsTrue(sentMessage2.Content == msgContent2);
+			Assert.IsTrue(sentMessage2.SentTime == datetime);
 		}
 	}
 }

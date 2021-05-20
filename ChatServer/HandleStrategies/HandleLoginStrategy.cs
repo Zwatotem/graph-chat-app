@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ChatModel;
+using ChatModel.Util;
 
 namespace ChatServer.HandleStrategies
 {
@@ -26,7 +27,7 @@ namespace ChatServer.HandleStrategies
                     handlerThread.HandledUserName = userName;
                     foreach (var conversation in user.getConversations())
                     {
-                        byte[] msg = conversation.serialize().ToArray();
+                        byte[] msg = conversation.serialize(new ConcreteSerializer()).ToArray();
                         handlerThread.sendMessage(5, msg);
                     }
                 }

@@ -30,9 +30,9 @@ namespace chatAppTest
 			// Creating a conversation with those users
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
 			// Sending a message
-			MessageContent msgContent1 = new TextContent("Heeejoooo");
+			IMessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;
-			Message sentMessage1 = chatSystem.sendMessage(savedConversation.getId(), "Jaú Kowalski", -1, msgContent1, datetime);
+			Message sentMessage1 = chatSystem.sendMessage(savedConversation.ID, "Jaú Kowalski", -1, msgContent1, datetime);
 			// Creating client chat system
 			ClientChatSystem clientChatSystem = new ClientChatSystem();
 			clientChatSystem.addNewUser("Kasia èdüb≥o");
@@ -42,13 +42,13 @@ namespace chatAppTest
 			bool conversationPresent = false;
 			foreach (var conversation in clientChatSystem.getUser("Kasia èdüb≥o").getConversations())
 			{
-				if (conversation.getId() == savedConversation.getId())
+				if (conversation.ID == savedConversation.ID)
 				{
 					conversationPresent = true;
 					bool messagePresent = false;
-					foreach (var message in conversation.getMessages())
+					foreach (var message in conversation.Messages)
 					{
-						if (message.getId() == sentMessage1.getId() && message.getContent().getData() == sentMessage1.getContent().getData())
+						if (message.ID == sentMessage1.ID && message.Content.getData() == sentMessage1.Content.getData())
 						{
 							messagePresent = true;
 						}

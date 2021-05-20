@@ -24,7 +24,7 @@ namespace ChatServer.HandleStrategies
                     Array.Copy(messageBytes, 0, msg, 0, 4);
                     Array.Copy(Encoding.UTF8.GetBytes(userName), 0, msg, 4, messageLength - 4);
                     Conversation conversation = chatSystem.getConversation(conversationId);
-                    foreach (var handler in allHandlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.HandledUserName)))
+                    foreach (var handler in allHandlers.FindAll(h => conversation.Users.Exists(u => u.getName() == h.HandledUserName)))
                     {
                         handler.sendMessage(3, msg);
                     }

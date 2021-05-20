@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ChatModel;
+using ChatModel.Util;
 
 namespace ChatServer.HandleStrategies
 {
@@ -21,11 +22,11 @@ namespace ChatServer.HandleStrategies
                     reply[0] = 1;
                     byte[] msg = messageBytes;
                     Conversation conversation = chatSystem.getConversation(conversationId);
-                    foreach (var handler in allHandlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.HandledUserName)))
+                    foreach (var handler in allHandlers.FindAll(h => conversation.Users.Exists(u => u.getName() == h.HandledUserName)))
                     {
                         if (handler.HandledUserName == nameToAdd)
                         {
-                            byte[] update = conversation.serialize().ToArray();
+                            byte[] update = conversation.serialize(new ConcreteSerializer()).ToArray();
                             handler.sendMessage(5, update);
                         }
                         else

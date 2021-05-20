@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
 using ChatModel;
+using ChatModel.Util;
 
 namespace ChatClient
 {
@@ -132,7 +133,7 @@ namespace ChatClient
                             try
                             {
                                 readWriteLock.AcquireWriterLock(lockTimeout);
-                                result = chatSystem.addConversation(memStream);
+                                result = chatSystem.addConversation(memStream, new ConcreteDeserializer());
                             }
                             finally
                             {
@@ -155,7 +156,7 @@ namespace ChatClient
                                 try
                                 {
                                     readWriteLock.AcquireWriterLock(lockTimeout);
-                                    result = conversation.addMessage(memStream);
+                                    result = conversation.addMessage(memStream, new ConcreteDeserializer());
                                 }
                                 finally
                                 {
@@ -213,9 +214,9 @@ namespace ChatClient
                             break;
                         case 11: //test case
                             Console.Write("Conversations of klaus: ");
-                            chatSystem.getUser("klaus").getConversations().ForEach(c => Console.WriteLine(c.getName()));
+                            chatSystem.getUser("klaus").getConversations().ForEach(c => Console.WriteLine(c.Name));
                             Console.Write("Conversations of hans: ");
-                            chatSystem.getUser("hans").getConversations().ForEach(c => Console.WriteLine(c.getName()));
+                            chatSystem.getUser("hans").getConversations().ForEach(c => Console.WriteLine(c.Name));
                             break;
                     }
                     Console.Write("Give number from 0 to 6: ");
@@ -508,9 +509,9 @@ namespace ChatClient
             try
             {
                 readWriteLock.AcquireReaderLock(lockTimeout);
-                foreach (var message in chatSystem.getConversation(conversationId).getMessages())
+                foreach (var message in chatSystem.getConversation(conversationId).Messages)
                 {
-                    Console.WriteLine("{0}: {1}", message.ID, message.getContent().getData());
+                    Console.WriteLine("{0}: {1}", message.ID, message.Content.getData());
                 }
             }
             finally

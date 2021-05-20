@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using ChatModel;
+using ChatModel.Util;
 
 namespace ChatServer.HandleStrategies
 {
@@ -35,7 +36,7 @@ namespace ChatServer.HandleStrategies
                 else
                 {
                     reply[0] = 1;
-                    byte[] msg = newConversation.serialize().ToArray();
+                    byte[] msg = newConversation.serialize(new ConcreteSerializer()).ToArray();
                     foreach (var handler in allHandlers.FindAll(h => namesOfParticipants.Contains(h.HandledUserName)))
                     {
                         handler.sendMessage(5, msg);

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Util
+namespace ChatModel.Util
 {
 	[Serializable]
 	public class Refrence<T>

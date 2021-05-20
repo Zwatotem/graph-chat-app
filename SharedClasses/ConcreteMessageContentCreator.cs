@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace ChatModel
 {
-    public class ContentFactory
+    public class ConcreteMessageContentCreator : IMessageContentCreator
     {
-        public static MessageContent getContent(byte[] data, int offset)
+        public IMessageContent createMessageContent(byte[] data, int offset)
         {
             if (data[0 + offset] == 1) //text message
             {

@@ -1,28 +1,30 @@
-
-﻿
-using System;
+using System;﻿
+using System.Text;
 
 namespace ChatModel
 {
 	[Serializable]
-	public class TextContent : MessageContent //class representing text content of a message, where text is stored in a string
-											  //objects of this class are immutable
+	public class TextContent : IMessageContent //respresents text content of a message
 	{
-		private string dataString; //field storing the data
+		private string dataString; //field storing text data
 
-		public TextContent(string dataString) //simple constructor
+		/// <summary>
+		/// Creates an immutable TextContent object, initialized with text passed as parameter.
+		/// </summary>
+		/// <param name="dataString"></param>
+		public TextContent(string dataString)
 		{
 			this.dataString = dataString;
 		}
 
-		public object getData() //returns the text of a message
+		public object getData()
 		{
 			return dataString;
 		}
 
-		public object serialize() //serializes the object
+		public byte[] serialize()
 		{
-			return dataString;
+			return Encoding.UTF8.GetBytes(dataString); //converts string to byte[] using UTF-8 encoding
 		}
 	}
 }

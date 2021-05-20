@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ChatModel;
+using ChatModel.Util;
 
 namespace ChatServer.HandleStrategies
 {
@@ -11,7 +12,8 @@ namespace ChatServer.HandleStrategies
             Console.WriteLine("DEBUG: {0} request received", "send message");
             int conversationId = BitConverter.ToInt32(messageBytes, 0);
             int targetedMessageId = BitConverter.ToInt32(messageBytes, 4);
-            MessageContent content = ContentFactory.getContent(messageBytes, 8);
+            IMessageContentCreator contentCreator = new ConcreteMessageContentCreator();
+            IMessageContent content = contentCreator.createMessageContent(messageBytes, 8);
             byte[] reply = new byte[1];
             if (content == null)
             {
@@ -26,12 +28,12 @@ namespace ChatServer.HandleStrategies
                     if (sentMessage != null)
                     {
                         reply[0] = 1;
-                        byte[] serializedBytes = sentMessage.serialize().ToArray(); //serialization must work properly for this one
+                        byte[] serializedBytes = sentMessage.serialize(new ConcreteSerializer()).ToArray(); //serialization must work properly for this one
                         byte[] msg = new byte[serializedBytes.Length + 4];
                         Array.Copy(BitConverter.GetBytes(conversationId), 0, msg, 0, 4);
                         Array.Copy(serializedBytes, 0, msg, 4, serializedBytes.Length);
                         Conversation conversation = chatSystem.getConversation(conversationId);
-                        foreach (var handler in allHandlers.FindAll(h => conversation.getUsers().Exists(u => u.getName() == h.HandledUserName)))
+                        foreach (var handler in allHandlers.FindAll(h => conversation.Users.Exists(u => u.getName() == h.HandledUserName)))
                         {
                             handler.sendMessage(6, msg);
                         }

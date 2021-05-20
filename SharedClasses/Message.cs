@@ -1,131 +1,102 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using Util;
+using ChatModel.Util;
 
 namespace ChatModel
 {
-	[Serializable]
-	public class Message
-	{
-		private Refrence<User> authorRef; // Helper for merging user lists after Conversation deserialization
-		private User author;
-		private MessageContent content;
-		private DateTime sentTime;
-		private Message targetedMessage;
-		private int targetId; // Redundant value used to recover the message structure after deserialization
-		private int id;
+    [Serializable]
+    public class Message
+    {
+        private Refrence<User> authorRef; // Helper for merging user lists after Conversation deserialization
+        private User author;
+        private IMessageContent content;
+        private DateTime sentTime;
+        private Message targetedMessage;
+        private int targetId; // Redundant value used to recover the message structure after deserialization
+        private int id;
 
-		public User Author
-		{
-			get
-			{
-				if (authorRef.Reference == null) // Author was probably removed from the conversation
-				{
-					return author;
-				}
-				else if (authorRef.Reference != author) // Conversation was merged with a new ChatSystem
-				{
-					author = authorRef.Reference;
-				}
-				return author;
-			}
-		}
+        public Refrence<User> AuthorRef { get => authorRef; set => authorRef = value; }
 
-		public Refrence<User> AuthorRef
-		{
-			set
-			{
-				authorRef = value;
-			}
-		}
+        public User Author
+        {
+            get
+            {
+                if (authorRef.Reference == null) // Author was probably removed from the conversation
+                {
+                    return author;
+                }
+                else if (authorRef.Reference != author) // Conversation was merged with a new ChatSystem
+                {
+                    author = authorRef.Reference;
+                }
+                return author;
+            }
+        }
 
-		public Message TargetedMessage
-		{
-			get => targetedMessage;
-			set
-			{
-				targetedMessage = value;
-				targetId = value == null ? -1 : value.ID;
-			}
-		}
+        public IMessageContent Content { get => content; }
 
-		public int ID { get => id; }
-		public int TargetId { get => targetId; }
+        public DateTime SentTime { get => sentTime; }
 
-		public Message(User user, Message targeted, MessageContent messageContent, DateTime datetime, int id)
-		{
-			this.author = user;
-			this.content = messageContent;
-			this.sentTime = datetime;
-			this.id = id;
-			this.TargetedMessage = targeted;
-		}
+        public Message Parent
+        {
+            get => targetedMessage;
+            set
+            {
+                targetedMessage = value;
+                targetId = (value == null) ? -1 : value.ID;
+            }
+        }
 
-		public Message(Refrence<User> user, Message targeted, MessageContent messageContent, DateTime datetime, int id)
-		{
-			this.authorRef = user;
-			this.content = messageContent;
-			this.sentTime = datetime;
-			this.id = id;
-			this.TargetedMessage = targeted;
-		}
+        public int TargetId { get => targetId; }
 
-		/// <summary>
-		/// Constructs new message by doing shallow copy of the object provided
-		/// </summary>
-		/// <param name="other">Template message for construction</param>
-		public Message(Message other)
-		{
-			this.authorRef = other.authorRef;
-			this.author = other.author;
-			this.content = other.content;
-			this.sentTime = other.sentTime;
-			this.id = other.id;
-			this.targetId = other.targetId;
-			this.targetedMessage = other.targetedMessage;
-		}
+        public int ID { get => id; }       
 
-		public Message getParent()
-		{
-			return targetedMessage;
-		}
+        public Message(User user, Message targeted, IMessageContent messageContent, DateTime datetime, int id)
+            : this(targeted, messageContent, datetime, id)
+        {
+            this.author = user;
+        }
 
-		public void setParentUnsafe(Message t)
-		{
-			targetedMessage = t;
-		}
+        public Message(Refrence<User> user, Message targeted, IMessageContent messageContent, DateTime datetime, int id)
+            : this(targeted, messageContent, datetime, id)
+        {
+            this.authorRef = user;
+        }
 
-		public int getId()
-		{
-			return id;
-		}
+        private Message(Message targeted, IMessageContent messageContent, DateTime datetime, int id)
+        {
+            this.content = messageContent;
+            this.sentTime = datetime;
+            this.id = id;
+            this.Parent = targeted;
+        }
 
-		public DateTime getTime()
-		{
-			return sentTime;
-		}
+        /// <summary>
+        /// Constructs new message by doing shallow copy of the object provided
+        /// </summary>
+        /// <param name="other">Template message for construction</param>
+        public Message(Message other)
+        {
+            this.authorRef = other.authorRef;
+            this.author = other.author;
+            this.content = other.content;
+            this.sentTime = other.sentTime;
+            this.id = other.id;
+            this.targetId = other.targetId;
+            this.targetedMessage = other.targetedMessage;
+        }
 
-		public MessageContent getContent()
-		{
-			return content;
-		}
+        public void setParentUnsafe(Message t)
+        {
+            targetedMessage = t;
+        }
 
-		public MemoryStream serialize()
-		{
-			MemoryStream stream = new MemoryStream();
-			var formatter = new BinaryFormatter();
-			Message copy = new Message(this);
-			copy.targetedMessage = null;
-			formatter.Serialize(stream, copy);
-			stream.Flush();
-			stream.Position = 0;
-			return stream;
-		}
-
-		public User getUser()
-		{
-			return Author;
-		}
-	}
+        public MemoryStream serialize(ISerializer serializer)
+        {
+            Message copy = new Message(this);
+            copy.targetedMessage = null;
+            return serializer.serialize(copy);
+        }
+    }
 }
