@@ -10,10 +10,10 @@ namespace chatAppTest
 		[TestMethod]
 		public void getUpdatesToUserTest()
 		{
-			ServerChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
-			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
-			User user3 = chatSystem.addNewUser("Roch Kowal");
+			IServerChatSystem chatSystem = new ServerChatSystem();
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			IUser user3 = chatSystem.addNewUser("Roch Kowal");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
 			Conversation savedConversation2 = chatSystem.addConversation("Konfa 2", user1, user3);
 			IMessageContent msgContent1 = new TextContent("Heeejoooo");
@@ -36,7 +36,7 @@ namespace chatAppTest
 						if (message.ID == sentMessage1.ID)
 						{
 							containsMessage = true;
-							Assert.IsTrue(message.Author.getName() == sentMessage1.Author.getName());
+							Assert.IsTrue(message.Author.Name == sentMessage1.Author.Name);
 							Assert.IsNull(message.Parent);
 							Assert.IsTrue(message.Content.getData() == sentMessage1.Content.getData());
 							Assert.IsTrue(message.SentTime == sentMessage1.SentTime);
@@ -61,11 +61,11 @@ namespace chatAppTest
 		[TestMethod]
 		public void getConversationsOfUserTest()
 		{
-			ServerChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
-			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			IServerChatSystem chatSystem = new ServerChatSystem();
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
-			User user3 = chatSystem.addNewUser("Johannes von Neustadt");
+			IUser user3 = chatSystem.addNewUser("Johannes von Neustadt");
 			Conversation savedConversation2 = chatSystem.addConversation("Ziomki", user1, user3);
 			bool hasConversation1 = false;
 			bool hasConversation2 = false;

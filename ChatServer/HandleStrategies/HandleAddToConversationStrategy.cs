@@ -8,7 +8,7 @@ namespace ChatServer.HandleStrategies
 {
     class HandleAddToConversationStrategy : IHandleStrategy
     {
-        public void handleRequest(List<IClientHandler> allHandlers, ChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, IChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "add user to conversation");
             int conversationId = BitConverter.ToInt32(messageBytes, 0);
@@ -22,7 +22,7 @@ namespace ChatServer.HandleStrategies
                     reply[0] = 1;
                     byte[] msg = messageBytes;
                     Conversation conversation = chatSystem.getConversation(conversationId);
-                    foreach (var handler in allHandlers.FindAll(h => conversation.Users.Exists(u => u.getName() == h.HandledUserName)))
+                    foreach (var handler in allHandlers.FindAll(h => conversation.Users.Exists(u => u.Name == h.HandledUserName)))
                     {
                         if (handler.HandledUserName == nameToAdd)
                         {

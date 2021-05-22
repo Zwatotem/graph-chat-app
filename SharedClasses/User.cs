@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ChatModel
 {
 	[Serializable]
-	public class User //class representing a user of the system
+	public class User : IUser //class representing a user of the system
 	{
 		private string userName; //unique name of the user
 		private List<Conversation> conversations; //list of all conversations in which the user participates
@@ -15,25 +15,9 @@ namespace ChatModel
 			this.conversations = new List<Conversation>();
 		}
 
-		public string Name //first way to get userName
-		{
-			get
-			{
-				return userName;
-			}
-		}
+		public string Name { get => userName; }
 
-		public string getName() //second way to get userName
-		{
-			return userName;
-		}
-
-		public List<Conversation> getConversations() //returns the collection of all conversations in which the user takes part.
-		{
-			return conversations;
-		}
-
-
+		public List<Conversation> Conversations { get => conversations; }
 
 		public bool matchWithConversation(Conversation conversation1) //method to assign a specific conversation to user
 																	  //return true is assignment successful. If the conversation1 is already assigned to user (or is null), returns false.

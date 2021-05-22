@@ -19,8 +19,8 @@ namespace chatAppTest
 		[TestMethod]
 		public void addMessageTest()
 		{
-			User user1 = new User("Roch Lancel");
-			User user2 = new User("Harry Potter");
+			IUser user1 = new User("Roch Lancel");
+			IUser user2 = new User("Harry Potter");
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			IMessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;
@@ -68,7 +68,7 @@ namespace chatAppTest
 		[TestMethod]
 		public void getMessageTest()
 		{
-			User user1 = new User("Roch Lancel");
+			IUser user1 = new User("Roch Lancel");
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			conversation1.matchWithUser(user1);
 			Assert.IsNull(conversation1.getMessage(1));
@@ -84,8 +84,8 @@ namespace chatAppTest
 		{
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			Conversation conversation2 = new Conversation("Konfa 2", 2);
-			User user1 = new User("Pan A");
-			User user2 = new User("Pani B");
+			IUser user1 = new User("Pan A");
+			IUser user2 = new User("Pani B");
 
 			bool hasUser1 = false;
 			bool hasUser2 = false;
@@ -144,7 +144,7 @@ namespace chatAppTest
 		public void unmatchWithUserTest()
 		{
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
-			User user1 = new User("Pan A");
+			IUser user1 = new User("Pan A");
 
 			bool hasUser1 = false;
 			bool hasWrongUser = false;
@@ -190,8 +190,8 @@ namespace chatAppTest
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			Conversation conversation2 = new Conversation("Konfa 2", 2);
 			Conversation conversation3 = new Conversation("Konfa 3", 3);
-			User user1 = new User("Pan A");
-			User user2 = new User("Pani B");
+			IUser user1 = new User("Pan A");
+			IUser user2 = new User("Pani B");
 
 			bool hasUser1 = false;
 			bool hasUser2 = false;
@@ -258,9 +258,9 @@ namespace chatAppTest
 		[TestMethod]
 		public void serializeTest()
 		{
-			ServerChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
-			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			IServerChatSystem chatSystem = new ServerChatSystem();
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
 			IMessageContent msgContent1 = new TextContent("Heeejoooo");
 			IMessageContent msgContent2 = new TextContent("Heeej");
@@ -268,9 +268,9 @@ namespace chatAppTest
 			Message sentMessage1 = chatSystem.sendMessage(savedConversation.ID, "Jaú Kowalski", -1, msgContent1, datetime);
 			Message sentMessage2 = chatSystem.sendMessage(savedConversation.ID, "Kasia èdüb≥o", sentMessage1.ID, msgContent2, datetime);
 
-			ClientChatSystem clientChatSystem = new ClientChatSystem();
-			User userClient1 = clientChatSystem.addNewUser("Jaú Kowalski");
-			User userClient2 = clientChatSystem.addNewUser("Kasia èdüb≥o");
+			IClientChatSystem clientChatSystem = new ClientChatSystem();
+			IUser userClient1 = clientChatSystem.addNewUser("Jaú Kowalski");
+			IUser userClient2 = clientChatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedClientConversation = clientChatSystem.addConversation(savedConversation.serialize(new ConcreteSerializer()), new ConcreteDeserializer());
 
 			bool msg1Present = false;
@@ -312,8 +312,8 @@ namespace chatAppTest
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 
 			// Users
-			User user1 = new User("Mr. X");
-			User user2 = new User("Ms. Y");
+			IUser user1 = new User("Mr. X");
+			IUser user2 = new User("Ms. Y");
 			// Matching
 			conversation1.matchWithUser(user1);
 			conversation1.matchWithUser(user2);
@@ -343,7 +343,7 @@ namespace chatAppTest
 				if (message.ID == sentMessage2.ID)
 				{
 					hasMessage2 = true;
-					Assert.IsTrue(message.Author.getName() == sentMessage2.Author.getName());
+					Assert.IsTrue(message.Author.Name == sentMessage2.Author.Name);
 					Assert.IsTrue(message.TargetId == 1);
 					Assert.IsTrue(message.Content.getData() == sentMessage2.Content.getData());
 					Assert.IsTrue(message.SentTime == sentMessage2.SentTime);
@@ -351,7 +351,7 @@ namespace chatAppTest
 				else if (message.ID == sentMessage3.ID)
 				{
 					hasMessage3 = true;
-					Assert.IsTrue(message.Author.getName() == sentMessage3.Author.getName());
+					Assert.IsTrue(message.Author.Name == sentMessage3.Author.Name);
 					Assert.IsTrue(message.Parent.ID == 2);
 					Assert.IsTrue(message.Content.getData() == sentMessage3.Content.getData());
 					Assert.IsTrue(message.SentTime == sentMessage3.SentTime);

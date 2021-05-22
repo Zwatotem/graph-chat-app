@@ -8,7 +8,7 @@ namespace ChatModel
 	{
 		public ConversationUpdates(string name, int id) : base(name, id) { }
 
-		public List<Refrence<User>> getUsersFull()
+		public List<Refrence<IUser>> getUsersFull()
 		{
 			return users;
 		}

@@ -17,7 +17,7 @@ namespace ChatClient
         private Socket socket;
         private ReaderWriterLock readWriteLock;
         private int lockTimeout;
-        private ClientChatSystem chatSystem;
+        private IClientChatSystem chatSystem;
         private byte[] inBuffer;
         private bool responseReady;
         private bool responseStatus;
@@ -214,9 +214,9 @@ namespace ChatClient
                             break;
                         case 11: //test case
                             Console.Write("Conversations of klaus: ");
-                            chatSystem.getUser("klaus").getConversations().ForEach(c => Console.WriteLine(c.Name));
+                            chatSystem.getUser("klaus").Conversations.ForEach(c => Console.WriteLine(c.Name));
                             Console.Write("Conversations of hans: ");
-                            chatSystem.getUser("hans").getConversations().ForEach(c => Console.WriteLine(c.Name));
+                            chatSystem.getUser("hans").Conversations.ForEach(c => Console.WriteLine(c.Name));
                             break;
                     }
                     Console.Write("Give number from 0 to 6: ");
@@ -381,14 +381,14 @@ namespace ChatClient
             try
             {
                 readWriteLock.AcquireReaderLock(lockTimeout);
-                yourName = chatSystem.getUserName();
+                yourName = chatSystem.LoggedInName;
                 if (yourName == null)
                 {
                     Console.WriteLine("You must be logged in first!");
                     return;
                 }
                 Console.WriteLine("Here is the list of your conversations:");
-                chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+                chatSystem.getUser(yourName).Conversations.ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
             }
             finally
             {
@@ -436,14 +436,14 @@ namespace ChatClient
             try
             {
                 readWriteLock.AcquireReaderLock(lockTimeout);
-                yourName = chatSystem.getUserName();
+                yourName = chatSystem.LoggedInName;
                 if (yourName == null)
                 {
                     Console.WriteLine("You must be logged in first!");
                     return;
                 }
                 Console.WriteLine("Here is the list of your conversations:");
-                chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+                chatSystem.getUser(yourName).Conversations.ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
             }
             finally
             {
@@ -469,7 +469,7 @@ namespace ChatClient
                 responseReady = false;
                 if (response)
                 {
-                    chatSystem.leaveConversation(yourName, conversationId);
+                    chatSystem.getConversation(conversationId).Users.ForEach(u => chatSystem.leaveConversation(u.Name, conversationId));
                 }
                 Monitor.Pulse(this);
             }
@@ -490,14 +490,14 @@ namespace ChatClient
             try
             {
                 readWriteLock.AcquireReaderLock(lockTimeout);
-                yourName = chatSystem.getUserName();
+                yourName = chatSystem.LoggedInName;
                 if (yourName == null)
                 {
                     Console.WriteLine("You must be logged in first!");
                     return;
                 }
                 Console.WriteLine("Here is the list of your conversations:");
-                chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+                chatSystem.getUser(yourName).Conversations.ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
             }
             finally
             {

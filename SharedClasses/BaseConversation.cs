@@ -9,30 +9,30 @@ namespace ChatModel
     {
         protected string name;
         protected int id;
-        protected List<Refrence<User>> users;
+        protected List<Refrence<IUser>> users;
         protected Dictionary<int, Message> messages;
 
 		public string Name { get => name; }
 
 		public int ID { get => id; }
 
-		public List<User> Users
+		public List<IUser> Users
 		{
 			get
 			{
-				var list = new List<User>();
+				var list = new List<IUser>();
 				foreach (var user in users)
 				{
-					list.Add(user);
+					list.Add(user.Reference);
 				}
 				return list;
 			}
 			set
 			{
-				users = new List<Refrence<User>>();
+				users = new List<Refrence<IUser>>();
 				foreach (var user in value)
 				{
-					users.Add(user);
+					users.Add(new Refrence<IUser>(user));
 				}
 			}
 		}
@@ -45,7 +45,7 @@ namespace ChatModel
 		{
 			this.name = name;
 			this.id = id;
-			this.users = new List<Refrence<User>>();
+			this.users = new List<Refrence<IUser>>();
 			this.messages = new Dictionary<int, Message>();
 		}
 

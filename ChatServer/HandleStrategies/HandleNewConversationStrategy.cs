@@ -8,7 +8,7 @@ namespace ChatServer.HandleStrategies
 {
     class HandleNewConversationStrategy : IHandleStrategy
     {
-        public void handleRequest(List<IClientHandler> allHandlers, ChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, IChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "add new conversation");
             List<string> namesOfParticipants = new List<string>();

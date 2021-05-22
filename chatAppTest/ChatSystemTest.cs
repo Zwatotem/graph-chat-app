@@ -10,8 +10,8 @@ namespace chatAppTest
 		[TestMethod]
 		public void AddNewUserTest()
 		{
-			ChatSystem chatSystem = new ServerChatSystem();
-			User savedUser = chatSystem.addNewUser("Jaú Kowalski");
+			IChatSystem chatSystem = new ServerChatSystem();
+			IUser savedUser = chatSystem.addNewUser("Jaú Kowalski");
 			Assert.IsNotNull(savedUser);
 
 			savedUser = chatSystem.addNewUser("Jaú Kowalski");
@@ -21,10 +21,10 @@ namespace chatAppTest
 		[TestMethod]
 		public void AddConversationTest()
 		{
-			ChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
-			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
-			User user3 = chatSystem.addNewUser("PszczÛ≥ka Maja");
+			IChatSystem chatSystem = new ServerChatSystem();
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			IUser user3 = chatSystem.addNewUser("PszczÛ≥ka Maja");
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2, user3);
 			Assert.IsNotNull(savedConversation1);
 			Conversation savedConversation2 = chatSystem.addConversation("Konfa 1", user1, user2, user3);
@@ -35,13 +35,13 @@ namespace chatAppTest
 		[TestMethod]
 		public void AddUserToConversation()
 		{
-			ChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
-			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			IChatSystem chatSystem = new ServerChatSystem();
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
-			User user3 = chatSystem.addNewUser("PszczÛ≥ka Maja");
+			IUser user3 = chatSystem.addNewUser("PszczÛ≥ka Maja");
 			chatSystem.addUserToConversation("PszczÛ≥ka Maja", savedConversation1.ID);
-			var collection1 = user3.getConversations();
+			var collection1 = user3.Conversations;
 			bool isThere = false;
 			foreach (var c in collection1)
 			{
@@ -67,9 +67,9 @@ namespace chatAppTest
 		[TestMethod]
 		public void LeaveConversation()
 		{
-			ChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
-			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			IChatSystem chatSystem = new ServerChatSystem();
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
 			chatSystem.leaveConversation("Kasia èdüb≥o", savedConversation1.ID);
 			var users = savedConversation1.Users;
@@ -77,7 +77,7 @@ namespace chatAppTest
 			{
 				Assert.IsFalse(u == user2);
 			}
-			var conversations = user2.getConversations();
+			var conversations = user2.Conversations;
 			foreach (var c in conversations)
 			{
 				Assert.IsFalse(c == savedConversation1);
@@ -87,9 +87,9 @@ namespace chatAppTest
 		[TestMethod]
 		public void GetConversationTest()
 		{
-			ChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
-			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			IChatSystem chatSystem = new ServerChatSystem();
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
 			Conversation returnedConversation = chatSystem.getConversation(savedConversation.ID);
 			Assert.IsTrue(returnedConversation == savedConversation);
@@ -98,9 +98,9 @@ namespace chatAppTest
 		[TestMethod]
 		public void sendMessageTest()
 		{
-			ChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
-			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			IChatSystem chatSystem = new ServerChatSystem();
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
 			IMessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;

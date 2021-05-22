@@ -8,57 +8,21 @@ namespace ChatModel
     [Serializable]
     public class Message
     {
-        private Refrence<User> authorRef; // Helper for merging user lists after Conversation deserialization
-        private User author;
+        private Refrence<IUser> authorRef; // Helper for merging user lists after Conversation deserialization
+        private IUser author;
         private IMessageContent content;
         private DateTime sentTime;
         private Message targetedMessage;
         private int targetId; // Redundant value used to recover the message structure after deserialization
         private int id;
 
-        public Refrence<User> AuthorRef { get => authorRef; set => authorRef = value; }
-
-        public User Author
-        {
-            get
-            {
-                if (authorRef.Reference == null) // Author was probably removed from the conversation
-                {
-                    return author;
-                }
-                else if (authorRef.Reference != author) // Conversation was merged with a new ChatSystem
-                {
-                    author = authorRef.Reference;
-                }
-                return author;
-            }
-        }
-
-        public IMessageContent Content { get => content; }
-
-        public DateTime SentTime { get => sentTime; }
-
-        public Message Parent
-        {
-            get => targetedMessage;
-            set
-            {
-                targetedMessage = value;
-                targetId = (value == null) ? -1 : value.ID;
-            }
-        }
-
-        public int TargetId { get => targetId; }
-
-        public int ID { get => id; }       
-
-        public Message(User user, Message targeted, IMessageContent messageContent, DateTime datetime, int id)
+        public Message(IUser user, Message targeted, IMessageContent messageContent, DateTime datetime, int id)
             : this(targeted, messageContent, datetime, id)
         {
             this.author = user;
         }
 
-        public Message(Refrence<User> user, Message targeted, IMessageContent messageContent, DateTime datetime, int id)
+        public Message(Refrence<IUser> user, Message targeted, IMessageContent messageContent, DateTime datetime, int id)
             : this(targeted, messageContent, datetime, id)
         {
             this.authorRef = user;
@@ -86,6 +50,42 @@ namespace ChatModel
             this.targetId = other.targetId;
             this.targetedMessage = other.targetedMessage;
         }
+
+        public Refrence<IUser> AuthorRef { get => authorRef; set => authorRef = value; }
+
+        public IUser Author
+        {
+            get
+            {
+                if (authorRef.Reference == null) // Author was probably removed from the conversation
+                {
+                    return author;
+                }
+                else if (authorRef.Reference != author) // Conversation was merged with a new IChatSystem
+                {
+                    author = authorRef.Reference;
+                }
+                return author;
+            }
+        }
+
+        public IMessageContent Content { get => content; }
+
+        public DateTime SentTime { get => sentTime; }
+
+        public Message Parent
+        {
+            get => targetedMessage;
+            set
+            {
+                targetedMessage = value;
+                targetId = (value == null) ? -1 : value.ID;
+            }
+        }
+
+        public int TargetId { get => targetId; }
+
+        public int ID { get => id; }       
 
         public void setParentUnsafe(Message t)
         {

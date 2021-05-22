@@ -11,7 +11,7 @@ namespace chatAppTest
 		[TestMethod]
 		public void getIdTest()
 		{
-			User user1 = new User("Jaœ Kowalski");
+			IUser user1 = new User("Jaœ Kowalski");
 			DateTime datetime = DateTime.Now;
 			IMessageContent messageContent1 = new TextContent("Siemka, co tam?");
 			Message message1 = new Message(user1, null, messageContent1, datetime, 1);
@@ -21,7 +21,7 @@ namespace chatAppTest
 		[TestMethod]
 		public void getTimeTest()
 		{
-			User user1 = new User("Jaœ Kowalski");
+			IUser user1 = new User("Jaœ Kowalski");
 			DateTime datetime = DateTime.Now;
 			IMessageContent messageContent1 = new TextContent("Siemka, co tam?");
 			Message message1 = new Message(user1, null, messageContent1, datetime, 1);
@@ -33,8 +33,8 @@ namespace chatAppTest
 		{
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			Conversation conversation2 = new Conversation("Konfa 2", 2);
-			User user1 = new User("Pszczó³ka Maja");
-			User user2 = new User("Stary Trzmiel");
+			IUser user1 = new User("Pszczó³ka Maja");
+			IUser user2 = new User("Stary Trzmiel");
 			conversation1.matchWithUser(user1);
 			conversation2.matchWithUser(user1);
 			conversation1.matchWithUser(user2);
@@ -50,13 +50,13 @@ namespace chatAppTest
 			Message recreatedMessage2 = conversation2.addMessage(message2.serialize(new ConcreteSerializer()), new ConcreteDeserializer());
 
 			Assert.AreEqual(recreatedMessage1.ID, message1.ID); // There is no way serialization keeps references
-			Assert.AreEqual(recreatedMessage1.Author.getName(), message1.Author.getName());
+			Assert.AreEqual(recreatedMessage1.Author.Name, message1.Author.Name);
 			Assert.IsNull(recreatedMessage1.Parent);
 			Assert.AreEqual(recreatedMessage1.Content.getData(), message1.Content.getData());
 			Assert.AreEqual(recreatedMessage1.SentTime, message1.SentTime);
 
 			Assert.AreEqual(recreatedMessage2.ID, message2.ID);
-			Assert.AreEqual(recreatedMessage2.Author.getName(), message2.Author.getName());
+			Assert.AreEqual(recreatedMessage2.Author.Name, message2.Author.Name);
 			Assert.AreEqual(recreatedMessage2.Parent, recreatedMessage1);
 			Assert.AreEqual(recreatedMessage2.Content.getData(), message2.Content.getData());
 			Assert.AreEqual(recreatedMessage2.SentTime, message2.SentTime);
@@ -65,7 +65,7 @@ namespace chatAppTest
 		[TestMethod]
 		public void getContentTest()
 		{
-			User user1 = new User("Jaœ Kowalski");
+			IUser user1 = new User("Jaœ Kowalski");
 			DateTime datetime = DateTime.Now;
 			IMessageContent messageContent1 = new TextContent("Siemka, co tam?");
 			Message message1 = new Message(user1, null, messageContent1, datetime, 1);

@@ -7,7 +7,7 @@ namespace ChatServer.HandleStrategies
 {
     class HandleLeaveConversationStrategy : IHandleStrategy
     {
-        public void handleRequest(List<IClientHandler> allHandlers, ChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, IChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "leave conversation");
             int conversationId = BitConverter.ToInt32(messageBytes, 0);
@@ -24,7 +24,7 @@ namespace ChatServer.HandleStrategies
                     Array.Copy(messageBytes, 0, msg, 0, 4);
                     Array.Copy(Encoding.UTF8.GetBytes(userName), 0, msg, 4, messageLength - 4);
                     Conversation conversation = chatSystem.getConversation(conversationId);
-                    foreach (var handler in allHandlers.FindAll(h => conversation.Users.Exists(u => u.getName() == h.HandledUserName)))
+                    foreach (var handler in allHandlers.FindAll(h => conversation.Users.Exists(u => u.Name == h.HandledUserName)))
                     {
                         handler.sendMessage(3, msg);
                     }

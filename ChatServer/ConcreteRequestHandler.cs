@@ -12,7 +12,7 @@ namespace ChatServer
             this.handleStrategy = handleStrategy;
         }
 
-        public void handleRequest(List<IClientHandler> allHandlers, ChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, IChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             this.handleStrategy.handleRequest(allHandlers, chatSystem, handlerThread, messageBytes);
         }

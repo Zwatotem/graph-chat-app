@@ -10,7 +10,7 @@ namespace ChatServer
     {
         private IIOSocketFacade socketFacade;
         private string handledUserName;
-        private ServerChatSystem chatSystem;      
+        private IServerChatSystem chatSystem;      
         private List<IClientHandler> allHandlers;
         private Thread listenerThread;
         private bool working;
@@ -23,7 +23,7 @@ namespace ChatServer
             set => handledUserName = value;
         }
 
-        public ConcreteClientHandler(ServerChatSystem chatSystem, Socket socket, List<IClientHandler> allHandlers, int headerLength)
+        public ConcreteClientHandler(IServerChatSystem chatSystem, Socket socket, List<IClientHandler> allHandlers, int headerLength)
         {
             Console.WriteLine("DEBUG: handler object created");
             this.chatSystem = chatSystem;

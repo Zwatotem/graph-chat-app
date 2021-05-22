@@ -7,7 +7,7 @@ namespace ChatServer.HandleStrategies
 {
     class HandleSendMessageStrategy : IHandleStrategy
     {
-        public void handleRequest(List<IClientHandler> allHandlers, ChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, IChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "send message");
             int conversationId = BitConverter.ToInt32(messageBytes, 0);
@@ -33,7 +33,7 @@ namespace ChatServer.HandleStrategies
                         Array.Copy(BitConverter.GetBytes(conversationId), 0, msg, 0, 4);
                         Array.Copy(serializedBytes, 0, msg, 4, serializedBytes.Length);
                         Conversation conversation = chatSystem.getConversation(conversationId);
-                        foreach (var handler in allHandlers.FindAll(h => conversation.Users.Exists(u => u.getName() == h.HandledUserName)))
+                        foreach (var handler in allHandlers.FindAll(h => conversation.Users.Exists(u => u.Name == h.HandledUserName)))
                         {
                             handler.sendMessage(6, msg);
                         }

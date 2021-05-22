@@ -7,12 +7,12 @@ namespace ChatServer.HandleStrategies
 {
     class HandleNewUserStrategy : IHandleStrategy
     {
-        public void handleRequest(List<IClientHandler> allHandlers, ChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, IChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "add new user");
             string proposedName = Encoding.UTF8.GetString(messageBytes);
             Console.WriteLine("DEBUG: trying to add new user");
-            User newUser = null;
+            IUser newUser = null;
             lock (allHandlers)
             {
                 newUser = chatSystem.addNewUser(proposedName);

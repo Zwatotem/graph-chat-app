@@ -11,7 +11,7 @@ namespace ChatServer
     {
         private IPEndPoint ipEndPoint;
         private Socket socket;
-        private ServerChatSystem chatSystem;
+        private IServerChatSystem chatSystem;
         private List<IClientHandler> handlers;
         private int maxUsers;
         private bool working;

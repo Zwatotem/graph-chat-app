@@ -35,20 +35,20 @@ namespace ChatModel
 			converge();
 		}
 
-		public Refrence<User> getUserRef(User user)
+		public Refrence<IUser> getUserRef(IUser user)
 		{
 			return users.Find(r => r.Reference == user);
 		}
 
-		public bool matchWithUser(User user)
+		public bool matchWithUser(IUser user)
 		{
 			if (Users.Contains(user))
 				return false;
-			users.Add(new Refrence<User>(user));
+			users.Add(new Refrence<IUser>(user));
 			return true;
 		}
 
-		public bool reMatchWithUser(User user)
+		public bool reMatchWithUser(IUser user)
 		{
 			var internalUser = Users.Find(u => u.Name == user.Name);
 			if (internalUser != null)
@@ -61,7 +61,7 @@ namespace ChatModel
 			return false;
 		}
 
-		public bool unmatchWithUser(User user)
+		public bool unmatchWithUser(IUser user)
 		{
 			if (Users.Contains(user))
 			{
@@ -81,7 +81,7 @@ namespace ChatModel
 			return null;
 		}
 
-		public Message addMessage(User user, int parentID, IMessageContent messageContent1, DateTime datetime)
+		public Message addMessage(IUser user, int parentID, IMessageContent messageContent1, DateTime datetime)
 		{
 			int newID = smallestFreeId;
 			if ((messages.ContainsKey(parentID) || parentID == -1) && Users.Contains(user) && !messages.ContainsKey(newID))

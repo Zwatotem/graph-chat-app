@@ -1,25 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace ChatModel
 {
-	public abstract class ChatSystem //abstract class implementing shared properties of client and server chat systems
+	public abstract class ChatSystem : IChatSystem //abstract class implementing shared properties of client and server chat systems
 	{
 		protected Dictionary<int, Conversation> conversations; //dictionary of all conversations in the chat system, indexed by their unique id
-		protected List<User> users; //list of all users in the chat system, each has an unique user name
+		protected List<IUser> users; //list of all users in the chat system, each has an unique user name
 		protected int smallestFreeId; //smallest unique id available to be assigned to a new conversation
 		protected Stack<int> freedIds; //stack of conversation ids smaller than current smallest available that were freed be deleting conversations
 
 		public ChatSystem() //simple constructor, initializing collections as empty and setting first available conversation id to 1
 		{
 			this.conversations = new Dictionary<int, Conversation>();
-			this.users = new List<User>();
+			this.users = new List<IUser>();
 			this.smallestFreeId = 1;
 			this.freedIds = new Stack<int>();
 		}
 
-		public User addNewUser(string newUserName) //method to create a new user in the chat system, with an unique name passed as parameter.
+		public IUser getUser(string userName) //method to return an existing user with a name passed as parameter. If successful, 
+											  //returns object reference, if there's no such user in the chat system, return null.
+		{
+			return users.Find(u => u.Name == userName); //returns first found user with specific name (there's at most one as names are unique)
+		}
+
+		public IUser addNewUser(string newUserName) //method to create a new user in the chat system, with an unique name passed as parameter.
 												   //if successful, returns a reference to created user object. If there's already present a user with passed user name, returns null.
 		{
 			if (users.Exists(u => u.Name == newUserName))
@@ -28,16 +33,10 @@ namespace ChatModel
 			}
 			else
 			{
-				User newUser = new User(newUserName); //creating and adding new user to the list
+				IUser newUser = new User(newUserName); //creating and adding new user to the list
 				users.Add(newUser);
 				return newUser;
 			}
-		}
-
-		public User getUser(string userName) //method to return an existing user with a name passed as parameter. If successful, 
-											 //returns object reference, if there's no such user in the chat system, return null.
-		{
-			return users.Find(u => u.Name == userName); //returns first found user with specific name (there's at most one as names are unique)
 		}
 
 		public Conversation getConversation(int id) //method to return a conversation with an id passed as parameter. If successful, 
@@ -57,11 +56,11 @@ namespace ChatModel
 																								  //passed as first parameter and list of user names of users that are to participate as second parameter.
 																								  //returns reference to created conversation or null, if the conversation cannot be created (eg. not all users exist in the system)
 		{
-			User[] owners = new User[ownersNames.Length]; //creates an array to be filled with references to the new conversation's users
+			IUser[] owners = new User[ownersNames.Length]; //creates an array to be filled with references to the new conversation's users
 			int index = 0; //index of first free position in the array
 			foreach (var userName in ownersNames) //finding all users in a loop
 			{
-				User userReference = users.Find(u => u.Name == userName); //finds user with a specific name
+				IUser userReference = users.Find(u => u.Name == userName); //finds user with a specific name
 				if (userReference == null) //if there's no such user conversation cannot be created
 				{
 					return null;
@@ -75,7 +74,7 @@ namespace ChatModel
 															  //the method can be called. Then it's returned value (a reference to created conversation) can be returned.
 		}
 
-		public Conversation addConversation(string conversationName, params User[] owners) //method to create new conversation with a name
+		public Conversation addConversation(string conversationName, params IUser[] owners) //method to create new conversation with a name
 																						   //passed as first parameter and list of references to users (that are expected to be present in the system!) as second parameter.
 																						   //returns created conversation
 		{
@@ -101,7 +100,7 @@ namespace ChatModel
 		public bool addUserToConversation(string userName, int id) //method to add a user with a given user name to a conversation with given id
 																   //returns true if operation successful, false if there is no such user or conversation or if the user is already assigned to it.
 		{
-			User userToAdd = getUser(userName); //getting reference to a user in the system with given user name
+			IUser userToAdd = getUser(userName); //getting reference to a user in the system with given user name
 			if (userToAdd == null)
 			{
 				return false; //if there is no such user, indicate failure of the operation
@@ -120,7 +119,7 @@ namespace ChatModel
 															   //a conversation with an id passed as second parameter. If there would be no users left in it, the conversation gets deleted.
 															   //return true if operation successful, false if unsuccessful (eg. there is no such user or they are not assigned to the conversation)
 		{
-			User userToRemove = getUser(userName); //getting reference to a user in the system with given user name
+			IUser userToRemove = getUser(userName); //getting reference to a user in the system with given user name
 			if (userToRemove == null)
 			{
 				return false; //if there is no such user, indicate failure of the operation
@@ -164,7 +163,7 @@ namespace ChatModel
 			{
 				return null; //if there is no such conversation, indicate failure of the operation
 			}
-			User author = conversation.Users.Find(u => u.Name == userName); //getting reference to a user in the conversation with given name
+			IUser author = conversation.Users.Find(u => u.Name == userName); //getting reference to a user in the conversation with given name
 			if (author == null)
 			{
 				return null; //if there is no such user, indicate failure of the operation
