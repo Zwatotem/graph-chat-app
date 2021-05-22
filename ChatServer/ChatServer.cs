@@ -69,7 +69,7 @@ namespace ChatServer
 
         public static void Main(string[] args)
         {
-            ChatServer chatServer = new ChatServer("192.168.42.225", 50000);
+            ChatServer chatServer = new ChatServer("192.168.1.13", 50000);
             chatServer.acceptConnections();
         }
     }

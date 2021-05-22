@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using ChatModel;
 
-namespace ChatClient
+namespace GraphChatApp
 {
     public class ChatClient
     {
