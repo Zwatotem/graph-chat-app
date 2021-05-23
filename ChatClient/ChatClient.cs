@@ -24,9 +24,9 @@ namespace ChatClient
         private int responseNumber;
         bool goOn;
 
-        ChatClient(string serverIpText, int portNumber)
+        ChatClient(string hostName, int portNumber)
         {
-            serverEndPoint = new IPEndPoint(IPAddress.Parse(serverIpText), portNumber);
+            serverEndPoint = new IPEndPoint(Dns.GetHostAddresses(hostName)[0], portNumber);
             readWriteLock = new ReaderWriterLock();
             lockTimeout = 10000;
             chatSystem = new ClientChatSystem();
@@ -567,7 +567,7 @@ namespace ChatClient
 
         public static void Main(string[] args)
         {
-            ChatClient client = new ChatClient("192.168.42.225", 50000);
+            ChatClient client = new ChatClient("czamara.dyndns.org", 50000);
             client.workClient();
         }
     }
