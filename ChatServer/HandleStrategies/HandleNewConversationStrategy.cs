@@ -6,17 +6,22 @@ using ChatModel.Util;
 
 namespace ChatServer.HandleStrategies
 {
+    /// <summary>
+    /// Class handling request to create new conversation.
+    /// </summary>
     class HandleNewConversationStrategy : IHandleStrategy
     {
-        public void handleRequest(List<IClientHandler> allHandlers, IChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
+        public void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "add new conversation");
+            //decoding request - first 4 bytes are length of proposed conversation name, next there is the name
             List<string> namesOfParticipants = new List<string>();
             int index = 0;
             int stringLength = BitConverter.ToInt32(messageBytes, 0);
             index += 4;
             string proposedConversationName = Encoding.UTF8.GetString(messageBytes, index, stringLength);
             index += stringLength;
+            //the rest of the request are some number of pairs: (4 bytes describing length of user name, name of user to add to conversation)
             while (index < messageBytes.Length)
             {
                 stringLength = BitConverter.ToInt32(messageBytes, index);
@@ -31,12 +36,13 @@ namespace ChatServer.HandleStrategies
                 Conversation newConversation = chatSystem.addConversation(proposedConversationName, namesOfParticipants.ToArray());
                 if (newConversation == null)
                 {
-                    reply[0] = 0;
+                    reply[0] = 0; //conversation could not be created
                 }
                 else
                 {
                     reply[0] = 1;
                     byte[] msg = newConversation.serialize(new ConcreteSerializer()).ToArray();
+                    //if conversation created successfully, send it to all participating users that are currently connected
                     foreach (var handler in allHandlers.FindAll(h => namesOfParticipants.Contains(h.HandledUserName)))
                     {
                         handler.sendMessage(5, msg);
@@ -47,3 +53,9 @@ namespace ChatServer.HandleStrategies
         }
     }
 }
+
+/*
+One of concrete strategies of the implemented strategy pattern.
+This class has only one responsibility.
+Complies with Liskov Substitution Principle - all interface methods are properly implemented.
+*/

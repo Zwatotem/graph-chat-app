@@ -6,10 +6,19 @@ namespace ChatServer.HandleStrategies
 {
     class HandleDisconnectStrategy : IHandleStrategy
     {
-        public void handleRequest(List<IClientHandler> allHandlers, IChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
+        /// <summary>
+        /// Class handling request to disconnect.
+        /// </summary>
+        public void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
         {
             Console.WriteLine("DEBUG: {0} request received", "disconnect");
-            handlerThread.shutdown();
+            handlerThread.shutdown(); //shutdown the handler
         }
     }
 }
+
+/*
+One of concrete strategies of the implemented strategy pattern.
+This class has only one responsibility.
+Complies with Liskov Substitution Principle - all interface methods are properly implemented.
+*/

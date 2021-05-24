@@ -2,12 +2,15 @@
 
 namespace ChatServer
 {
+    /// <summary>
+    /// Concrete implementation of IRequestHandlerCreator.
+    /// </summary>
     class ConcreteRequestHandlerCreator : IRequestHandlerCreator
     {
         public IRequestHandler createRequestHandler(byte typeByte)
         {
             IRequestHandler createdRequestHandler = null;
-            switch(typeByte)
+            switch(typeByte) //choose a strategy to supply to the strategy pattern context (IRequestHandler) depending on the type byte
             {
                 case 0:
                     createdRequestHandler = new ConcreteRequestHandler(new HandleDisconnectStrategy());
@@ -34,7 +37,12 @@ namespace ChatServer
                     createdRequestHandler = new ConcreteRequestHandler(new HandleUnknownStrategy());
                     break;
             }
-            return createdRequestHandler;
+            return createdRequestHandler; //return the created instance referenced as interface type
         }
     }
 }
+
+/*
+This class is the concrete part of the factory design pattern as it contains the factory method creating instances of IRequestHandler.
+It's compliant with Liskov Substitution as it properly implements all of interface's methods (just one in this case).
+*/
