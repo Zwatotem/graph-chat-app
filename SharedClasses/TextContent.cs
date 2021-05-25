@@ -3,15 +3,14 @@ using System.Text;
 
 namespace ChatModel
 {
+	/// <summary>
+	/// Implementation of IMessageContent representing text content.
+	/// </summary>
 	[Serializable]
-	public class TextContent : IMessageContent //respresents text content of a message
+	public class TextContent : IMessageContent
 	{
 		private string dataString; //field storing text data
 
-		/// <summary>
-		/// Creates an immutable TextContent object, initialized with text passed as parameter.
-		/// </summary>
-		/// <param name="dataString"></param>
 		public TextContent(string dataString)
 		{
 			this.dataString = dataString;
@@ -28,3 +27,8 @@ namespace ChatModel
 		}
 	}
 }
+
+/*
+Compliant with Liskov Substitution as it properly implements all interface methods. Doesn't add any new methods, so it still 
+has only a single responsibility.
+*/
