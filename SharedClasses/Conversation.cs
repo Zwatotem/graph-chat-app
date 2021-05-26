@@ -46,7 +46,7 @@ namespace ChatModel
 		/// <summary>
 		/// Fixes the internal structure of messages by setting references to parent messages.
 		/// </summary>
-		public void converge()
+		internal void converge()
 		{
 			foreach (Message message in messages.Values)
 			{
@@ -84,7 +84,7 @@ namespace ChatModel
 		/// <remarks>Used after deserialization.</remarks>
 		/// <param name="user">User of the system.</param>
 		/// <returns>Returns true if rematched, false otherwise.</returns>
-		public bool reMatchWithUser(IUser user)
+		internal bool reMatchWithUser(IUser user)
 		{
 			var internalUser = Users.Find(u => u.Name == user.Name); //finds the same user as parameter but as different object - relic of serialization
 			if (internalUser != null)
