@@ -3,7 +3,7 @@
 	  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	  xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-	  xmlns:local="clr-namespace:GraphChatApp" xmlns:chatmodel="clr-namespace:ChatModel;assembly=ChatModel" d:DataContext="{d:DesignInstance Type=chatmodel:ClientChatSystem}"
+	  xmlns:local="clr-namespace:GraphChatApp" xmlns:viewmodel="clr-namespace:GraphChatApp.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:ConversationCollectionViewModel}"
 	  mc:Ignorable="d" 
 	  d:DesignHeight="450" d:DesignWidth="800"
 	  Title="UserPanel">
@@ -18,7 +18,16 @@
 			x:Name="ConversationListView" ItemsSource="{Binding observableConversations}">
 			<ListView.ItemTemplate>
 				<DataTemplate>
-					<TextBlock Text="{Binding Name}"/>
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="10*"/>
+							<ColumnDefinition Width="30*"/>
+							<ColumnDefinition Width="100*"/>
+						</Grid.ColumnDefinitions>
+						<TextBlock	VerticalAlignment="Center" Grid.Column="0" Margin="10 0 10 0" Text="Ilość userów tutaj"/>
+						<Button		VerticalAlignment="Center" Grid.Column="1" Margin="10 0 10 0" Content="Enter" Command="{Binding Path=EnterCommand}"/>
+						<TextBlock	VerticalAlignment="Center" Grid.Column="2" Margin="10 0 10 0" Text="{Binding Name}"/>
+					</Grid>
 				</DataTemplate>
 			</ListView.ItemTemplate>
 		</ListView>

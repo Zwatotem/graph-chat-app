@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization;
@@ -17,7 +18,7 @@ namespace ChatModel
 		private Dictionary<int, Message> messages;
 		private int smallestFreeId;
 
-		[field:NonSerialized]public event PropertyChangedEventHandler PropertyChanged = (obj, e) => { };
+		[field:NonSerialized]public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
 
 		public List<User> Users
 		{
@@ -37,6 +38,30 @@ namespace ChatModel
 				{
 					users.Add(user);
 				}
+			}
+		}
+		public ObservableCollection<User> observableUsers
+		{
+			get
+			{
+				var oc = new ObservableCollection<User>();
+				foreach (Refrence<User> user in users)
+				{
+					oc.Add(user.Reference);
+				}
+				return oc;
+			}
+		}
+		public ObservableCollection<Message> observableMessages
+		{
+			get
+			{
+				var oc = new ObservableCollection<Message>();
+				foreach(var message in messages)
+				{
+					oc.Add(message.Value);
+				}
+				return oc;
 			}
 		}
 

@@ -1,10 +1,8 @@
 ﻿using ChatModel;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace GraphChatApp.ViewModel
 {
@@ -12,24 +10,26 @@ namespace GraphChatApp.ViewModel
 	{
 		private ObservableCollection<ConversationViewModel> conversations;
 		private ChatSystem chatSystem;
+		private Action<Conversation> enterConversation;
 
-		public ConversationCollectionViewModel(ChatSystem chatSystem)
+		public ConversationCollectionViewModel(ChatSystem chatSystem, Action<Conversation> enterConversation)
 		{
 			this.chatSystem = chatSystem;
+			chatSystem.PropertyChanged += InvokePropertyChanged;
+			this.enterConversation = enterConversation;
 			this.conversations = new ObservableCollection<ConversationViewModel>(
-					chatSystem.Conversations.Select(conv => new ConversationViewModel(conv.Value))
+					chatSystem.Conversations.Select(conv => new ConversationViewModel(conv.Value, enterConversation))
 				);
 		}
 
-
-		public ObservableCollection<ConversationViewModel> Conversations
+		public ObservableCollection<ConversationViewModel> observableConversations
 		{
 			get
 			{
 				if (chatSystem.Conversations.Count != conversations.Count)
 				{
 					this.conversations = new ObservableCollection<ConversationViewModel>(
-							chatSystem.Conversations.Select(conv => new ConversationViewModel(conv.Value))
+							chatSystem.observableConversations.Select(conv => new ConversationViewModel(conv, enterConversation))
 						);
 				}
 				return conversations;

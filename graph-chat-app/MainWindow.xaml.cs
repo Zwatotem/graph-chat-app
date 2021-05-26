@@ -55,6 +55,9 @@ namespace GraphChatApp
 			app.Client.SuccessfullyLogged -= (object s, SuccessfullyLoggededEventArgs a) => OpenUserPanel();
 			MainFrame.NavigationService.Navigated += ClearNavigationHistory;
 			MainFrame.NavigationService.Navigate(userPanel);
+			registrationPage = null;
+			logInPage = null;
+			welcomeScreen = null;
 		}
 
 		private void ClearNavigationHistory(object sender, NavigationEventArgs e)

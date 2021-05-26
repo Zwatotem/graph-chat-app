@@ -115,7 +115,6 @@ namespace ChatModel
 				user.matchWithConversation(conv);
 			}
 			Conversations.Add(conv.ID, conv);
-			InvokePropertyChanged(nameof(Conversations));
 			InvokePropertyChanged(nameof(observableConversations));
 			return conv;
 		}
