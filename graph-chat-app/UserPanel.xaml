@@ -15,10 +15,10 @@
 		</Grid.RowDefinitions>
 		<Button Grid.Row="0" Content="Add conversation" Click="AddConversation" />
 		<ListView Grid.Row="1"
-			x:Name="ConversationListView" ItemsSource="{Binding Conversations}">
+			x:Name="ConversationListView" ItemsSource="{Binding observableConversations}">
 			<ListView.ItemTemplate>
 				<DataTemplate>
-					<TextBlock Text="{Binding Value.Name}"/>
+					<TextBlock Text="{Binding Name}"/>
 				</DataTemplate>
 			</ListView.ItemTemplate>
 		</ListView>
