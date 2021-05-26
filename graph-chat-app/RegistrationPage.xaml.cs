@@ -31,10 +31,5 @@ namespace GraphChatApp
 		{
 			window.OnUserRegistered(Namebox.Text);
 		}
-
-		private void Username_Click(object sender, RoutedEventArgs e)
-		{
-
-		}
 	}
 }

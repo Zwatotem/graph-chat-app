@@ -23,8 +23,11 @@ namespace GraphChatApp
 		private int responseNumber;
 		bool goOn;
 
+		public ClientChatSystem ChatSystem { get => chatSystem; set => chatSystem = value; }
+
 		public event EventHandler<SuccessfullyRegisteredEventArgs> SuccessfullyRegistered;
 		public event EventHandler<SuccessfullyLoggededEventArgs> SuccessfullyLogged;
+		public event EventHandler<SuccessfullyAddedConversationEventArgs> SuccessfullyAddedConversation;
 
 
 		public ChatClient(string serverIpText, int portNumber)
@@ -32,7 +35,7 @@ namespace GraphChatApp
 			serverEndPoint = new IPEndPoint(IPAddress.Parse(serverIpText), portNumber);
 			readWriteLock = new ReaderWriterLock();
 			lockTimeout = 10000;
-			chatSystem = new ClientChatSystem();
+			ChatSystem = new ClientChatSystem();
 			Console.WriteLine("DEBUG: chatSystem created");
 			inBuffer = new Byte[1024 * 1024];
 			responseReady = false;
@@ -78,13 +81,13 @@ namespace GraphChatApp
 						{
 							Console.WriteLine("DEBUG: listener received user to remove from conversation");
 							int conversationId = BitConverter.ToInt32(inBuffer, 0);
-							Conversation conversation = chatSystem.getConversation(conversationId);
+							Conversation conversation = ChatSystem.getConversation(conversationId);
 							string nameToRemove = Encoding.UTF8.GetString(inBuffer, 4, messageLength - 4);
 							bool result = false;
 							try
 							{
 								readWriteLock.AcquireWriterLock(lockTimeout);
-								result = chatSystem.leaveConversation(nameToRemove, conversationId);
+								result = ChatSystem.leaveConversation(nameToRemove, conversationId);
 							}
 							finally
 							{
@@ -99,14 +102,14 @@ namespace GraphChatApp
 						{
 							Console.WriteLine("DEBUG: listener received user to add to conversation");
 							int conversationId = BitConverter.ToInt32(inBuffer, 0);
-							Conversation conversation = chatSystem.getConversation(conversationId);
+							Conversation conversation = ChatSystem.getConversation(conversationId);
 							string nameToAdd = Encoding.UTF8.GetString(inBuffer, 4, messageLength - 4);
-							if (chatSystem.getUser(nameToAdd) == null)
+							if (ChatSystem.getUser(nameToAdd) == null)
 							{
 								try
 								{
 									readWriteLock.AcquireWriterLock(lockTimeout);
-									chatSystem.addNewUser(nameToAdd);
+									ChatSystem.addNewUser(nameToAdd);
 								}
 								finally
 								{
@@ -117,7 +120,7 @@ namespace GraphChatApp
 							try
 							{
 								readWriteLock.AcquireWriterLock(lockTimeout);
-								result = chatSystem.addUserToConversation(nameToAdd, conversationId);
+								result = ChatSystem.addUserToConversation(nameToAdd, conversationId);
 							}
 							finally
 							{
@@ -136,7 +139,7 @@ namespace GraphChatApp
 							try
 							{
 								readWriteLock.AcquireWriterLock(lockTimeout);
-								result = chatSystem.addConversation(memStream);
+								result = ChatSystem.addConversation(memStream);
 							}
 							finally
 							{
@@ -146,13 +149,17 @@ namespace GraphChatApp
 							{
 								Console.WriteLine("ERROR: something unexpected in {0}", "serialized conversation");
 							}
+							else
+							{
+								SuccessfullyAddedConversation(this, new(result));
+							}
 						}
 						else if (type == (byte)6)
 						{
 							Console.WriteLine("DEBUG: listener received serialized message");
 							int conversationId = BitConverter.ToInt32(inBuffer, 0);
 							MemoryStream memStream = new MemoryStream(inBuffer, 4, messageLength - 4);
-							Conversation conversation = chatSystem.getConversation(conversationId);
+							Conversation conversation = ChatSystem.getConversation(conversationId);
 							Message result = null;
 							if (conversation != null)
 							{
@@ -191,43 +198,13 @@ namespace GraphChatApp
 				Console.WriteLine("DEBUG: socket connected");
 				Thread listener = new Thread(this.listen);
 				listener.Start();
-				int actionNumber = Convert.ToInt32(Console.ReadLine());
-				while (actionNumber != 0)
-				{
-					switch (actionNumber)
-					{
-						case 3: //add conversation
-							requestAddConversation();
-							break;
-						case 4: //add user to conversation
-							requestAddUserToConversation();
-							break;
-						case 5: //leave conversation
-							requestLeaveConversation();
-							break;
-						case 6: //send text message
-							requestSendTextMessage();
-							break;
-						case 11: //test case
-							Console.Write("Conversations of klaus: ");
-							chatSystem.getUser("klaus").getConversations().ForEach(c => Console.WriteLine(c.getName()));
-							Console.Write("Conversations of hans: ");
-							chatSystem.getUser("hans").getConversations().ForEach(c => Console.WriteLine(c.getName()));
-							break;
-					}
-					actionNumber = Convert.ToInt32(Console.ReadLine());
-				}
-				requestDisconnect();
 			}
 			catch (Exception ex)
 			{
 				Console.WriteLine("Exception thrown: {0}", ex.Message);
 				Console.WriteLine(ex.StackTrace);
-				throw;
-			}
-			finally
-			{
 				socket.Dispose();
+				throw;
 			}
 		}
 
@@ -243,6 +220,7 @@ namespace GraphChatApp
 			socket.Send(header);
 			socket.Send(content);
 			Console.WriteLine("DEBUG: sending {0} request", "add new user");
+			User addedUser = null;
 			bool response = await Task.Run(() =>
 			{
 				lock (this)
@@ -255,8 +233,7 @@ namespace GraphChatApp
 					responseReady = false;
 					if (rsp)
 					{
-						var addedUser = chatSystem.addNewUser(proposedName);
-						SuccessfullyRegistered.Invoke(this, new(addedUser));
+						addedUser = ChatSystem.addNewUser(proposedName);
 					}
 					Monitor.Pulse(this);
 					return rsp;
@@ -264,6 +241,7 @@ namespace GraphChatApp
 			});
 			if (response)
 			{
+				SuccessfullyRegistered.Invoke(this, new(addedUser));
 				Console.WriteLine("Successfully added user: {0}", proposedName);
 			}
 			else
@@ -277,7 +255,6 @@ namespace GraphChatApp
 			Console.WriteLine("DEBUG: attempt to {0}", "logIn");
 			string userName = args.Username;
 			Console.Write("Enter your user Name: ");
-			userName = Console.ReadLine();
 			byte[] content = Encoding.UTF8.GetBytes(userName);
 			int contentLength = content.Length;
 			byte[] header = new byte[5];
@@ -286,6 +263,7 @@ namespace GraphChatApp
 			socket.Send(header);
 			socket.Send(content);
 			Console.WriteLine("DEBUG: sending {0} request", "logIn");
+			User loggedUser = null;
 			bool response = await Task.Run(() =>
 			{
 				lock (this)
@@ -298,9 +276,8 @@ namespace GraphChatApp
 					responseReady = false;
 					if (rsp)
 					{
-						var loggedUser = chatSystem.addNewUser(userName);
-						chatSystem.logIn(userName);
-						SuccessfullyLogged(this, new(loggedUser));
+						var loggedUser = ChatSystem.addNewUser(userName);
+						ChatSystem.logIn(userName);
 					}
 					Monitor.Pulse(this);
 					return rsp;
@@ -309,6 +286,7 @@ namespace GraphChatApp
 			if (response)
 			{
 				Console.WriteLine("Successfully loggedIn: {0}", userName);
+				SuccessfullyLogged(this, new(loggedUser));
 			}
 			else
 			{
@@ -316,12 +294,12 @@ namespace GraphChatApp
 			}
 		}
 
-		public async void requestAddConversation()
+		public async void requestAddConversation(object sender, ConversationAddedEventArgs args)
 		{
 			Console.WriteLine("DEBUG: attempt to {0}", "add conversation");
 			List<byte> contentList = new List<byte>();
 			Console.Write("Enter proposed conversation name: ");
-			string conversationName = Console.ReadLine();
+			string conversationName = args.ConversationName;
 			foreach (byte b in BitConverter.GetBytes(Encoding.UTF8.GetByteCount(conversationName)))
 			{
 				contentList.Add(b);
@@ -331,11 +309,11 @@ namespace GraphChatApp
 				contentList.Add(b);
 			}
 			Console.Write("With how many users? ");
-			int usersToAdd = Convert.ToInt32(Console.ReadLine());
+			int usersToAdd = args.Users.Length;
 			for (int i = 0; i < usersToAdd; ++i)
 			{
 				Console.WriteLine("Give next user's name: ");
-				string userName = Console.ReadLine();
+				string userName = args.Users[i];
 				foreach (byte b in BitConverter.GetBytes(Encoding.UTF8.GetByteCount(userName)))
 				{
 					contentList.Add(b);
@@ -386,14 +364,14 @@ namespace GraphChatApp
 				try
 				{
 					readWriteLock.AcquireReaderLock(lockTimeout);
-					yourName = chatSystem.getUserName();
+					yourName = ChatSystem.getUserName();
 					if (yourName == null)
 					{
 						Console.WriteLine("You must be logged in first!");
 						return false;
 					}
 					Console.WriteLine("Here is the list of your conversations:");
-					chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+					ChatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
 				}
 				finally
 				{
@@ -452,14 +430,14 @@ namespace GraphChatApp
 				try
 				{
 					readWriteLock.AcquireReaderLock(lockTimeout);
-					yourName = chatSystem.getUserName();
+					yourName = ChatSystem.getUserName();
 					if (yourName == null)
 					{
 						Console.WriteLine("You must be logged in first!");
 						return false;
 					}
 					Console.WriteLine("Here is the list of your conversations:");
-					chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+					ChatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
 				}
 				finally
 				{
@@ -492,7 +470,7 @@ namespace GraphChatApp
 					responseReady = false;
 					if (rsp)
 					{
-						chatSystem.leaveConversation(yourName, conversationId);
+						ChatSystem.leaveConversation(yourName, conversationId);
 					}
 					Monitor.Pulse(this);
 					return rsp;
@@ -517,14 +495,14 @@ namespace GraphChatApp
 				try
 				{
 					readWriteLock.AcquireReaderLock(lockTimeout);
-					yourName = chatSystem.getUserName();
+					yourName = ChatSystem.getUserName();
 					if (yourName == null)
 					{
 						Console.WriteLine("You must be logged in first!");
 						return false;
 					}
 					Console.WriteLine("Here is the list of your conversations:");
-					chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+					ChatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
 				}
 				finally
 				{
@@ -544,7 +522,7 @@ namespace GraphChatApp
 				try
 				{
 					readWriteLock.AcquireReaderLock(lockTimeout);
-					foreach (var message in chatSystem.getConversation(conversationId).getMessages())
+					foreach (var message in ChatSystem.getConversation(conversationId).getMessages())
 					{
 						Console.WriteLine("{0}: {1}", message.ID, message.getContent().getData());
 					}
@@ -602,6 +580,17 @@ namespace GraphChatApp
 			request[0] = 0;
 			Array.Copy(BitConverter.GetBytes(0), 0, request, 1, 4);
 			socket.Send(request);
+			socket.Dispose();
+		}
+	}
+
+	public class SuccessfullyAddedConversationEventArgs
+	{
+		Conversation addedConversation;
+		public Conversation AddedConversation { get => addedConversation; set => addedConversation = value; }
+		public SuccessfullyAddedConversationEventArgs(Conversation conv)
+		{
+			addedConversation = conv;
 		}
 	}
 

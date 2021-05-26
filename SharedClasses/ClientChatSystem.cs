@@ -41,10 +41,10 @@ namespace ChatModel
 		{
 			foreach (var convUpdate in updates)
 			{
-				if (!conversations.ContainsKey(convUpdate.ID))
+				if (!Conversations.ContainsKey(convUpdate.ID))
 				{
 					var newUsers = new List<User>(); // List of overlapping User objects
-					conversations.Add(convUpdate.ID, new Conversation(convUpdate));
+					Conversations.Add(convUpdate.ID, new Conversation(convUpdate));
 					foreach (var user in convUpdate.getUsers())
 					{
 						Predicate<User> p = (u => u.Name == user.Name);
@@ -60,8 +60,8 @@ namespace ChatModel
 					foreach (var user in newUsers)
 					{
 						// Replace 'new' users with ones, that we already have
-						conversations[convUpdate.ID].reMatchWithUser(user);
-						user.matchWithConversation(conversations[convUpdate.ID]);
+						Conversations[convUpdate.ID].reMatchWithUser(user);
+						user.matchWithConversation(Conversations[convUpdate.ID]);
 					}
 					if (freedIds.Contains(convUpdate.ID))
 					{
@@ -80,7 +80,7 @@ namespace ChatModel
 				}
 				else
 				{
-					conversations[convUpdate.ID].applyUpdates(convUpdate);
+					Conversations[convUpdate.ID].applyUpdates(convUpdate);
 				}
 			}
 		}
@@ -88,8 +88,10 @@ namespace ChatModel
 		public Conversation addConversation(Stream stream)
 		{
 			BinaryFormatter formatter = new BinaryFormatter();
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
 			Conversation conv = (Conversation)formatter.Deserialize(stream);
-			if (conversations.ContainsKey(conv.ID))
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
+			if (Conversations.ContainsKey(conv.ID))
 			{
 				return null;
 			}
@@ -112,7 +114,8 @@ namespace ChatModel
 				conv.reMatchWithUser(user);
 				user.matchWithConversation(conv);
 			}
-			conversations.Add(conv.ID, conv);
+			Conversations.Add(conv.ID, conv);
+			InvokePropertyChanged(nameof(Conversations));
 			return conv;
 		}
 	}

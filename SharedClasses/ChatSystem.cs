@@ -1,15 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 
 namespace ChatModel
 {
-	public abstract class ChatSystem //abstract class implementing shared properties of client and server chat systems
+	public abstract class ChatSystem : INotifyPropertyChanged //abstract class implementing shared properties of client and server chat systems
 	{
 		protected Dictionary<int, Conversation> conversations; //dictionary of all conversations in the chat system, indexed by their unique id
 		protected List<User> users; //list of all users in the chat system, each has an unique user name
 		protected int smallestFreeId; //smallest unique id available to be assigned to a new conversation
 		protected Stack<int> freedIds; //stack of conversation ids smaller than current smallest available that were freed be deleting conversations
+
+		public event PropertyChangedEventHandler PropertyChanged = (obj, e) => { };
+		protected void InvokePropertyChanged(string nameofProperty)
+		{
+			PropertyChanged(this, new(nameofProperty));
+		}
+
+		public List<User> Users { get => users; }
+		public Dictionary<int, Conversation> Conversations { get => conversations; }
+		public ObservableCollection<Conversation> observableConversations
+		{
+			get
+			{
+				var oc = new ObservableCollection<Conversation>();
+				foreach(var c in conversations)
+				{
+					oc.Add(c.Value);
+				}
+				return oc;
+			}
+		}
 
 		public ChatSystem() //simple constructor, initializing collections as empty and setting first available conversation id to 1
 		{
@@ -30,6 +53,7 @@ namespace ChatModel
 			{
 				User newUser = new User(newUserName); //creating and adding new user to the list
 				users.Add(newUser);
+				PropertyChanged(this, new(nameof(Users)));
 				return newUser;
 			}
 		}
@@ -43,9 +67,9 @@ namespace ChatModel
 		public Conversation getConversation(int id) //method to return a conversation with an id passed as parameter. If successful, 
 													//returns object reference, if there's no such conversation in the chat system, return null.
 		{
-			if (conversations.ContainsKey(id)) //if conversation with a given id is present 
+			if (Conversations.ContainsKey(id)) //if conversation with a given id is present 
 			{
-				return conversations[id]; //returns a reference to it
+				return Conversations[id]; //returns a reference to it
 			}
 			else
 			{
@@ -89,12 +113,13 @@ namespace ChatModel
 				newId = smallestFreeId++; //else we take current smallest available id and set smallestFreeId to next integer
 			}
 			Conversation newConversation = new Conversation(conversationName, newId); //new conversation is created
-			conversations.Add(newId, newConversation); //and added to collection, indexed with it's id
+			Conversations.Add(newId, newConversation); //and added to collection, indexed with it's id
 			foreach (var owner in owners) //each user passed as parameter:
 			{
 				newConversation.matchWithUser(owner); //has to assigned to newly created conversation
 				owner.matchWithConversation(newConversation); //and the conversation has to be assigned to them
 			}
+			PropertyChanged(this, new(nameof(Conversations)));
 			return newConversation; //returns created conversation
 		}
 
@@ -145,7 +170,7 @@ namespace ChatModel
 			{
 				if (conversation.getUsers().Count == 0) //if there would be no users in the conversation left
 				{
-					conversations.Remove(id); //deletes the conversation
+					Conversations.Remove(id); //deletes the conversation
 					if (id == smallestFreeId - 1) //if the id of deleted conversation was only one smaller than smallestFreeId
 					{
 						smallestFreeId--; //decrement the variable

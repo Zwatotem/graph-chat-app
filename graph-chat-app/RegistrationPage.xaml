@@ -24,7 +24,6 @@
 			<TextBox x:Name="Namebox"/>
 			<Button Content="Submit" HorizontalAlignment="Center"  VerticalAlignment="Center" Click="Button_Click"/>
 		</StackPanel>
-		<Button x:Name="Username" Content="Cancel" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" />
 
 	</Grid>
 </Page>

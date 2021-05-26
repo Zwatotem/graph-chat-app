@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -8,13 +9,15 @@ using Util;
 namespace ChatModel
 {
 	[Serializable]
-	public class Conversation : IConversation
+	public class Conversation : IConversation, INotifyPropertyChanged
 	{
 		private string name;
 		private int id;
 		private List<Refrence<User>> users;
 		private Dictionary<int, Message> messages;
 		private int smallestFreeId;
+
+		[field:NonSerialized]public event PropertyChangedEventHandler PropertyChanged = (obj, e) => { };
 
 		public List<User> Users
 		{
@@ -102,10 +105,11 @@ namespace ChatModel
 			if (Users.Contains(user))
 				return false;
 			users.Add(new Refrence<User>(user));
+			PropertyChanged(this, new(nameof(Users)));
 			return true;
 		}
 
-		public bool reMatchWithUser(User user)
+		internal bool reMatchWithUser(User user)
 		{
 			var internalUser = Users.Find(u => u.Name == user.Name);
 			if (internalUser != null)
@@ -153,7 +157,9 @@ namespace ChatModel
 		public Message addMessage(Stream stream)
 		{
 			var formatter = new BinaryFormatter();
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
 			Message mess = (Message)formatter.Deserialize(stream);
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
 			if (mess != null)
 			{
 				if (mess.ID >= smallestFreeId)
@@ -238,7 +244,9 @@ namespace ChatModel
 		{
 			MemoryStream stream = new MemoryStream();
 			var formatter = new BinaryFormatter();
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
 			formatter.Serialize(stream, this);
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
 			stream.Flush();
 			stream.Position = 0;
 			return stream;

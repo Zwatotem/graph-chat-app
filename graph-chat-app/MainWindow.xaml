@@ -6,6 +6,7 @@
 		xmlns:local="clr-namespace:GraphChatApp"
 		mc:Ignorable="d"
 		Title="Graph chat app" Height="450" Width="800"
-		Loaded="Window_Loaded">
+		Loaded="Window_Loaded"
+		Closed="Window_Closed">
     <Frame x:Name="MainFrame"/>
 </Window>
