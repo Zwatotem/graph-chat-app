@@ -567,6 +567,7 @@ namespace ChatClient
 
         public static void Main(string[] args)
         {
+            //ChatClient client = new ChatClient(args[0], Convert.ToInt32(args[1]));
             ChatClient client = new ChatClient("czamara.dyndns.org", 50000);
             client.workClient();
         }
