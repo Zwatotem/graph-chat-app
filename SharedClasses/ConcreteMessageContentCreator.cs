@@ -9,15 +9,18 @@ namespace ChatModel
     {
         public IMessageContent createMessageContent(byte[] data, int offset)
         {
-            //first byte of proper data indicates the content's type
-            if (data[0 + offset] == 1) //text message
+            byte contentType = data[0 + offset];//first byte of proper data indicates the content's type
+            IMessageContent createdContent = null;
+            switch(contentType)
             {
-                return new TextContent(Encoding.UTF8.GetString(data, 1 + offset, data.Length - 1 - offset)); //decode text and instantiate object
+                case 1: //text content
+                    createdContent = new TextContent(Encoding.UTF8.GetString(data, 1 + offset, data.Length - 1 - offset)); //decode text and instantiate object
+                    break;
+                default: //unrecognized type of content
+                    createdContent = null;
+                    break;
             }
-            else //unrecognized type of message
-            {
-                return null;
-            }
+            return createdContent;
         }
     }
 }

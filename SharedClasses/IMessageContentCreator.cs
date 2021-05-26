@@ -11,7 +11,7 @@ namespace ChatModel
         /// </summary>
         /// <param name="data">Byte array containing data from which content is to be created</param>
         /// <param name="offset">Number of bytes to skip at the beginning of array</param>
-        /// <returns>Instance of class implementing IMessageContent.</returns>
+        /// <returns>Instance of class implementing IMessageContent or null for unrecognized data.</returns>
         IMessageContent createMessageContent(byte[] data, int offset);
     }
 }
