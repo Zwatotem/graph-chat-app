@@ -15,22 +15,18 @@ namespace GraphChatApp
 	{
 		public string chatModelNamespace;
 		public MainWindow window;
-		private ConversationCollectionViewModel viewModel;
+		public ConversationCreationPage conversationCreationPage;
 		public UserPanel(MainWindow window)
 		{
 			InitializeComponent();
 			this.window = window;
-			//viewModel = new ConversationCollectionViewModel(window.app.Client.ChatSystem);
 			DataContext = window.app.Client.ChatSystem;
+			conversationCreationPage = new ConversationCreationPage(window);
 		}
 
 		private void AddConversation(object sender, RoutedEventArgs e)
 		{
-			window.OnConversationAdded(DateTime.Now.ToString());
-		}
-
-		internal void displayNewConversation(object sender, SuccessfullyAddedConversationEventArgs e)
-		{
+			window.MainFrame.NavigationService.Navigate(conversationCreationPage);
 		}
 	}
 }

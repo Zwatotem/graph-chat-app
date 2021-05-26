@@ -25,9 +25,9 @@ namespace GraphChatApp
 
 		public ClientChatSystem ChatSystem { get => chatSystem; set => chatSystem = value; }
 
-		public event EventHandler<SuccessfullyRegisteredEventArgs> SuccessfullyRegistered;
-		public event EventHandler<SuccessfullyLoggededEventArgs> SuccessfullyLogged;
-		public event EventHandler<SuccessfullyAddedConversationEventArgs> SuccessfullyAddedConversation;
+		public event EventHandler<SuccessfullyRegisteredEventArgs> SuccessfullyRegistered = (sender, e) => { };
+		public event EventHandler<SuccessfullyLoggededEventArgs> SuccessfullyLogged = (sender, e) => { };
+		public event EventHandler<SuccessfullyAddedConversationEventArgs> SuccessfullyAddedConversation = (sender, e) => { };
 
 
 		public ChatClient(string serverIpText, int portNumber)

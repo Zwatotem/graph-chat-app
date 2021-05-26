@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Navigation;
 using GraphChatApp;
 
 namespace GraphChatApp
@@ -51,12 +53,19 @@ namespace GraphChatApp
 		private void OpenUserPanel()
 		{
 			app.Client.SuccessfullyLogged -= (object s, SuccessfullyLoggededEventArgs a) => OpenUserPanel();
-			app.Client.SuccessfullyAddedConversation += userPanel.displayNewConversation;
+			MainFrame.NavigationService.Navigated += ClearNavigationHistory;
 			MainFrame.NavigationService.Navigate(userPanel);
-			while (MainFrame.NavigationService.CanGoBack)
+		}
+
+		private void ClearNavigationHistory(object sender, NavigationEventArgs e)
+		{
+			Frame nav = sender as Frame;
+			do
 			{
-				MainFrame.NavigationService.RemoveBackEntry();
+				nav.RemoveBackEntry();
 			}
+			while (nav.CanGoBack);
+			nav.Navigated -= ClearNavigationHistory;
 		}
 
 		internal void OpenRegistrationPage()
@@ -75,9 +84,9 @@ namespace GraphChatApp
 			UserLogged.Invoke(this, new(username));
 		}
 
-		internal void OnConversationAdded(string conversationName)
+		internal void OnConversationAdded(string conversationName, string[] usernames)
 		{
-			ConversationAdded.Invoke(this, new(conversationName, app.Client.ChatSystem.getUserName()));
+			ConversationAdded.Invoke(this, new(conversationName, usernames));
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)

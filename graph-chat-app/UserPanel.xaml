@@ -13,7 +13,7 @@
 			<RowDefinition Height="4*"/>
 			<RowDefinition Height="41*"/>
 		</Grid.RowDefinitions>
-		<Button Grid.Row="0" Content="Add conversation" Click="AddConversation" />
+		<Button Content="Add new conversation" Click="AddConversation"/>
 		<ListView Grid.Row="1"
 			x:Name="ConversationListView" ItemsSource="{Binding observableConversations}">
 			<ListView.ItemTemplate>

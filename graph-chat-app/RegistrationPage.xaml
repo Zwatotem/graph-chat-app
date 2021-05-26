@@ -22,8 +22,14 @@
 		<StackPanel Grid.Column="1" Grid.Row="1" >
 			<Label Content="Username: "/>
 			<TextBox x:Name="Namebox"/>
-			<Button Content="Submit" HorizontalAlignment="Center"  VerticalAlignment="Center" Click="Button_Click"/>
+			<Button Content="Submit" HorizontalAlignment="Center"  VerticalAlignment="Center" Click="RegisterClick"/>
 		</StackPanel>
-
+		<TextBlock Grid.Row="2"
+				   Grid.ColumnSpan="3"
+				   x:Name="ErrorDisplay"
+				   VerticalAlignment="Bottom" 
+				   HorizontalAlignment="Left" 
+				   Margin="10,10,10,10"
+				   Foreground="Red"/>
 	</Grid>
 </Page>

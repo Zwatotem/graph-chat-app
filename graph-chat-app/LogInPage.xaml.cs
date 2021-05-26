@@ -27,14 +27,21 @@ namespace GraphChatApp
 			InitializeComponent();
 		}
 
-		private void Button_Click(object sender, RoutedEventArgs e)
+		private void LoginClick(object sender, RoutedEventArgs e)
 		{
-			window.OnUserLogged(Namebox.Text);
-		}
-
-		private void Username_Click(object sender, RoutedEventArgs e)
-		{
-
+			var username = Namebox.Text;
+			if (String.IsNullOrWhiteSpace(username))
+			{
+				ErrorDisplay.Text = "Please enter the username";
+			}
+			else if (username.Contains(','))
+			{
+				ErrorDisplay.Text = "Username cannot contain commas (,)";
+			}
+			else
+			{
+				window.OnUserLogged(Namebox.Text.Trim());
+			}
 		}
 	}
 }
