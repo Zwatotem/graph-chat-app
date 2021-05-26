@@ -10,12 +10,12 @@ namespace chatAppTest
 		[TestMethod]
 		public void getUserNameTest()
 		{
-			ClientChatSystem chatSystem = new ClientChatSystem();
-			string name = chatSystem.getUserName();
+			IClientChatSystem chatSystem = new ClientChatSystem();
+			string name = chatSystem.LoggedInName;
 			Assert.IsNull(name);
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
 			chatSystem.logIn("Jaú Kowalski");
-			name = chatSystem.getUserName();
+			name = chatSystem.LoggedInName;
 			Assert.IsTrue(name == "Jaú Kowalski");
 		}
 
@@ -23,32 +23,32 @@ namespace chatAppTest
 		public void applyUpdatesTest()
 		{
 			// Creating 'server' chat system
-			ServerChatSystem chatSystem = new ServerChatSystem();
+			IServerChatSystem chatSystem = new ServerChatSystem();
 			// Creating two users
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
-			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			// Creating a conversation with those users
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
 			// Sending a message
-			MessageContent msgContent1 = new TextContent("Heeejoooo");
+			IMessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;
-			Message sentMessage1 = chatSystem.sendMessage(savedConversation.getId(), "Jaú Kowalski", -1, msgContent1, datetime);
+			Message sentMessage1 = chatSystem.sendMessage(savedConversation.ID, "Jaú Kowalski", -1, msgContent1, datetime);
 			// Creating client chat system
-			ClientChatSystem clientChatSystem = new ClientChatSystem();
+			IClientChatSystem clientChatSystem = new ClientChatSystem();
 			clientChatSystem.addNewUser("Kasia èdüb≥o");
 			// Applying updates
 			clientChatSystem.applyUpdates(chatSystem.getUpdatesToUser("Kasia èdüb≥o", datetime - TimeSpan.FromSeconds(3)));
 			// Checks
 			bool conversationPresent = false;
-			foreach (var conversation in clientChatSystem.getUser("Kasia èdüb≥o").getConversations())
+			foreach (var conversation in clientChatSystem.getUser("Kasia èdüb≥o").Conversations)
 			{
-				if (conversation.getId() == savedConversation.getId())
+				if (conversation.ID == savedConversation.ID)
 				{
 					conversationPresent = true;
 					bool messagePresent = false;
-					foreach (var message in conversation.getMessages())
+					foreach (var message in conversation.Messages)
 					{
-						if (message.getId() == sentMessage1.getId() && message.getContent().getData() == sentMessage1.getContent().getData())
+						if (message.ID == sentMessage1.ID && message.Content.getData() == sentMessage1.Content.getData())
 						{
 							messagePresent = true;
 						}
@@ -62,11 +62,11 @@ namespace chatAppTest
 		[TestMethod]
 		public void logInTest()
 		{
-			ClientChatSystem chatSystem = new ClientChatSystem();
+			IClientChatSystem chatSystem = new ClientChatSystem();
 			Assert.IsFalse(chatSystem.logIn("Kasia èdüb≥o"));
 			chatSystem.addNewUser("Kasia èdüb≥o");
 			Assert.IsTrue(chatSystem.logIn("Kasia èdüb≥o"));
-			Assert.IsTrue(chatSystem.getUserName() == "Kasia èdüb≥o");
+			Assert.IsTrue(chatSystem.LoggedInName == "Kasia èdüb≥o");
 		}
 	}
 }

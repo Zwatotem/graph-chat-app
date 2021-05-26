@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
 using ChatModel;
+using ChatModel.Util;
 
 namespace ChatClient
 {
@@ -16,16 +17,16 @@ namespace ChatClient
         private Socket socket;
         private ReaderWriterLock readWriteLock;
         private int lockTimeout;
-        private ClientChatSystem chatSystem;
+        private IClientChatSystem chatSystem;
         private byte[] inBuffer;
         private bool responseReady;
         private bool responseStatus;
         private int responseNumber;
         bool goOn;
 
-        ChatClient(string serverIpText, int portNumber)
+        ChatClient(string hostName, int portNumber)
         {
-            serverEndPoint = new IPEndPoint(IPAddress.Parse(serverIpText), portNumber);
+            serverEndPoint = new IPEndPoint(Dns.GetHostAddresses(hostName)[0], portNumber);
             readWriteLock = new ReaderWriterLock();
             lockTimeout = 10000;
             chatSystem = new ClientChatSystem();
@@ -132,7 +133,7 @@ namespace ChatClient
                             try
                             {
                                 readWriteLock.AcquireWriterLock(lockTimeout);
-                                result = chatSystem.addConversation(memStream);
+                                result = chatSystem.addConversation(memStream, new ConcreteDeserializer());
                             }
                             finally
                             {
@@ -155,7 +156,7 @@ namespace ChatClient
                                 try
                                 {
                                     readWriteLock.AcquireWriterLock(lockTimeout);
-                                    result = conversation.addMessage(memStream);
+                                    result = conversation.addMessage(memStream, new ConcreteDeserializer());
                                 }
                                 finally
                                 {
@@ -213,9 +214,9 @@ namespace ChatClient
                             break;
                         case 11: //test case
                             Console.Write("Conversations of klaus: ");
-                            chatSystem.getUser("klaus").getConversations().ForEach(c => Console.WriteLine(c.getName()));
+                            chatSystem.getUser("klaus").Conversations.ForEach(c => Console.WriteLine(c.Name));
                             Console.Write("Conversations of hans: ");
-                            chatSystem.getUser("hans").getConversations().ForEach(c => Console.WriteLine(c.getName()));
+                            chatSystem.getUser("hans").Conversations.ForEach(c => Console.WriteLine(c.Name));
                             break;
                     }
                     Console.Write("Give number from 0 to 6: ");
@@ -230,11 +231,13 @@ namespace ChatClient
             }
             finally
             {
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
                 socket.Dispose();
             }
         }
 
-        public async void requestCreateNewUser()
+        public void requestCreateNewUser()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "add new user");
             string proposedName = null;
@@ -273,7 +276,7 @@ namespace ChatClient
             }
         }
 
-        public async void requestLogIn()
+        public void requestLogIn()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "logIn");
             string userName = null;
@@ -313,7 +316,7 @@ namespace ChatClient
             }
         }
 
-        public async void requestAddConversation()
+        public void requestAddConversation()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "add conversation");
             List<byte> contentList = new List<byte>();
@@ -371,21 +374,21 @@ namespace ChatClient
             }
         }
 
-        public async void requestAddUserToConversation()
+        public void requestAddUserToConversation()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "add user to conversation");
             string yourName = null;
             try
             {
                 readWriteLock.AcquireReaderLock(lockTimeout);
-                yourName = chatSystem.getUserName();
+                yourName = chatSystem.LoggedInName;
                 if (yourName == null)
                 {
                     Console.WriteLine("You must be logged in first!");
                     return;
                 }
                 Console.WriteLine("Here is the list of your conversations:");
-                chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+                chatSystem.getUser(yourName).Conversations.ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
             }
             finally
             {
@@ -426,21 +429,21 @@ namespace ChatClient
             }
         }
 
-        public async void requestLeaveConversation()
+        public void requestLeaveConversation()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "leave conversation");
             string yourName = null;
             try
             {
                 readWriteLock.AcquireReaderLock(lockTimeout);
-                yourName = chatSystem.getUserName();
+                yourName = chatSystem.LoggedInName;
                 if (yourName == null)
                 {
                     Console.WriteLine("You must be logged in first!");
                     return;
                 }
                 Console.WriteLine("Here is the list of your conversations:");
-                chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+                chatSystem.getUser(yourName).Conversations.ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
             }
             finally
             {
@@ -466,7 +469,7 @@ namespace ChatClient
                 responseReady = false;
                 if (response)
                 {
-                    chatSystem.leaveConversation(yourName, conversationId);
+                    chatSystem.getConversation(conversationId).Users.ForEach(u => chatSystem.leaveConversation(u.Name, conversationId));
                 }
                 Monitor.Pulse(this);
             }
@@ -480,21 +483,21 @@ namespace ChatClient
             }
         }
 
-        public async void requestSendTextMessage()
+        public void requestSendTextMessage()
         {
             Console.WriteLine("DEBUG: attempt to {0}", "send message");
             string yourName = null;
             try
             {
                 readWriteLock.AcquireReaderLock(lockTimeout);
-                yourName = chatSystem.getUserName();
+                yourName = chatSystem.LoggedInName;
                 if (yourName == null)
                 {
                     Console.WriteLine("You must be logged in first!");
                     return;
                 }
                 Console.WriteLine("Here is the list of your conversations:");
-                chatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
+                chatSystem.getUser(yourName).Conversations.ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
             }
             finally
             {
@@ -506,9 +509,9 @@ namespace ChatClient
             try
             {
                 readWriteLock.AcquireReaderLock(lockTimeout);
-                foreach (var message in chatSystem.getConversation(conversationId).getMessages())
+                foreach (var message in chatSystem.getConversation(conversationId).Messages)
                 {
-                    Console.WriteLine("{0}: {1}", message.ID, message.getContent().getData());
+                    Console.WriteLine("{0}: {1}", message.ID, message.Content.getData());
                 }
             }
             finally
@@ -564,7 +567,7 @@ namespace ChatClient
 
         public static void Main(string[] args)
         {
-            ChatClient client = new ChatClient("192.168.42.225", 50000);
+            ChatClient client = new ChatClient("czamara.dyndns.org", 50000);
             client.workClient();
         }
     }

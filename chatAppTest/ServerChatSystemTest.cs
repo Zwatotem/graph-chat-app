@@ -10,36 +10,36 @@ namespace chatAppTest
 		[TestMethod]
 		public void getUpdatesToUserTest()
 		{
-			ServerChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
-			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
-			User user3 = chatSystem.addNewUser("Roch Kowal");
+			IServerChatSystem chatSystem = new ServerChatSystem();
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			IUser user3 = chatSystem.addNewUser("Roch Kowal");
 			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
 			Conversation savedConversation2 = chatSystem.addConversation("Konfa 2", user1, user3);
-			MessageContent msgContent1 = new TextContent("Heeejoooo");
-			MessageContent msgContent2 = new TextContent("Heeej");
+			IMessageContent msgContent1 = new TextContent("Heeejoooo");
+			IMessageContent msgContent2 = new TextContent("Heeej");
 			DateTime datetime = DateTime.Now;
-			Message sentMessage1 = chatSystem.sendMessage(savedConversation.getId(), "Jaú Kowalski", -1, msgContent1, datetime);
-			Message sentMessage2 = chatSystem.sendMessage(savedConversation2.getId(), "Jaú Kowalski", -1, msgContent2, datetime);
+			Message sentMessage1 = chatSystem.sendMessage(savedConversation.ID, "Jaú Kowalski", -1, msgContent1, datetime);
+			Message sentMessage2 = chatSystem.sendMessage(savedConversation2.ID, "Jaú Kowalski", -1, msgContent2, datetime);
 			UserUpdates updates = chatSystem.getUpdatesToUser("Kasia èdüb≥o", datetime - TimeSpan.FromSeconds(3));
 			bool containsConversation = false;
 			bool containsWrongConversation = false;
 			foreach (var conversation in updates)
 			{
-				if (conversation.getId() == savedConversation.getId() && conversation.getName() == savedConversation.getName())
+				if (conversation.ID == savedConversation.ID && conversation.Name == savedConversation.Name)
 				{
 					containsConversation = true;
 					bool containsMessage = false;
 					bool containsWrongMessage = false;
-					foreach (var message in conversation.getMessages())
+					foreach (var message in conversation.Messages)
 					{
-						if (message.getId() == sentMessage1.getId())
+						if (message.ID == sentMessage1.ID)
 						{
 							containsMessage = true;
-							Assert.IsTrue(message.getUser().getName() == sentMessage1.getUser().getName());
-							Assert.IsNull(message.getParent());
-							Assert.IsTrue(message.getContent().getData() == sentMessage1.getContent().getData());
-							Assert.IsTrue(message.getTime() == sentMessage1.getTime());
+							Assert.IsTrue(message.Author.Name == sentMessage1.Author.Name);
+							Assert.IsNull(message.Parent);
+							Assert.IsTrue(message.Content.getData() == sentMessage1.Content.getData());
+							Assert.IsTrue(message.SentTime == sentMessage1.SentTime);
 						}
 						else
 						{
@@ -61,11 +61,11 @@ namespace chatAppTest
 		[TestMethod]
 		public void getConversationsOfUserTest()
 		{
-			ServerChatSystem chatSystem = new ServerChatSystem();
-			User user1 = chatSystem.addNewUser("Jaú Kowalski");
-			User user2 = chatSystem.addNewUser("Kasia èdüb≥o");
+			IServerChatSystem chatSystem = new ServerChatSystem();
+			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
+			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
-			User user3 = chatSystem.addNewUser("Johannes von Neustadt");
+			IUser user3 = chatSystem.addNewUser("Johannes von Neustadt");
 			Conversation savedConversation2 = chatSystem.addConversation("Ziomki", user1, user3);
 			bool hasConversation1 = false;
 			bool hasConversation2 = false;

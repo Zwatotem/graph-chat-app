@@ -3,31 +3,41 @@ using System.Collections.Generic;
 
 namespace ChatModel
 {
-	public class ServerChatSystem : ChatSystem //concrete class derived from abstract ChatSystem. It represents the chat system on the server side.
+	/// <summary>
+	/// Concrete instance of IServerChatSystem.
+	/// </summary>
+	public class ServerChatSystem : ChatSystem, IServerChatSystem
 	{
-
-		public ServerChatSystem() : base() { } //no-arg constructor calling ChatSystem constructor
+		public ServerChatSystem() : base() { }
 
 		public UserUpdates getUpdatesToUser(string userName, DateTime t)
 		{
 			var user = users.Find(u => u.Name == userName);
+			if (user == null)
+            {
+				return null; //cannot be done if there is no such user
+            }
 			var updates = new UserUpdates();
-			foreach (var conv in user.getConversations())
+			foreach (var conv in user.Conversations)
 			{
-				updates.addConversation(conv.getUpdates(t));
+				updates.addConversation(conv.getUpdates(t)); //get updates to all of users conversations
 			}
 			return updates;
 		}
 
-		public List<Conversation> getConversationsOfUser(string userName) //method to return a list of all conversations of user with user name
-																		  //passed as parameter. If successful returns the collection, else (eg. if there is no such user) returns null.
+		public List<Conversation> getConversationsOfUser(string userName)
 		{
-			User user = getUser(userName); //gets reference to the user whose conversations are to be returned
+			IUser user = getUser(userName);
 			if (user == null)
 			{
 				return null; //if there is no such user, return null
 			}
-			return user.getConversations(); //returns list the of conversations of specified user.
+			return user.Conversations;
 		}
 	}
 }
+
+/*
+This class complies with Liskov Substitution as it properly implements all base and interface methods. Its only responsibility is to realize
+chat system logic necessary only on the server side of the app.
+*/

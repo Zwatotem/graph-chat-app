@@ -1,131 +1,137 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using Util;
+using ChatModel.Util;
 
 namespace ChatModel
 {
-	[Serializable]
-	public class Message
-	{
-		private Refrence<User> authorRef; // Helper for merging user lists after Conversation deserialization
-		private User author;
-		private MessageContent content;
-		private DateTime sentTime;
-		private Message targetedMessage;
-		private int targetId; // Redundant value used to recover the message structure after deserialization
-		private int id;
+    /// <summary>
+    /// Class representing one message in the system
+    /// </summary>
+    [Serializable]
+    public class Message
+    {
+        private Refrence<IUser> authorRef; // Double reference is useful for merging user lists after Conversation deserialization
+        private IUser author; // (slightly redundant) reference to message's author
+        private IMessageContent content; //content of the message
+        private DateTime sentTime;
+        private Message targetedMessage; //message to which this one is replying
+        private int targetId; // Redundant value used to recover the message structure after deserialization
+        private int id; //unique id of the message
 
-		public User Author
-		{
-			get
-			{
-				if (authorRef.Reference == null) // Author was probably removed from the conversation
-				{
-					return author;
-				}
-				else if (authorRef.Reference != author) // Conversation was merged with a new ChatSystem
-				{
-					author = authorRef.Reference;
-				}
-				return author;
-			}
-		}
+        public Message(IUser user, Message targeted, IMessageContent messageContent, DateTime datetime, int id) //this constructor is mainly for the unit tests
+            : this(targeted, messageContent, datetime, id) 
+        {
+            this.author = user;
+        }
 
-		public Refrence<User> AuthorRef
-		{
-			set
-			{
-				authorRef = value;
-			}
-		}
+        public Message(Refrence<IUser> user, Message targeted, IMessageContent messageContent, DateTime datetime, int id)
+            : this(targeted, messageContent, datetime, id)
+        {
+            this.authorRef = user;
+        }
 
-		public Message TargetedMessage
-		{
-			get => targetedMessage;
-			set
-			{
-				targetedMessage = value;
-				targetId = value == null ? -1 : value.ID;
-			}
-		}
+        private Message(Message targeted, IMessageContent messageContent, DateTime datetime, int id) //private as it doesn't make sense on its own
+        {
+            this.content = messageContent;
+            this.sentTime = datetime;
+            this.id = id;
+            this.Parent = targeted;
+        }
 
-		public int ID { get => id; }
-		public int TargetId { get => targetId; }
+        /// <summary>
+        /// Constructs new message by doing shallow copy of the object provided.
+        /// </summary>
+        /// <param name="other">Template message for construction.</param>
+        public Message(Message other)
+        {
+            this.authorRef = other.authorRef;
+            this.author = other.author;
+            this.content = other.content;
+            this.sentTime = other.sentTime;
+            this.id = other.id;
+            this.targetId = other.targetId;
+            this.targetedMessage = other.targetedMessage;
+        }
 
-		public Message(User user, Message targeted, MessageContent messageContent, DateTime datetime, int id)
-		{
-			this.author = user;
-			this.content = messageContent;
-			this.sentTime = datetime;
-			this.id = id;
-			this.TargetedMessage = targeted;
-		}
+        /// <summary>
+        /// Refrence object containing a reference to message's author.
+        /// </summary>
+        public Refrence<IUser> AuthorRef { get => authorRef; set => authorRef = value; }
 
-		public Message(Refrence<User> user, Message targeted, MessageContent messageContent, DateTime datetime, int id)
-		{
-			this.authorRef = user;
-			this.content = messageContent;
-			this.sentTime = datetime;
-			this.id = id;
-			this.TargetedMessage = targeted;
-		}
+        /// <summary>
+        /// Author of the message.
+        /// </summary>
+        public IUser Author
+        {
+            get
+            {
+                //if authorRef.Reference == null then author was probably removed from the conversation
+                if (authorRef.Reference != null && authorRef.Reference != author) // if authorRef is set and doesn't match with author
+                {
+                    author = authorRef.Reference; //set author properly before returning
+                }
+                return author;
+            }
+        }
 
-		/// <summary>
-		/// Constructs new message by doing shallow copy of the object provided
-		/// </summary>
-		/// <param name="other">Template message for construction</param>
-		public Message(Message other)
-		{
-			this.authorRef = other.authorRef;
-			this.author = other.author;
-			this.content = other.content;
-			this.sentTime = other.sentTime;
-			this.id = other.id;
-			this.targetId = other.targetId;
-			this.targetedMessage = other.targetedMessage;
-		}
+        /// <summary>
+        /// Content of the message.
+        /// </summary>
+        public IMessageContent Content { get => content; }
 
-		public Message getParent()
-		{
-			return targetedMessage;
-		}
+        /// <summary>
+        /// Time when the message was sent.
+        /// </summary>
+        public DateTime SentTime { get => sentTime; }
 
-		public void setParentUnsafe(Message t)
-		{
-			targetedMessage = t;
-		}
+        /// <summary>
+        /// Message to which this one is replying.
+        /// </summary>
+        public Message Parent
+        {
+            get => targetedMessage;
+            set
+            {
+                targetedMessage = value;
+                targetId = (value == null) ? -1 : value.ID;
+            }
+        }
 
-		public int getId()
-		{
-			return id;
-		}
+        /// <summary>
+        /// Id of the parent message.
+        /// </summary>
+        public int TargetId { get => targetId; }
 
-		public DateTime getTime()
-		{
-			return sentTime;
-		}
+        /// <summary>
+        /// Unique id of the message.
+        /// </summary>
+        public int ID { get => id; }       
 
-		public MessageContent getContent()
-		{
-			return content;
-		}
+        /// <summary>
+        /// Sets parent message without any validation.
+        /// </summary>
+        /// <param name="t">Message to set parent to.</param>
+        internal void setParentUnsafe(Message t)
+        {
+            targetedMessage = t;
+        }
 
-		public MemoryStream serialize()
-		{
-			MemoryStream stream = new MemoryStream();
-			var formatter = new BinaryFormatter();
-			Message copy = new Message(this);
-			copy.targetedMessage = null;
-			formatter.Serialize(stream, copy);
-			stream.Flush();
-			stream.Position = 0;
-			return stream;
-		}
-
-		public User getUser()
-		{
-			return Author;
-		}
-	}
+        /// <summary>
+        /// Serializes the message.
+        /// </summary>
+        /// <param name="serializer">ISerializer instance which is to be used</param>
+        /// <returns>MemoryStream containing serialized message.</returns>
+        public MemoryStream serialize(ISerializer serializer)
+        {
+            Message copy = new Message(this); //we serialize the copy
+            copy.targetedMessage = null; //after setting its parent to null
+            return serializer.serialize(copy); //to avoid serializing the whole chain of parent messages
+        }
+    }
 }
+
+/*
+This class is perhaps too big for modern standards, but it's structure came from business analysis department and contact with the client.
+Still where it was possible, dependency inversion was implemented (refering to IMessageContent rather than something concrete) 
+and the class has more less one responsibility (logic necessary for representing a message, serialization delegated to a specialized interface).  
+*/
