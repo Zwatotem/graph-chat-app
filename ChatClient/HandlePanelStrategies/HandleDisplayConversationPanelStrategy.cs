@@ -16,7 +16,7 @@ namespace ChatClient.HandlePanelStrategies
                 client.readWriteLock.AcquireReaderLock(client.lockTimeout);
                 foreach (var message in client.chatSystem.getConversation(client.displayedConversationId).Messages)
                 {
-                    Console.WriteLine("{0} at {1} ID {2}:", message.Author.Name, message.SentTime, message.ID);
+                    Console.WriteLine("{0} at {1} ID: {2} reply: {3}", message.Author.Name, message.SentTime, message.ID, message.Parent.ID);
                     Console.WriteLine(message.Content.getData());
                 }
                 client.displayingConversation = true;
