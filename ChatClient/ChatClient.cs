@@ -15,14 +15,18 @@ namespace ChatClient
     {
         private IPEndPoint serverEndPoint;
         private Socket socket;
-        private ReaderWriterLock readWriteLock;
-        private int lockTimeout;
-        private IClientChatSystem chatSystem;
+        internal ReaderWriterLock readWriteLock;
+        internal int lockTimeout;
+        internal IClientChatSystem chatSystem;
         private byte[] inBuffer;
-        private bool responseReady;
-        private bool responseStatus;
+        internal bool responseReady;
+        internal bool responseStatus;
         private int responseNumber;
-        bool goOn;
+        internal IIOSocketFacade socketFacade;
+        internal int displayedConversationId;
+        internal bool displayingConversation;
+        internal bool displayingConversationsList;
+        private bool goOn;
 
         ChatClient(string hostName, int portNumber)
         {
@@ -30,9 +34,12 @@ namespace ChatClient
             readWriteLock = new ReaderWriterLock();
             lockTimeout = 10000;
             chatSystem = new ClientChatSystem();
-            Console.WriteLine("DEBUG: chatSystem created");
+            //Console.WriteLine("DEBUG: chatSystem created");
             inBuffer = new Byte[1024 * 1024];
             responseReady = false;
+            displayedConversationId = -1;
+            displayingConversationsList = false;
+            displayingConversation = false;
             goOn = true;
         }
 
@@ -40,7 +47,7 @@ namespace ChatClient
         {
             try
             {
-                Console.WriteLine("DEBUG: listener thread started");
+                //Console.WriteLine("DEBUG: listener thread started");
                 int headerLength = BitConverter.GetBytes(4).Length + 1;
                 byte[] headerBytes = new byte[headerLength];
                 lock (this)
@@ -65,7 +72,7 @@ namespace ChatClient
                         } //do poprawy, bufor moze byc za maly
                         if (type == (byte)1)
                         {
-                            Console.WriteLine("DEBUG: listener received boolean response");
+                            //Console.WriteLine("DEBUG: listener received boolean response");
                             responseStatus = (inBuffer[0] == (byte)0) ? false : true;
                             responseReady = true;
                             Monitor.Pulse(this);
@@ -73,7 +80,7 @@ namespace ChatClient
                         }
                         else if (type == (byte)3)
                         {
-                            Console.WriteLine("DEBUG: listener received user to remove from conversation");
+                            //Console.WriteLine("DEBUG: listener received user to remove from conversation");
                             int conversationId = BitConverter.ToInt32(inBuffer, 0);
                             Conversation conversation = chatSystem.getConversation(conversationId);
                             string nameToRemove = Encoding.UTF8.GetString(inBuffer, 4, messageLength - 4);
@@ -94,7 +101,7 @@ namespace ChatClient
                         }
                         else if (type == (byte)4)
                         {
-                            Console.WriteLine("DEBUG: listener received user to add to conversation");
+                            //Console.WriteLine("DEBUG: listener received user to add to conversation");
                             int conversationId = BitConverter.ToInt32(inBuffer, 0);
                             Conversation conversation = chatSystem.getConversation(conversationId);
                             string nameToAdd = Encoding.UTF8.GetString(inBuffer, 4, messageLength - 4);
@@ -127,7 +134,7 @@ namespace ChatClient
                         }
                         else if (type == (byte)5)
                         {
-                            Console.WriteLine("DEBUG: listener received serialized conversation");
+                            //Console.WriteLine("DEBUG: listener received serialized conversation");
                             MemoryStream memStream = new MemoryStream(inBuffer, 0, messageLength);
                             Conversation result;
                             try
@@ -143,10 +150,14 @@ namespace ChatClient
                             {
                                 Console.WriteLine("ERROR: something unexpected in {0}", "serialized conversation");
                             }
+                            else if(displayingConversationsList)
+                            {
+                                Console.WriteLine("{0}:\t{1}", result.ID, result.Name);
+                            }
                         }
                         else if (type == (byte)6)
                         {
-                            Console.WriteLine("DEBUG: listener received serialized message");
+                            //Console.WriteLine("DEBUG: listener received serialized message");
                             int conversationId = BitConverter.ToInt32(inBuffer, 0);
                             MemoryStream memStream = new MemoryStream(inBuffer, 4, messageLength - 4);
                             Conversation conversation = chatSystem.getConversation(conversationId);
@@ -157,6 +168,7 @@ namespace ChatClient
                                 {
                                     readWriteLock.AcquireWriterLock(lockTimeout);
                                     result = conversation.addMessage(memStream, new ConcreteDeserializer());
+                                    
                                 }
                                 finally
                                 {
@@ -167,9 +179,14 @@ namespace ChatClient
                             {
                                 Console.WriteLine("ERROR: something unexpected in {0}", "serialized message");
                             }
+                            else if (displayingConversation && displayedConversationId == conversation.ID)
+                            {
+                                Console.WriteLine("{0} at {1} ID {2}:", result.Author, result.SentTime, result.ID);
+                                Console.WriteLine(result.Content);
+                            }
                         }
                     }
-                    Console.WriteLine("DEBUG: listener thread terminating");
+                    //Console.WriteLine("DEBUG: listener thread terminating");
                 }
             }
             catch (Exception ex)
@@ -185,9 +202,18 @@ namespace ChatClient
             {
                 socket = new Socket(serverEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 socket.Connect(serverEndPoint);
-                Console.WriteLine("DEBUG: socket connected");
+                socketFacade = new ConcreteIOSocketFacade(socket);
+                //Console.WriteLine("DEBUG: socket connected");
                 Thread listener = new Thread(this.listen);
                 listener.Start();
+                IPanelHandlerCreator factory = new ConcretePanelHandlerCreator();
+                int decision = 10;
+                while(goOn)
+                {
+                    IPanelHandler panelHandler = factory.createPanelHandler(decision);
+                    decision = panelHandler.handle(this);
+                }
+                /*
                 Console.Write("Give number from 0 to 6: ");
                 int actionNumber = Convert.ToInt32(Console.ReadLine());
                 while (actionNumber != 0)
@@ -220,9 +246,10 @@ namespace ChatClient
                             break;
                     }
                     Console.Write("Give number from 0 to 6: ");
-                    actionNumber = Convert.ToInt32(Console.ReadLine());
+                    actionNumber = Convert.ToInt32(Console.ReadLine());                   
                 }
                 requestDisconnect();
+                */
             }
             catch (Exception ex)
             {
@@ -557,7 +584,6 @@ namespace ChatClient
 
         public void requestDisconnect()
         {
-            Console.WriteLine("DEBUG: attempt to {0}", "disconnect");
             goOn = false;
             byte[] request = new byte[5];
             request[0] = 0;
