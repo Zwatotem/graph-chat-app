@@ -1,7 +1,7 @@
 ﻿using System;
 using ChatModel;
 
-namespace ChatClient
+namespace ChatClient.HandlePanelStrategies
 {
     public class HandleUsersListPanelStrategy : IHandlePanelStrategy
     {
@@ -19,8 +19,13 @@ namespace ChatClient
             {
                 client.readWriteLock.ReleaseReaderLock();
             }
-            Console.WriteLine("1 - refresh, otherwise - go back");
-            int decision = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("1 - refresh, other number - go back");
+            int decision;// = Convert.ToInt32(Console.ReadLine());
+            bool isNum = int.TryParse(Console.ReadLine(), out decision);
+            if (!isNum)
+            {
+                return 30;
+            }
             return (decision == 1) ? 3003 : 30;
         }
     }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace ChatClient
+namespace ChatClient.HandlePanelStrategies
 {
     public class HandleLeaveConversationPanelStrategy : IHandlePanelStrategy
     {
@@ -12,7 +12,7 @@ namespace ChatClient
         {
             Console.Clear();
             string yourName = client.chatSystem.LoggedInName;
-            Console.Write("Enter the ID of the conversation you wish to leave: ");
+            Console.WriteLine("Enter the ID of the conversation you wish to leave:");
             try
             {
                 client.readWriteLock.AcquireReaderLock(client.lockTimeout);
@@ -22,10 +22,11 @@ namespace ChatClient
             finally
             {
                 client.readWriteLock.ReleaseReaderLock();
-            }               
-            int conversationId = Convert.ToInt32(Console.ReadLine());
+            }
+            int conversationId;// = Convert.ToInt32(Console.ReadLine());
+            bool isNum = int.TryParse(Console.ReadLine(), out conversationId);
             client.displayingConversationsList = false;
-            while (client.chatSystem.getConversation(conversationId) == null)
+            if (!isNum && client.chatSystem.getConversation(conversationId) == null)
             {
                 Console.WriteLine("There is no such conversation!");
                 Console.WriteLine("Press ENTER to continue...");

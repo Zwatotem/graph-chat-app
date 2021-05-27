@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ChatClient
+namespace ChatClient.HandlePanelStrategies
 {
     public class HandleDisplayConversationPanelStrategy : IHandlePanelStrategy
     {
@@ -25,9 +25,10 @@ namespace ChatClient
             {
                 client.readWriteLock.ReleaseReaderLock();
             }
-            int decision = Convert.ToInt32(Console.ReadLine());
+            int decision;// = Convert.ToInt32(Console.ReadLine());
+            bool isNum = int.TryParse(Console.ReadLine(), out decision);
             client.displayingConversation = false;
-            if (decision < 0 || decision > 3)
+            if (!isNum || decision < 0 || decision > 4)
             {
                 return 30;
             }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace ChatClient
+namespace ChatClient.HandlePanelStrategies
 {
     public class HandleSendMessagePanelStrategy : IHandlePanelStrategy
     {
@@ -12,8 +12,15 @@ namespace ChatClient
         {
             Console.Clear();
             Console.WriteLine("Enter ID of the message to which you want to reply (-1 to not reply to any one): ");
-            int messageId = Convert.ToInt32(Console.ReadLine());
-            Console.WriteLine("Enter the text of your message (end with newline + EOF):");
+            int messageId;// = Convert.ToInt32(Console.ReadLine());
+            bool isNum = int.TryParse(Console.ReadLine(), out messageId);
+            while (!isNum)
+            {
+                Console.Clear();
+                Console.WriteLine("Enter ID of the message to which you want to reply (-1 to not reply to any one): ");
+                isNum = int.TryParse(Console.ReadLine(), out messageId);
+            }
+            Console.WriteLine("Enter the text of your message (ENTER + ^Z + ENTER):");
             StringBuilder messageBuilder = new StringBuilder();
             string line = null;
             while ((line = Console.ReadLine()) != null)

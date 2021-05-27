@@ -4,18 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatClient
+namespace ChatClient.HandlePanelStrategies
 {
-    public class HandleUserPanelStrategy : IHandlePanelStrategy
+    public class HandleChooseConversationPanelStrategy : IHandlePanelStrategy
     {
         public int handle(ChatClient client)
         {
             Console.Clear();
             string yourName = client.chatSystem.LoggedInName;
-            Console.WriteLine("Logged in user: {0}", yourName);
-            Console.WriteLine("Type in a number to proceed:");
-            Console.WriteLine("1 - new conversation\t2 - leave conversation\t3 - display conversation\t0 - quit");
-            Console.WriteLine("Your conversations (ID: Name):");
+            Console.WriteLine("Enter the ID of the conversation you wish to display: ");
             try
             {
                 client.readWriteLock.AcquireReaderLock(client.lockTimeout);
@@ -25,14 +22,19 @@ namespace ChatClient
             finally
             {
                 client.readWriteLock.ReleaseReaderLock();
-            }            
-            int decision = Convert.ToInt32(Console.ReadLine());
+            }
+            int conversationId;// = Convert.ToInt32(Console.ReadLine());
+            bool isNum = int.TryParse(Console.ReadLine(), out conversationId);
             client.displayingConversationsList = false;
-            if (decision < 0 || decision > 3)
+            while (!isNum || client.chatSystem.getConversation(conversationId) == null)
             {
+                Console.WriteLine("There is no such conversation!");
+                Console.WriteLine("Press ENTER to continue...");
+                Console.ReadLine();
                 return 20;
             }
-            return (decision == 0) ? decision : 2000 + decision;
+            client.displayedConversationId = conversationId;
+            return 30;
         }
     }
 }

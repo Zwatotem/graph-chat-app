@@ -44,12 +44,9 @@ namespace ChatClient
 
         public void shutdown()
         {
-            lock (socket) //don't want to close the socket while some other thread is receiving/sending
-            {
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Close();
-                socket.Dispose();
-            }
+            socket.Shutdown(SocketShutdown.Both);
+            socket.Close();
+            socket.Dispose();
         }
     }
 }

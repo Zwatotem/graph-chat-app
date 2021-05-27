@@ -4,20 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace ChatClient
+namespace ChatClient.HandlePanelStrategies
 {
-    public class HandleAddUserPanelStrategy : IHandlePanelStrategy
+    public class HandleRegisterPanelStrategy : IHandlePanelStrategy
     {
         public int handle(ChatClient client)
         {
             Console.Clear();
-            Console.Write("Enter the user name of the user you wish to add to conversation: ");
-            string userName = Console.ReadLine();
-            int messageLength = Encoding.UTF8.GetByteCount(userName) + 4;
-            byte[] message = new byte[messageLength];
-            Array.Copy(BitConverter.GetBytes(client.displayedConversationId), 0, message, 0, 4);
-            Array.Copy(Encoding.UTF8.GetBytes(userName), 0, message, 4, messageLength - 4);
-            client.socketFacade.sendMessage(4, message);
+            Console.Write("Enter proposed user name (or empty line to go back): ");
+            string proposedName = Console.ReadLine();
+            if (proposedName == "")
+            {
+                return 10;
+            }
+            byte[] message = Encoding.UTF8.GetBytes(proposedName);
+            client.socketFacade.sendMessage(1, message);
             bool response = false;
             lock (client)
             {
@@ -27,21 +28,25 @@ namespace ChatClient
                 }
                 response = client.responseStatus;
                 client.responseReady = false;
+                if (response)
+                {
+                    client.chatSystem.addNewUser(proposedName);
+                }
                 Monitor.Pulse(client);
             }
             if (response)
             {
-                Console.WriteLine("Successfully added user to conversation: {0}", userName);
+                Console.WriteLine("Successfully added user: {0}", proposedName);
                 Console.WriteLine("Press ENTER to continue...");
                 Console.ReadLine();
-                return 30;
+                return 10;
             }
             else
             {
-                Console.WriteLine("Entered user does not exist.");
+                Console.WriteLine("Username already taken: {0}", proposedName);
                 Console.WriteLine("Press ENTER to continue...");
                 Console.ReadLine();
-                return 3001;
+                return 1001;
             }
         }
     }

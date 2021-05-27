@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatClient
+namespace ChatClient.HandlePanelStrategies
 {
     public class HandleWelcomePanelStrategy : IHandlePanelStrategy
     {
@@ -14,8 +14,9 @@ namespace ChatClient
             Console.WriteLine("Welcome to GraphChatApp!");
             Console.WriteLine("Type in a number to proceed:");
             Console.WriteLine("1 - register new user\t2 - log in\t0 - quit");
-            int decision = Convert.ToInt32(Console.ReadLine());
-            if (decision < 0 || decision > 2)
+            int decision;// = Convert.ToInt32(Console.ReadLine());
+            bool isNum = int.TryParse(Console.ReadLine(), out decision);
+            if (!isNum || decision < 0 || decision > 2)
             {
                 return 10;
             }
