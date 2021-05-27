@@ -11,8 +11,10 @@ namespace ChatModel.Util
         public object deserialize(Stream stream)
         {
             BinaryFormatter formatter = new BinaryFormatter();
-            return formatter.Deserialize(stream); //uses a BinaryFormatter to deserialize
-        }
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
+			return formatter.Deserialize(stream); //uses a BinaryFormatter to deserialize
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
+		}
     }
 }
 
