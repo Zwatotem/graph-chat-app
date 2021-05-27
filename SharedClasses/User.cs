@@ -24,7 +24,7 @@ namespace ChatModel
 
 		public bool matchWithConversation(Conversation conversation)
 		{
-			if (conversation == null || conversations.Contains(conversation)) //cannot match with null conversation or one already matched with user
+			if (conversation == null || conversations.Exists(c => c.ID == conversation.ID)) //cannot match with null conversation or one already matched with user
 				return false;
 			conversations.Add(conversation);
 			return true;
