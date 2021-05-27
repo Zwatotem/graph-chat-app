@@ -3,7 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:GraphChatApp" xmlns:viewmodel="clr-namespace:GraphChatApp.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:ConversationCreatorViewModel}"
+      xmlns:local="clr-namespace:GraphChatApp" xmlns:viewmodel="clr-namespace:GraphChatApp.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:ConversationCanvasViewModel}"
 	  mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="ConversationCanvasPage">
@@ -13,6 +13,45 @@
 			<RowDefinition Height="2*"/>
 			<RowDefinition Height="23*"/>
 		</Grid.RowDefinitions>
-		<TextBlock x:Name="ConversationTitle" Text="{Binding ConversationName}"/>
+		<StackPanel Grid.Row="0" Orientation="Horizontal" FlowDirection="RightToLeft">
+			<TextBlock x:Name="ConversationTitle"
+				   Margin="10"
+				   HorizontalAlignment="Right"
+				   VerticalAlignment="Center"
+				   FontSize="22"
+				   Text="{Binding ConversationName}"/>
+			<Button x:Name="NewMessage" HorizontalAlignment="Right" Content="Send new message" Click="SendMessage"/>
+		</StackPanel>
+		<ScrollViewer Grid.Row="1">
+			<ItemsControl ItemsSource="{Binding RootMessages}">
+				<ItemsControl.Style>
+					<Style TargetType="{x:Type ItemsControl}">
+						<Setter Property="ItemsPanel">
+							<Setter.Value>
+								<ItemsPanelTemplate>
+									<StackPanel Orientation="Horizontal"/>
+								</ItemsPanelTemplate>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</ItemsControl.Style>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Grid>
+							<Grid.RowDefinitions>
+								<RowDefinition/>
+								<RowDefinition/>
+							</Grid.RowDefinitions>
+							<TextBlock Grid.Row="0" Text="{Binding tempText}"/>
+							<StackPanel Grid.Row="1" Orientation="Horizontal">
+								<ItemsControl>
+
+								</ItemsControl>
+							</StackPanel>
+						</Grid>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
 	</Grid>
 </Page>

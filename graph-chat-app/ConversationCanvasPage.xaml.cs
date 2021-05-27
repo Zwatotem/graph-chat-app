@@ -1,5 +1,6 @@
 ﻿using ChatModel;
 using GraphChatApp.ViewModel;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace GraphChatApp
@@ -15,10 +16,16 @@ namespace GraphChatApp
 		public ConversationCanvasPage(MainWindow window, Conversation conversation)
 		{
 			InitializeComponent();
+			this.window = window;
 			this.conversation = conversation;
 			viewModel = new ConversationCanvasViewModel(conversation);
 			DataContext = viewModel;
-			ConversationTitle
+		}
+		
+		private void SendMessage(object sender, RoutedEventArgs e)
+		{
+			var currentUser = window.app.Client.ChatSystem.getUser(window.app.Client.ChatSystem.getUserName());
+			window.app.Client.requestSendTextMessage(this, new(currentUser, conversation.getId(), "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pharetra massa, nec ultrices tortor."));
 		}
 	}
 }

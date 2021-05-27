@@ -486,56 +486,13 @@ namespace GraphChatApp
 			}
 		}
 
-		public async void requestSendTextMessage()
+		public async void requestSendTextMessage(object sender, SendMessageEventArgs args)
 		{
 			Console.WriteLine("DEBUG: attempt to {0}", "send message");
-			string yourName = null;
-			bool loggedIn = await Task.Run(() =>
-			{
-				try
-				{
-					readWriteLock.AcquireReaderLock(lockTimeout);
-					yourName = ChatSystem.getUserName();
-					if (yourName == null)
-					{
-						Console.WriteLine("You must be logged in first!");
-						return false;
-					}
-					Console.WriteLine("Here is the list of your conversations:");
-					ChatSystem.getUser(yourName).getConversations().ForEach(c => Console.WriteLine("{0}\t-\t{1}", c.Name, c.ID));
-				}
-				finally
-				{
-					readWriteLock.ReleaseReaderLock();
-				}
-				return true;
-			});
-			if (!loggedIn)
-			{
-				return;
-			}
-			Console.Write("Give the id of conversation where you want to send message: ");
-			int conversationId = Convert.ToInt32(Console.ReadLine());
-			Console.WriteLine("Here is the list of messages in your conversations:");
-			await Task.Run(() =>
-			{
-				try
-				{
-					readWriteLock.AcquireReaderLock(lockTimeout);
-					foreach (var message in ChatSystem.getConversation(conversationId).getMessages())
-					{
-						Console.WriteLine("{0}: {1}", message.ID, message.getContent().getData());
-					}
-				}
-				finally
-				{
-					readWriteLock.ReleaseReaderLock();
-				}
-			});
-			Console.Write("Give the id of the message you want to target: ");
-			int messageId = Convert.ToInt32(Console.ReadLine());
-			Console.WriteLine("Enter the text of the message:");
-			string text = Console.ReadLine();
+			string yourName = args.MessageSender.Name;
+			int conversationId = args.ConversationID;
+			int messageId = args.ParentMessageID;
+			string text = args.MessageContent;
 			int contentLength = 9 + Encoding.UTF8.GetByteCount(text);
 			byte[] content = new byte[contentLength];
 			Array.Copy(BitConverter.GetBytes(conversationId), 0, content, 0, 4);
@@ -581,6 +538,26 @@ namespace GraphChatApp
 			Array.Copy(BitConverter.GetBytes(0), 0, request, 1, 4);
 			socket.Send(request);
 			socket.Dispose();
+		}
+	}
+
+	public class SendMessageEventArgs
+	{
+		public User MessageSender;
+		public int ConversationID;
+		public int ParentMessageID;
+		public string MessageContent;
+		public SendMessageEventArgs(User user, int conv, string content)
+		{
+			MessageSender = user;
+			ConversationID = conv;
+			ParentMessageID = -1;
+			MessageContent = content;
+		}
+		public SendMessageEventArgs(User user, int conv, int target, string content)
+			: this(user, conv, content)
+		{
+			ParentMessageID = target;
 		}
 	}
 

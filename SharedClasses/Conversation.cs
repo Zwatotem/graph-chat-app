@@ -189,15 +189,17 @@ namespace ChatModel
 			{
 				if (mess.ID >= smallestFreeId)
 				{
-					messages.Add(mess.ID, mess);
 					if (mess.TargetId == -1)
 					{
+						messages.Add(mess.ID, mess);
 						mess.TargetedMessage = null;
-
+						PropertyChanged(this, new(nameof(observableMessages)));
 					}
 					else if (messages.ContainsKey(mess.TargetId))
 					{
+						messages.Add(mess.ID, mess);
 						mess.TargetedMessage = messages[mess.TargetId];
+						PropertyChanged(this, new(nameof(observableMessages)));
 					}
 					else if (mess.TargetId == -1)
 					{

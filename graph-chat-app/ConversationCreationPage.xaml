@@ -10,14 +10,14 @@
 
 	<Grid>
 		<Grid.ColumnDefinitions>
+			<ColumnDefinition MinWidth="20"/>
 			<ColumnDefinition/>
-			<ColumnDefinition/>
-			<ColumnDefinition/>
+			<ColumnDefinition MinWidth="20"/>
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
-			<RowDefinition/>
-			<RowDefinition/>
-			<RowDefinition/>
+			<RowDefinition MinHeight="20"/>
+			<RowDefinition Height="2*"/>
+			<RowDefinition MinHeight="20"/>
 		</Grid.RowDefinitions>
 		<StackPanel Grid.Column="1" Grid.Row="1" >
 			<Label Content="Users you wish to add: "/>
