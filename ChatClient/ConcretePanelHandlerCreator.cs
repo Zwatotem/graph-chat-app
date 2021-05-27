@@ -2,6 +2,9 @@
 
 namespace ChatClient
 {
+    /// <summary>
+    /// Concrete implementation of IPanelHandlerCreator.
+    /// </summary>
     public class ConcretePanelHandlerCreator : IPanelHandlerCreator
     {
         public IPanelHandler createPanelHandler(int type)
@@ -53,3 +56,8 @@ namespace ChatClient
         }
     }
 }
+
+/*
+Concrete part of factory method pattern.
+Analogus in compliance with solid to factory method pattern in ChatServer.
+*/

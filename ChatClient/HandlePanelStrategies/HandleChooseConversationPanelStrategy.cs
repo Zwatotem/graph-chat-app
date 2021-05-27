@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChatClient.HandlePanelStrategies
 {
@@ -23,7 +19,7 @@ namespace ChatClient.HandlePanelStrategies
             {
                 client.readWriteLock.ReleaseReaderLock();
             }
-            int conversationId;// = Convert.ToInt32(Console.ReadLine());
+            int conversationId;
             bool isNum = int.TryParse(Console.ReadLine(), out conversationId);
             client.displayingConversationsList = false;
             while (!isNum || client.chatSystem.getConversation(conversationId) == null)

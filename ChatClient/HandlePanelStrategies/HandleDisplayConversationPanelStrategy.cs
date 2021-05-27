@@ -25,7 +25,7 @@ namespace ChatClient.HandlePanelStrategies
             {
                 client.readWriteLock.ReleaseReaderLock();
             }
-            int decision;// = Convert.ToInt32(Console.ReadLine());
+            int decision;
             bool isNum = int.TryParse(Console.ReadLine(), out decision);
             client.displayingConversation = false;
             if (!isNum || decision < 0 || decision > 4)

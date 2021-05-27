@@ -20,7 +20,7 @@ namespace ChatClient.HandlePanelStrategies
                 client.readWriteLock.ReleaseReaderLock();
             }
             Console.WriteLine("1 - refresh, other number - go back");
-            int decision;// = Convert.ToInt32(Console.ReadLine());
+            int decision;
             bool isNum = int.TryParse(Console.ReadLine(), out decision);
             if (!isNum)
             {

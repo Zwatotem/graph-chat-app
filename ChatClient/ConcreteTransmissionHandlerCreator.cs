@@ -1,8 +1,10 @@
-﻿using System;
-using ChatClient.HandleTransmissionStrategies;
+﻿using ChatClient.HandleTransmissionStrategies;
 
 namespace ChatClient
 {
+    /// <summary>
+    /// Concrete implementation of ITransmissionHandlerCreator.
+    /// </summary>
     public class ConcreteTransmissionHandlerCreator : ITransmissionHandlerCreator
     {
         public ITransmissionHandler createTransmissionHandler(int type)
@@ -30,3 +32,8 @@ namespace ChatClient
         }
     }
 }
+
+/*
+Concrete part of factory method pattern.
+Analogus in compliance with solid to factory method pattern in ChatServer.
+*/

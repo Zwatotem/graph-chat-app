@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChatClient.HandlePanelStrategies
 {
@@ -14,7 +10,7 @@ namespace ChatClient.HandlePanelStrategies
             Console.WriteLine("Welcome to GraphChatApp!");
             Console.WriteLine("Type in a number to proceed:");
             Console.WriteLine("1 - register new user\t2 - log in\t0 - quit");
-            int decision;// = Convert.ToInt32(Console.ReadLine());
+            int decision;
             bool isNum = int.TryParse(Console.ReadLine(), out decision);
             if (!isNum || decision < 0 || decision > 2)
             {

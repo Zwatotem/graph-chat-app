@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace ChatClient
 {
+    /// <summary>
+    /// Concrete implementation of IPanelHandler.
+    /// </summary>
     public class ConcretePanelHandler : IPanelHandler
     {
         private IHandlePanelStrategy handleStrategy;
@@ -21,3 +19,8 @@ namespace ChatClient
         }
     }
 }
+
+/*
+Strategy pattern context. 
+Analogus in compliance with solid to strategy pattern in ChatServer.
+*/

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace ChatClient.HandlePanelStrategies
@@ -23,7 +20,7 @@ namespace ChatClient.HandlePanelStrategies
             {
                 client.readWriteLock.ReleaseReaderLock();
             }
-            int conversationId;// = Convert.ToInt32(Console.ReadLine());
+            int conversationId;
             bool isNum = int.TryParse(Console.ReadLine(), out conversationId);
             client.displayingConversationsList = false;
             if (!isNum && client.chatSystem.getConversation(conversationId) == null)
@@ -50,7 +47,7 @@ namespace ChatClient.HandlePanelStrategies
                 }
                 response = client.responseStatus;
                 client.responseReady = false;
-                if (response)
+                if (response && client.chatSystem.getConversation(conversationId) != null)
                 {
                     client.chatSystem.getConversation(conversationId).Users.ForEach(u => client.chatSystem.leaveConversation(u.Name, conversationId));
                 }

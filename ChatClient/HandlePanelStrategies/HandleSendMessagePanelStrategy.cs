@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -12,7 +10,7 @@ namespace ChatClient.HandlePanelStrategies
         {
             Console.Clear();
             Console.WriteLine("Enter ID of the message to which you want to reply (-1 to not reply to any one): ");
-            int messageId;// = Convert.ToInt32(Console.ReadLine());
+            int messageId;
             bool isNum = int.TryParse(Console.ReadLine(), out messageId);
             while (!isNum)
             {
