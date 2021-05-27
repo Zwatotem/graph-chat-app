@@ -29,10 +29,13 @@ namespace ChatServer.HandleStrategies
                     Array.Copy(messageBytes, 0, msg, 0, 4);
                     Array.Copy(Encoding.UTF8.GetBytes(userName), 0, msg, 4, messageLength - 4);
                     Conversation conversation = chatSystem.getConversation(conversationId);
-                    //notify other client of the change
-                    foreach (var handler in allHandlers.FindAll(h => conversation.Users.Exists(u => u.Name == h.HandledUserName)))
+                    if (conversation != null) //if there are users left in the conversation
                     {
-                        handler.sendMessage(3, msg); //left conversation - type 3
+                        //notify other clients of the change
+                        foreach (var handler in allHandlers.FindAll(h => conversation.Users.Exists(u => u.Name == h.HandledUserName)))
+                        {
+                            handler.sendMessage(3, msg); //left conversation - type 3
+                        }
                     }
                 }
                 else
