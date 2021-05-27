@@ -32,7 +32,7 @@ namespace ChatClient.HandleTransmissionStrategies
             }
             else if (client.displayingConversation && client.displayedConversationId == conversation.ID)
             {
-                Console.WriteLine("{0} at {1} ID: {2} reply: {3}", result.Author.Name, result.SentTime, result.ID, result.Parent.ID);
+                Console.WriteLine("{0} at {1} ID: {2} reply: {3}", result.Author.Name, result.SentTime, result.ID, (result.Parent != null) ? result.Parent.ID : -1);
                 Console.WriteLine(result.Content.getData());
             }
         }
