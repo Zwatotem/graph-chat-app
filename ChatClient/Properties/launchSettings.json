@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ChatClient": {
+      "commandName": "Project",
+      "commandLineArgs": "czamara.dyndns.org 50000"
+    }
+  }
+}

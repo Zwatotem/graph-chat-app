@@ -51,7 +51,7 @@ namespace ChatModel
                 {
                     users.Add(user); //if the user doesn't yet exist in the chat system they are added
                 }
-            }
+            }            
             foreach (var user in newUsers)
             {
                 //fix references in the conversation that point to users already present in the system so that they point to correct objects
