@@ -36,6 +36,7 @@ namespace ChatClient.HandlePanelStrategies
             {
                 contentList.Add(b);
             }
+            Console.WriteLine("Who other than you is to be part of the conversation?");
             while (userName != "")
             {
                 Console.WriteLine("Enter name of next user you wish to add to conversation (or empty line to stop): ");
