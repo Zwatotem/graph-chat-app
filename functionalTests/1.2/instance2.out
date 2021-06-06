@@ -1,0 +1,20 @@
+Welcome to GraphChatApp!
+Type in a number to proceed:
+1 - register new user	2 - log in	0 - quit
+Enter your user name (or empty line to go back): Successfully logged in: user2
+Press ENTER to continue...
+Logged in user: user2
+Type in a number to proceed:
+1 - new conversation	2 - leave conversation	3 - display conversation	0 - quit
+Your conversations (ID: Name):
+1:	conv
+Enter the ID of the conversation you wish to display: 
+1:	conv
+Type in a number to proceed:
+1 - add user	2 - send message	3 - show users' list	4 - return to user panel	0 - quit
+
+Conversation name: conv
+user1 at 06.06.2021 15:09:17 ID: 1 reply: -1
+bf8b1f32-0510-4e43-8040-ad5099f9edb1
+
+Bye bye!
