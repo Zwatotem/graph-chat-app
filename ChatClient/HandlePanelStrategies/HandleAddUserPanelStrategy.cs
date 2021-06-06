@@ -8,7 +8,7 @@ namespace ChatClient.HandlePanelStrategies
     {
         public int handle(ChatClient client)
         {
-            Console.Clear();
+            if (!Console.IsOutputRedirected) {Console.Clear();}
             Console.Write("Enter the user name of the user you wish to add to conversation: ");
             string userName = Console.ReadLine();
             int messageLength = Encoding.UTF8.GetByteCount(userName) + 4;

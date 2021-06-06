@@ -7,7 +7,7 @@ namespace ChatClient.HandlePanelStrategies
     {
         public int handle(ChatClient client)
         {
-            Console.Clear();
+            if(!Console.IsOutputRedirected) {Console.Clear(); }
             try
             {
                 client.readWriteLock.AcquireReaderLock(client.lockTimeout);

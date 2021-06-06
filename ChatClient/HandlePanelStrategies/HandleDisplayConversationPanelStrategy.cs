@@ -6,7 +6,10 @@ namespace ChatClient.HandlePanelStrategies
     {
         public int handle(ChatClient client)
         {
-            Console.Clear();
+			if (!Console.IsOutputRedirected)
+			{
+                if (!Console.IsOutputRedirected) {Console.Clear();}
+			}
             Console.WriteLine("Type in a number to proceed:");
             Console.WriteLine("1 - add user\t2 - send message\t3 - show users' list\t4 - return to user panel\t0 - quit");
             Console.WriteLine();
@@ -27,6 +30,7 @@ namespace ChatClient.HandlePanelStrategies
             }
             int decision;
             bool isNum = int.TryParse(Console.ReadLine(), out decision);
+            if(!isNum)Console.Error.WriteLine("not num");
             client.displayingConversation = false;
             if (!isNum || decision < 0 || decision > 4)
             {

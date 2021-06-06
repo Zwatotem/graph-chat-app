@@ -9,7 +9,7 @@ namespace ChatClient.HandlePanelStrategies
     {
         public int handle(ChatClient client)
         {
-            Console.Clear();
+            if (!Console.IsOutputRedirected) {Console.Clear();}
             List<byte> contentList = new List<byte>();
             Console.Write("Enter proposed conversation name: ");
             string conversationName = Console.ReadLine();

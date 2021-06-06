@@ -8,7 +8,7 @@ namespace ChatClient.HandlePanelStrategies
     {
         public int handle(ChatClient client)
         {
-            Console.Clear();
+            if (!Console.IsOutputRedirected) {Console.Clear();}
             Console.WriteLine("Enter ID of the message to which you want to reply (-1 to not reply to any one): ");
             int messageId;
             bool isNum = int.TryParse(Console.ReadLine(), out messageId);
@@ -21,7 +21,7 @@ namespace ChatClient.HandlePanelStrategies
             Console.WriteLine("Enter the text of your message (to end: ENTER + ^Z + ENTER):");
             StringBuilder messageBuilder = new StringBuilder();
             string line = null;
-            while ((line = Console.ReadLine()) != null)
+            while (!String.IsNullOrEmpty(line = Console.ReadLine()))
             {
                 messageBuilder.Append(line);
                 messageBuilder.Append('\n');

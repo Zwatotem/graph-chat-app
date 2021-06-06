@@ -6,7 +6,7 @@ namespace ChatClient.HandlePanelStrategies
     {
         public int handle(ChatClient client)
         {
-            Console.Clear();
+            if(!Console.IsOutputRedirected) {Console.Clear(); }
             string yourName = client.chatSystem.LoggedInName;
             Console.WriteLine("Logged in user: {0}", yourName);
             Console.WriteLine("Type in a number to proceed:");

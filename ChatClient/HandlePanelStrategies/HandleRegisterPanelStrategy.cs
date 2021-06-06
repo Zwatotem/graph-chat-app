@@ -8,7 +8,7 @@ namespace ChatClient.HandlePanelStrategies
     {
         public int handle(ChatClient client)
         {
-            Console.Clear();
+            if (!Console.IsOutputRedirected) {Console.Clear();}
             Console.Write("Enter proposed user name (or empty line to go back): ");
             string proposedName = Console.ReadLine();
             if (proposedName == "")

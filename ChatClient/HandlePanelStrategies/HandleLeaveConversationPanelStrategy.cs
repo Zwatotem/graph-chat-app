@@ -7,7 +7,7 @@ namespace ChatClient.HandlePanelStrategies
     {
         public int handle(ChatClient client)
         {
-            Console.Clear();
+            if (!Console.IsOutputRedirected) {Console.Clear();}
             string yourName = client.chatSystem.LoggedInName;
             Console.WriteLine("Enter the ID of the conversation you wish to leave:");
             try

@@ -6,7 +6,7 @@ namespace ChatClient.HandlePanelStrategies
     {
         public int handle(ChatClient client)
         {
-            Console.Clear();
+            if (!Console.IsOutputRedirected) {Console.Clear();}
             Console.WriteLine("Bye bye!");
             client.requestDisconnect();
             return 0;
