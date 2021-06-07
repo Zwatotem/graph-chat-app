@@ -21,7 +21,7 @@ $startInfoClient = New-Object 'System.Diagnostics.ProcessStartInfo' -Property @{
 }
 $result = $true
 $expectedDisplay = Get-Content ((gi $PSCommandPath).DirectoryName + '\expectedDisplay.txt')
-$endTime = Get-Date -Hour 20 -Minute 30 -Second 0
+$endTime = Get-Date -Hour 20 -Minute 0 -Second 0
 $currTime = Get-Date
 while ($currTime -lt $endTime) {
     $client = [System.Diagnostics.Process]::Start($startInfoClient)
