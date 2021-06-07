@@ -21,16 +21,15 @@ $startInfoClient = New-Object 'System.Diagnostics.ProcessStartInfo' -Property @{
 }
 $result = $true
 $expectedDisplay = Get-Content ((gi $PSCommandPath).DirectoryName + '\expectedDisplay.txt')
-$endTime = Get-Date -Hour 20 -Minute 0 -Second 0
+$endTime = Get-Date -Hour 20 -Minute 30 -Second 0
 $currTime = Get-Date
 while ($currTime -lt $endTime) {
     $client = [System.Diagnostics.Process]::Start($startInfoClient)
     $client.StandardInput.WriteLine("0") 
     $stdout = $client.StandardOutput.ReadToEnd()
-    $stdout
-    If ($stdout -notcontains $expectedDisplay) {$result = $false}
+    If ($stdout.IndexOf($expectedDisplay) -eq -1) {$result = $false}
     Start-Sleep -Seconds 300
     $currTime = Get-Date
 }
 ps | ? { ('ChatClient', 'ChatServer') -contains $_.Name } | Stop-Process
-$result
+Write-Output $result 
