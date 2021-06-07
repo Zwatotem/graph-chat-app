@@ -30,7 +30,6 @@ namespace ChatClient.HandlePanelStrategies
             }
             int decision;
             bool isNum = int.TryParse(Console.ReadLine(), out decision);
-            if(!isNum)Console.Error.WriteLine("not num");
             client.displayingConversation = false;
             if (!isNum || decision < 0 || decision > 4)
             {
