@@ -27,9 +27,10 @@ while ($currTime -lt $endTime) {
     $client = [System.Diagnostics.Process]::Start($startInfoClient)
     $client.StandardInput.WriteLine("0") 
     $stdout = $client.StandardOutput.ReadToEnd()
-    If ($stdout.IndexOf($expectedDisplay) -eq -1) {$result = $false}
+    $stdout
+    If ($stdout -notcontains $expectedDisplay) {$result = $false}
     Start-Sleep -Seconds 300
     $currTime = Get-Date
 }
 ps | ? { ('ChatClient', 'ChatServer') -contains $_.Name } | Stop-Process
-Write-Output $result
+$result

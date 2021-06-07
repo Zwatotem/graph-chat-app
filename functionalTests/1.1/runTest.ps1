@@ -32,19 +32,21 @@ $startInfo = New-Object 'System.Diagnostics.ProcessStartInfo' -Property @{
 }
 $client1 = [System.Diagnostics.Process]::Start($startInfo)
 Write-Debug "First instance started"
-Write-Debug "Logging user 1"
-& $sendInput $client1 $loginUser1
-Write-Debug "Sending message"
-& $sendInput $client1 $sendMessage.Replace("messageText", $message)
-Write-Debug "Closing client 1"
-& $sendInput $client1 $end
-Start-Sleep 1
 $client2 = [System.Diagnostics.Process]::Start($startInfo)
 Write-Debug "Second instance started"
+Write-Debug "Logging user 1"
+& $sendInput $client1 $loginUser1
+Start-Sleep 1
 Write-Debug "Logging user 2"
 & $sendInput $client2 $loginUser2
+Start-Sleep 1
+Write-Debug "Sending message"
+& $sendInput $client1 $sendMessage.Replace("messageText", $message)
+Start-Sleep 1
 Write-Debug "Receiving message"
 & $sendInput $client2 $receiveMessage
+Write-Debug "Closing"
+& $sendInput $client1 $end
 $out = $client2.StandardOutput.ReadToEnd()
 Stop-Process $server, $client1, $client2
 $out.Contains($message)
