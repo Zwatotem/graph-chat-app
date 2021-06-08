@@ -39,4 +39,4 @@ for ($i = 0; $i -lt 1; $i++) {
     $currTime = Get-Date
 }
 ps | ? { ('ChatClient', 'ChatServer') -contains $_.Name } | Stop-Process
-Write-Output $result 
+$result 

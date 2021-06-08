@@ -32,4 +32,4 @@ while ($currTime -lt $endTime) {
     $currTime = Get-Date
 }
 ps | ? { ('ChatClient', 'ChatServer') -contains $_.Name } | Stop-Process
-Write-Output $result 
+$result 
