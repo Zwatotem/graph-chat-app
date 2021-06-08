@@ -43,23 +43,31 @@ Start-Sleep 1
 Write-Debug "Logging user 2"
 & $sendInput $client2 $loginUser.Replace('user', 'user2')
 Write-Debug "Creating conversation"
-& $sendInput $client1 $createConversation.Replace('user', 'user2')
+& $sendInput $client1 $createConversation.Replace('user', 'user2').Replace('conv', 'conv1')
+& $sendInput $client1 $createConversation.Replace('user', 'user2').Replace('conv', 'conv2')
 Start-Sleep 1
-& $sendInput $client1 $enterConversation
-& $sendInput $client2 $enterConversation
+& $sendInput $client1 $enterConversation.Replace('conv', 'conv1')
+& $sendInput $client2 $enterConversation.Replace('conv', 'conv1')
 Write-Debug "Sending message"
 & $sendInput $client1 $sendMessage.Replace("messageText", "message1")
 Start-Sleep 1
 Write-Debug "Resending message"
 & $sendInput $client2 $sendMessage.Replace("messageText", "message2")
 Start-Sleep 1
-Write-Debug "Leaving conversation view"
+Write-Debug "Leaving original conversation"
 & $sendInput $client1 $leaveConversation
 & $sendInput $client2 $leaveConversation
 Start-Sleep (1)
-Write-Debug "Reentering conversation view"
-& $sendInput $client1 $enterConversation
-& $sendInput $client2 $enterConversation
+Write-Debug "Detour to second conversation"
+& $sendInput $client1 $enterConversation.Replace('conv', 'conv2')
+& $sendInput $client2 $enterConversation.Replace('conv', 'conv2')
+& $sendInput $client1 $sendMessage
+& $sendInput $client1 $leaveConversation
+& $sendInput $client2 $leaveConversation
+Start-Sleep (1)
+Write-Debug "Reentering original conversation"
+& $sendInput $client1 $enterConversation.Replace('conv', 'conv1')
+& $sendInput $client2 $enterConversation.Replace('conv', 'conv1')
 Write-Debug "Ending processes"
 & $sendInput $client1 $end
 & $sendInput $client2 $end
