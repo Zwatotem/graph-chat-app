@@ -5,245 +5,268 @@ DEBUG: add new user request received
 DEBUG: trying to add new user
 DEBUG: logIn request received
 DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: disconnect request received
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: handler object created
-DEBUG: listener thread started
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: add new user request received
-DEBUG: trying to add new user
-DEBUG: logIn request received
-DEBUG: requested logIn
-DEBUG: logIn request received
-DEBUG: requested logIn
 DEBUG: add new conversation request received
 DEBUG: trying to add conversation
-DEBUG: add new conversation request received
-DEBUG: trying to add conversation
+DEBUG: send message request received
+DEBUG: trying to send message
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
+DEBUG: disconnect request received
+DEBUG: handler object created
+DEBUG: listener thread started
+DEBUG: logIn request received
+DEBUG: requested logIn
 DEBUG: disconnect request received
