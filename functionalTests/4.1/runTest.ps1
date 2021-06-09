@@ -28,7 +28,7 @@ while ($currTime -lt $endTime) {
     $client.StandardInput.WriteLine("0") 
     $stdout = $client.StandardOutput.ReadToEnd()
     If ($stdout.IndexOf($expectedDisplay) -eq -1) {$result = $false}
-    Start-Sleep -Seconds 300
+    Start-Sleep -Seconds 30
     $currTime = Get-Date
 }
 ps | ? { ('ChatClient', 'ChatServer') -contains $_.Name } | Stop-Process
