@@ -9,6 +9,8 @@ $cArgs = ('127.0.0.1', (50000+$testNo).ToString())
 # Prepare action templates
 $loginUser1 =	gc((gi $PSCommandPath).DirectoryName + '\loginUser1.in')
 $loginUser2 =	gc((gi $PSCommandPath).DirectoryName + '\loginUser2.in')
+$createConversation =	gc((gi $PSCommandPath).DirectoryName + '\createConversation.in')
+$enterConversation =	gc((gi $PSCommandPath).DirectoryName + '\enterConversation.in')
 $sendMessage =	gc((gi $PSCommandPath).DirectoryName + '\sendMessage.in')
 $receiveMessage =	gc((gi $PSCommandPath).DirectoryName + '\receiveMessage.in')
 $end =	gc((gi $PSCommandPath).DirectoryName + '\end.in')
