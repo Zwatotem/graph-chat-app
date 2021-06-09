@@ -47,7 +47,7 @@ $clients | foreach {
 }
 Write-Debug 'Creating conversation'
 $userList = ''
-$clients[0..2] | foreach {
+$clients[1..2] | foreach {
 	$userList += 'user' + $_.Id + [System.Environment]::NewLine
 }
 &$sendInput $clients[0] $createConversation.Replace('user', $userList).Replace('conv', 'ourConv')
