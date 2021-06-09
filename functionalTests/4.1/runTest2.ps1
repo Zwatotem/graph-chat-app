@@ -1,9 +1,10 @@
 # Executing setup script
 $setup = (gi $PSCommandPath).DirectoryName + '\..\setup.ps1'
 ($projectRoot, $serverPath, $clientPath, $serverExe, $clientExe) = (& $setup)
+$testNo = [int]((gi $PSCommandPath).Directory.Name.Replace('.', ''))
 # Prepare args for tested programs
-$sArgs = ('127.0.0.1', '50000', '5')
-$cArgs = ('127.0.0.1', '50000')
+$sArgs = ('127.0.0.1', (50000+$testNo).ToString(), '5')
+$cArgs = ('127.0.0.1', (50000+$testNo).ToString())
 $startInfoServer = New-Object 'System.Diagnostics.ProcessStartInfo' -Property @{
     FileName = $serverExe
     Arguments = $sArgs
