@@ -7,7 +7,7 @@ $testNo = [int]((gi $PSCommandPath).Directory.Name.Replace('.', ''))
 $sArgs = ('127.0.0.1', (50000+$testNo).ToString(), '5')
 $cArgs = ('127.0.0.1', (50000+$testNo).ToString())
 # Prepare action templates
-$serverOut =	(gi $PSCommandPath).DirectoryName + '\..\server.out'
+$serverOut =	(gi $PSCommandPath).DirectoryName + '\server.out'
 $loginUser1 =	gc((gi $PSCommandPath).DirectoryName + '\loginUser1.in')
 $loginUser2 =	gc((gi $PSCommandPath).DirectoryName + '\loginUser2.in')
 $sendMessage =	gc((gi $PSCommandPath).DirectoryName + '\sendMessage.in')

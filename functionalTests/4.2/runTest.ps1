@@ -3,6 +3,7 @@ $setup = (gi $PSCommandPath).DirectoryName + '\..\setup.ps1'
 $sendInput = (gi $PSCommandPath).DirectoryName + '\..\sendInput.ps1'
 ($projectRoot, $serverPath, $clientPath, $serverExe, $clientExe) = (& $setup)
 $testNo = [int]((gi $PSCommandPath).Directory.Name.Replace('.', ''))
+$serverOut =	(gi $PSCommandPath).DirectoryName + '\server.out'
 # Prepare args for tested programs
 $sArgs = ('127.0.0.1', (50000+$testNo).ToString(), '5')
 $cArgs = ('127.0.0.1', (50000+$testNo).ToString())
@@ -19,7 +20,7 @@ $startInfoServer = New-Object 'System.Diagnostics.ProcessStartInfo' -Property @{
 	RedirectStandardInput  = $true
 	RedirectStandardOutput	= $true
 }
-$server = [System.Diagnostics.Process]::Start($startInfoServer)
+$server = (Start-Process $serverExe -ArgumentList $sArgs -NoNewWindow -RedirectStandardOutput $serverOut -PassThru)
 Write-Debug "Server started"
 $startInfo = New-Object 'System.Diagnostics.ProcessStartInfo' -Property @{
 	FileName               = $clientExe

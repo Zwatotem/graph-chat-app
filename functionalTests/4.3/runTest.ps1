@@ -8,7 +8,7 @@ $sArgs = ('127.0.0.1', (50000+$testNo).ToString(), '5')
 $cArgs = ('127.0.0.1', (50000+$testNo).ToString())
 # Prepare action templates
 $clientOperations =	gc((gi $PSCommandPath).DirectoryName + '\clientOperations.in')
-$serverOut =	(gi $PSCommandPath).DirectoryName + '\..\server.out'
+$serverOut =	(gi $PSCommandPath).DirectoryName + '\server.out'
 # Create start info objects
 $server = (Start-Process $serverExe -ArgumentList $sArgs -NoNewWindow -RedirectStandardOutput $serverOut -PassThru)
 Start-Sleep 2
