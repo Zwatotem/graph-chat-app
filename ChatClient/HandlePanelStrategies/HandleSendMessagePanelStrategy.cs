@@ -18,7 +18,7 @@ namespace ChatClient.HandlePanelStrategies
                 Console.WriteLine("Enter ID of the message to which you want to reply (-1 to not reply to any one): ");
                 isNum = int.TryParse(Console.ReadLine(), out messageId);
             }
-            Console.WriteLine("Enter the text of your message (to end: ENTER + ^Z + ENTER):");
+            Console.WriteLine("Enter the text of your message (to end: empty line or ENTER + ^Z + ENTER):");
             StringBuilder messageBuilder = new StringBuilder();
             string line = null;
             while (!String.IsNullOrEmpty(line = Console.ReadLine()))
