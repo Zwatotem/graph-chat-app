@@ -31,6 +31,11 @@ namespace ChatModel
                 return false;
             }
         }
+        
+        public string getUserName() //returns the user name of the user currently logged in or null if there is no such user.
+        {
+            return userName;
+        }
 
         public Conversation addConversation(Stream stream, IDeserializer deserializer)
         {

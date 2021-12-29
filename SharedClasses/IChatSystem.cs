@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace ChatModel
 {
@@ -44,6 +45,8 @@ namespace ChatModel
 		/// <param name="owners">Array of references to users which are to participate</param>
 		/// <returns>Returns reference to created conversation, or null if unsuccessful.</returns>
 		Conversation addConversation(string conversationName, params IUser[] owners);
+
+		public Conversation addConversation(Stream stream);
 
 		/// <summary>
 		/// Adds a user to a conversation.

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using ChatModel.Util;
@@ -10,15 +12,42 @@ namespace ChatModel
 	/// Class representing a conversation.
 	/// </summary>
 	[Serializable]
-	public class Conversation : BaseConversation
+	public class Conversation : BaseConversation, INotifyPropertyChanged
 	{
+		[field:NonSerialized]public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
 		private int smallestFreeId;	//smallest id available to be assigned to a new message (as ids are unique and strictly increasing)
 
 		public Conversation(string name, int id) : base(name, id)
 		{
 			this.smallestFreeId = 1;
 		}
-
+		
+		
+		public ObservableCollection<IUser> observableUsers
+		{
+			get
+			{
+				var oc = new ObservableCollection<IUser>();
+				foreach (Refrence<IUser> user in users)
+				{
+					oc.Add(user.Reference);
+				}
+				return oc;
+			}
+		}
+		public ObservableCollection<Message> observableMessages
+		{
+			get
+			{
+				var oc = new ObservableCollection<Message>();
+				foreach(var message in messages)
+				{
+					oc.Add(message.Value);
+				}
+				return oc;
+			}
+		}
+		
 		/// <summary>
 		/// Creates a new conversation from a conversation update.
 		/// </summary>
@@ -260,6 +289,7 @@ namespace ChatModel
 		{
 			return serializer.serialize(this);
 		}
+
 	}
 }
 

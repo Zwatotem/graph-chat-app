@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
 
 namespace ChatModel
 {
@@ -7,13 +10,30 @@ namespace ChatModel
 	/// Concrete implementation of IChatSystem.
 	/// </summary>
 	/// <remarks>Abstract as it was specified to be so in documentation.</remarks>
-	public abstract class ChatSystem : IChatSystem
+	public abstract class ChatSystem : IChatSystem, INotifyPropertyChanged
 	{
+		public event PropertyChangedEventHandler PropertyChanged = (obj, e) => { };
+		
 		protected Dictionary<int, Conversation> conversations; //dictionary of all conversations in the chat system, indexed by their unique id
 		protected List<IUser> users; //list of all users in the chat system, each has an unique user name
 		protected int smallestFreeId; //smallest unique id available to be assigned to a new conversation
 		protected Stack<int> freedIds; //stack of conversation ids smaller than current smallest available that were freed be deleting conversations
 
+		public List<IUser> Users { get => users; }
+		public Dictionary<int, Conversation> Conversations { get => conversations; }
+		public ObservableCollection<Conversation> observableConversations
+		{
+			get
+			{
+				var oc = new ObservableCollection<Conversation>();
+				foreach(var c in conversations)
+				{
+					oc.Add(c.Value);
+				}
+				return oc;
+			}
+		}
+		
 		public ChatSystem()
 		{
 			this.conversations = new Dictionary<int, Conversation>();
@@ -98,6 +118,11 @@ namespace ChatModel
 				owner.matchWithConversation(newConversation);
 			}
 			return newConversation;
+		}
+
+		public Conversation addConversation(Stream stream)
+		{
+			throw new NotImplementedException();
 		}
 
 		public bool addUserToConversation(string userName, int id)
