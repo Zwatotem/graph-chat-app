@@ -23,7 +23,7 @@ namespace GraphChatApp.ViewModel
 		public ConversationViewModel(Conversation conversation, Action<Conversation> action)
 		{
 			this.conversation = conversation;
-			conversation.PropertyChanged += InvokePropertyChanged;
+			conversation.PropertyChanged += OnPropertyChanged;
 			this.enteringMethod = action;
 			EnterCommand = new EnterConversationCommand(EnterConversation);
 		}

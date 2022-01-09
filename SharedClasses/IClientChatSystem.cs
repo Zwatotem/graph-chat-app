@@ -22,14 +22,6 @@ namespace ChatModel
         bool logIn(string login);
 
         /// <summary>
-        /// Deserializes and adds a conversation to the chat system from stream.
-        /// </summary>
-        /// <param name="stream">Serialized conversation in stream form</param>
-        /// <param name="deserializer">Deserializer to be used</param>
-        /// <returns></returns>
-        Conversation addConversation(Stream stream, IDeserializer deserializer);
-
-        /// <summary>
         /// Updates the state of chat system based on UserUpdates object.
         /// </summary>
         /// <param name="updates">Object containig updates to apply</param>

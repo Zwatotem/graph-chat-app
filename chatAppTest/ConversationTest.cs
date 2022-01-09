@@ -268,7 +268,7 @@ namespace chatAppTest
 			Message sentMessage1 = chatSystem.sendMessage(savedConversation.ID, "Jaú Kowalski", -1, msgContent1, datetime);
 			Message sentMessage2 = chatSystem.sendMessage(savedConversation.ID, "Kasia èdüb≥o", sentMessage1.ID, msgContent2, datetime);
 
-			IClientChatSystem clientChatSystem = new ClientChatSystem();
+			ClientChatSystem clientChatSystem = new ClientChatSystem();
 			IUser userClient1 = clientChatSystem.addNewUser("Jaú Kowalski");
 			IUser userClient2 = clientChatSystem.addNewUser("Kasia èdüb≥o");
 			Conversation savedClientConversation = clientChatSystem.addConversation(savedConversation.serialize(new ConcreteSerializer()), new ConcreteDeserializer());

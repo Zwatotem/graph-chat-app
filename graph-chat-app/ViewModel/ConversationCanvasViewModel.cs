@@ -1,93 +1,159 @@
 ﻿using ChatModel;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
+using System.Windows.Input;
 
-namespace GraphChatApp.ViewModel
+namespace GraphChatApp.ViewModel;
+
+internal class ConversationCanvasViewModel : ViewModel
 {
-	internal class ConversationCanvasViewModel : ViewModel
+	public readonly Conversation conversation;
+	private string conversationName;
+	ObservableCollection<MessageViewModelBase> rootMessages;
+	private ClientChatSystem chatSystem;
+	public ClientChatSystem ChatSystem
 	{
-		Conversation conversation;
-		private string conversationName;
-		List<MessageViewModel> allMessages;
-		ObservableCollection<MessageViewModel> rootMessages;
-
-		public ObservableCollection<Message> observableMessages
+		get { return chatSystem; }
+	}
+	public string ConversationName => conversationName;
+	private DraftMessageViewModel globalEditor;
+	public DraftMessageViewModel GlobalEditor
+	{
+		get
 		{
-			get
+			return globalEditor;
+		}
+		set
+		{
+			globalEditor = value;
+			if(globalEditor != null)
 			{
-				return conversation.observableMessages;
+				rootMessages.Add(GlobalEditor);
+			}
+			else
+			{
+				rootMessages.Remove(GlobalEditor);
+			}
+		}
+	}
+
+	public ICommand ShowGlobalEditorCommand { get; set; }
+
+	public ObservableCollection<MessageViewModelBase> RootMessages
+	{
+		get { return rootMessages; }
+	}
+
+	public ConversationCanvasViewModel(Conversation conversation)
+	{
+		ClientChatSystem chatSystem = App.Current.ChatSystem;
+		this.conversation = conversation;
+		rootMessages = new ObservableCollection<MessageViewModelBase>(
+			this.conversation
+				.Messages
+				.Where(m => m.Parent == null)
+				.Select(m => new MessageViewModel(m, this.conversation, this.chatSystem))
+				.ToList()
+		);
+		this.conversationName = conversation.Name;
+		this.chatSystem = chatSystem;
+		this.conversation.PropertyChanged += Conversation_PropertyChanged;
+		this.globalEditor = null;
+		this.ShowGlobalEditorCommand = new ShowGlobalEditorCommand(this);
+	}
+	public ConversationCanvasViewModel(Conversation conversation, ClientChatSystem chatSystem)
+	{
+		this.conversation = conversation;
+		rootMessages = new ObservableCollection<MessageViewModelBase>(
+			this.conversation
+				.Messages
+				.Where(m => m.Parent == null)
+				.Select(m => new MessageViewModel(m, this.conversation, this.chatSystem))
+				.ToList()
+		);
+		this.conversationName = conversation.Name;
+		this.chatSystem = chatSystem;
+		this.conversation.PropertyChanged += Conversation_PropertyChanged;
+		this.globalEditor = null;
+		this.ShowGlobalEditorCommand = new ShowGlobalEditorCommand(this);
+	}
+
+	private void Conversation_PropertyChanged(object sender, PropertyChangedEventArgs e)
+	{
+		if (e.PropertyName == nameof(Conversation.Name))
+		{
+			this.conversationName = this.conversation.Name;
+			OnPropertyChanged(this, new(nameof(ConversationName)));
+		}
+
+		if (e.PropertyName == nameof(Conversation.observableMessages) ||
+			e.PropertyName == nameof(Conversation.Messages))
+		{
+			updateRootMessages();
+		}
+	}
+
+	private void updateRootMessages()
+	{
+		bool isChanged = false;
+		var newRootMessages = this.conversation
+			.Messages
+			.Where(m => m.Parent == null)
+			.Select(m => new MessageViewModel(m, conversation, this.chatSystem))
+			.ToList();
+
+		var oldRootMessages = this.rootMessages.ToList();
+
+		foreach (var newRootMessage in newRootMessages)
+		{
+			if (!oldRootMessages.Contains(newRootMessage))
+			{
+				this.rootMessages.Add(newRootMessage);
+				isChanged = true;
 			}
 		}
 
-		public ObservableCollection<MessageViewModel> RootMessages
+		foreach (var oldRootMessage in oldRootMessages)
 		{
-			get
+			if (!newRootMessages.Contains(oldRootMessage))
 			{
-				return rootMessages;
+				this.rootMessages.Remove(oldRootMessage);
+				isChanged = true;
 			}
 		}
 
-		public ConversationCanvasViewModel(Conversation conversation)
+		if (globalEditor is not null)
 		{
-			this.conversation = conversation;
-			allMessages = new List<MessageViewModel>();
-			rootMessages = new ObservableCollection<MessageViewModel>();
-			PropertyChanged += CheckAdditionalPropertyChanged;
-			conversation.PropertyChanged += InvokePropertyChanged;
-			BuildMessages();
+			this.rootMessages.Add(globalEditor);
 		}
 
-		private void BuildMessages()
+		if (isChanged)
 		{
-			foreach (var m in conversation.Messages)
-			{
-				allMessages.Add(new MessageViewModel(m));
-			}
-			foreach (var m in allMessages)
-			{
-				if (!m.Link(allMessages))
-				{
-					rootMessages.Add(m);
-					InvokePropertyChanged(this, new(nameof(RootMessages)));
-				};
-			}
+			OnPropertyChanged(this, new(nameof(RootMessages)));
 		}
+	}
+}
 
-		private void RebuildMessages()
-		{
-			foreach (var m in conversation.Messages)
-			{
-				if (!allMessages.Exists(vm => vm.message == m))
-				{
-					allMessages.Add(new MessageViewModel(m));
-					InvokePropertyChanged(this, new(nameof(allMessages)));
-					InvokePropertyChanged(this, new(nameof(RootMessages)));
-				}
-			}
-			foreach (var m in allMessages)
-			{
-				if (!m.IsLinked() && !m.Link(allMessages))
-				{
-					rootMessages.Add(m);
-					InvokePropertyChanged(this, new(nameof(RootMessages)));
-				};
-			}
-		}
+internal class ShowGlobalEditorCommand : ICommand
+{
+	private ConversationCanvasViewModel viewModel;
 
-		public string ConversationName { get => conversation.Name; }
+	public ShowGlobalEditorCommand(ConversationCanvasViewModel viewModel)
+	{
+		this.viewModel = viewModel;
+	}
+	public event EventHandler CanExecuteChanged;
 
-		void CheckAdditionalPropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
-		{
-			var propertyName = eventArgs.PropertyName;
-			switch (propertyName)
-			{
-				case "observableMessages":
-					RebuildMessages();
-					break;
-				default:
-					break;
-			}
-		}
+	public bool CanExecute(object parameter)
+	{
+		return viewModel.GlobalEditor is null;
+	}
+
+	public void Execute(object parameter)
+	{
+		viewModel.GlobalEditor = new DraftMessageViewModel(-1 ,viewModel.conversation, viewModel.ChatSystem);
 	}
 }

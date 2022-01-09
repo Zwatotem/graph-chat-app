@@ -1,12 +1,15 @@
-﻿<Window x:Class="GraphChatApp.MainWindow"
-		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:local="clr-namespace:GraphChatApp"
-		mc:Ignorable="d"
-		Title="Graph chat app" Height="450" Width="800"
-		Loaded="Window_Loaded"
-		Closed="Window_Closed">
-    <Frame x:Name="MainFrame"/>
+﻿<Window
+	x:Class="GraphChatApp.MainWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:local="clr-namespace:GraphChatApp"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	Title="Graph chat app"
+	Width="800"
+	Height="450"
+	Closed="Window_Closed"
+	Loaded="Window_Loaded"
+	mc:Ignorable="d">
+	<Frame x:Name="MainFrame" />
 </Window>

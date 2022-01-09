@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatModel.Util;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -13,7 +14,8 @@ namespace ChatModel
 	public abstract class ChatSystem : IChatSystem, INotifyPropertyChanged
 	{
 		public event PropertyChangedEventHandler PropertyChanged = (obj, e) => { };
-		
+		protected void OnPropertyChanged(object sender, PropertyChangedEventArgs args) => PropertyChanged(sender, args);
+
 		protected Dictionary<int, Conversation> conversations; //dictionary of all conversations in the chat system, indexed by their unique id
 		protected List<IUser> users; //list of all users in the chat system, each has an unique user name
 		protected int smallestFreeId; //smallest unique id available to be assigned to a new conversation
@@ -21,19 +23,19 @@ namespace ChatModel
 
 		public List<IUser> Users { get => users; }
 		public Dictionary<int, Conversation> Conversations { get => conversations; }
-		public ObservableCollection<Conversation> observableConversations
+		public ObservableCollection<Conversation> ObservableConversations
 		{
 			get
 			{
 				var oc = new ObservableCollection<Conversation>();
-				foreach(var c in conversations)
+				foreach (var c in conversations)
 				{
 					oc.Add(c.Value);
 				}
 				return oc;
 			}
 		}
-		
+
 		public ChatSystem()
 		{
 			this.conversations = new Dictionary<int, Conversation>();
@@ -47,10 +49,10 @@ namespace ChatModel
 			return users.Find(u => u.Name == userName); //returns first found user with specific name (there's at most one as names are unique)
 		}
 
-		public IUser addNewUser(string newUserName)	
+		public IUser addNewUser(string newUserName)
 		{
 			if (users.Exists(u => u.Name == newUserName)) //checking if the proposed user name would be unique
-			{ 
+			{
 				return null;
 			}
 			else
@@ -104,12 +106,12 @@ namespace ChatModel
 				newId = smallestFreeId++; //else we take current smallest available id and set smallestFreeId to next integer
 			}
 			foreach (var owner in owners) //check if all owners are indeed part of the chat system
-            {
+			{
 				if (!users.Contains(owner))
-                {
+				{
 					return null;
-                }
-            }
+				}
+			}
 			Conversation newConversation = new Conversation(conversationName, newId);
 			conversations.Add(newId, newConversation);
 			foreach (var owner in owners)
@@ -117,12 +119,9 @@ namespace ChatModel
 				newConversation.matchWithUser(owner);
 				owner.matchWithConversation(newConversation);
 			}
+			PropertyChanged(this, new(nameof(Conversations)));
+			PropertyChanged(this, new(nameof(ObservableConversations)));
 			return newConversation;
-		}
-
-		public Conversation addConversation(Stream stream)
-		{
-			throw new NotImplementedException();
 		}
 
 		public bool addUserToConversation(string userName, int id)
@@ -192,7 +191,7 @@ namespace ChatModel
 				return null; //if there is no such user, indicate failure of the operation
 			}
 			return conversation.addMessage(author, targetId, messageContent, sentTime); //calls the conversation method responsible for
-																						 //creating a message. Returns it's returned value. True if operation successful, else false.
+																						//creating a message. Returns it's returned value. True if operation successful, else false.
 		}
 	}
 }

@@ -10,17 +10,27 @@ namespace GraphChatApp
 	/// </summary>
 	public partial class App : Application
 	{
+		
+		public static App Current
+		{
+			get;
+			private set;
+		}
+		
 		ChatClient client;
 		ClientChatSystem chatSystem;
 		MainWindow mainWindow;
-		App()
+		App() : base()
 		{
-			Client = new ChatClient("192.168.1.13", 50000);
+			Current = this;
+			Client = new ChatClient("192.168.1.13", 50000, this.Dispatcher);
 			chatSystem = Client.ChatSystem;
 			Client.workClient();
+			AppDomain.CurrentDomain.UnhandledException += (sender, args) => Unload();
 		}
 
 		public ChatClient Client { get => client; set => client = value; }
+		public ClientChatSystem ChatSystem { get => chatSystem; }
 
 		public void InitializeWithGUI()
 		{

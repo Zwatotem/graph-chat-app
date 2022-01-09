@@ -15,10 +15,10 @@ namespace GraphChatApp.ViewModel
 		public ConversationCollectionViewModel(ChatSystem chatSystem, Action<Conversation> enterConversation)
 		{
 			this.chatSystem = chatSystem;
-			chatSystem.PropertyChanged += InvokePropertyChanged;
+			chatSystem.PropertyChanged += OnPropertyChanged;
 			this.enterConversation = enterConversation;
 			this.conversations = new ObservableCollection<ConversationViewModel>(
-					chatSystem.Conversations.Select(conv => new ConversationViewModel(conv.Value, enterConversation))
+					chatSystem.Conversations.Select(conv => new ConversationViewModel(conv.Value, enterConversation)).ToList()
 				);
 		}
 
@@ -29,7 +29,7 @@ namespace GraphChatApp.ViewModel
 				if (chatSystem.Conversations.Count != conversations.Count)
 				{
 					this.conversations = new ObservableCollection<ConversationViewModel>(
-							chatSystem.observableConversations.Select(conv => new ConversationViewModel(conv, enterConversation))
+							chatSystem.ObservableConversations.Select(conv => new ConversationViewModel(conv, enterConversation)).ToList()
 						);
 				}
 				return conversations;
