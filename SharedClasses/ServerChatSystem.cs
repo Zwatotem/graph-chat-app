@@ -1,39 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ChatModel
+namespace ChatModel;
+
+/// <summary>
+/// Concrete instance of IServerChatSystem.
+/// </summary>
+public class ServerChatSystem : ChatSystem, IServerChatSystem
 {
-	/// <summary>
-	/// Concrete instance of IServerChatSystem.
-	/// </summary>
-	public class ServerChatSystem : ChatSystem, IServerChatSystem
+	public ServerChatSystem() : base() { }
+
+	public UserUpdates getUpdatesToUser(string userName, DateTime t)
 	{
-		public ServerChatSystem() : base() { }
-
-		public UserUpdates getUpdatesToUser(string userName, DateTime t)
+		var user = users.Find(u => u.Name == userName);
+		if (user == null)
 		{
-			var user = users.Find(u => u.Name == userName);
-			if (user == null)
-            {
-				return null; //cannot be done if there is no such user
-            }
-			var updates = new UserUpdates();
-			foreach (var conv in user.Conversations)
-			{
-				updates.addConversation(conv.getUpdates(t)); //get updates to all of users conversations
-			}
-			return updates;
+			return null; //cannot be done if there is no such user
 		}
-
-		public List<Conversation> getConversationsOfUser(string userName)
+		var updates = new UserUpdates();
+		foreach (var conv in user.Conversations)
 		{
-			IUser user = getUser(userName);
-			if (user == null)
-			{
-				return null; //if there is no such user, return null
-			}
-			return user.Conversations;
+			updates.addConversation(conv.getUpdates(t)); //get updates to all of users conversations
 		}
+		return updates;
+	}
+
+	public List<Conversation> getConversationsOfUser(string userName)
+	{
+		IUser user = getUser(userName);
+		if (user == null)
+		{
+			return null; //if there is no such user, return null
+		}
+		return user.Conversations;
 	}
 }
 

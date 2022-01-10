@@ -1,36 +1,35 @@
 ﻿using System.Collections.Generic;
 
-namespace ChatModel
+namespace ChatModel;
+
+/// <summary>
+/// Interface representing a user of the chat system.
+/// </summary>
+public interface IUser
 {
 	/// <summary>
-	/// Interface representing a user of the chat system.
+	/// User name of the user.
 	/// </summary>
-    public interface IUser
-    {
-		/// <summary>
-		/// User name of the user.
-		/// </summary>
-		string Name { get; }
+	string Name { get; }
 
-		/// <summary>
-		/// List of conversations in which the user takes part.
-		/// </summary>
-		List<Conversation> Conversations { get; }
+	/// <summary>
+	/// List of conversations in which the user takes part.
+	/// </summary>
+	List<Conversation> Conversations { get; }
 
-		/// <summary>
-		/// Adds a conversation to the list of conversations in which the user takes part.
-		/// </summary>
-		/// <param name="conversation">Conversation to match</param>
-		/// <returns>True if successful, false otherwise.</returns>
-		bool matchWithConversation(Conversation conversation);
+	/// <summary>
+	/// Adds a conversation to the list of conversations in which the user takes part.
+	/// </summary>
+	/// <param name="conversation">Conversation to match</param>
+	/// <returns>True if successful, false otherwise.</returns>
+	bool matchWithConversation(Conversation conversation);
 
-		/// <summary>
-		/// Removes a conversation from the list of all in which the user takes part.
-		/// </summary>
-		/// <param name="conversation1"></param>
-		/// <returns>True if successful, false otherwise.</returns>
-		bool unmatchWithConversation(Conversation conversation1);
-	}
+	/// <summary>
+	/// Removes a conversation from the list of all in which the user takes part.
+	/// </summary>
+	/// <param name="conversation1"></param>
+	/// <returns>True if successful, false otherwise.</returns>
+	bool unmatchWithConversation(Conversation conversation1);
 }
 
 /*

@@ -6,7 +6,7 @@ using ChatModel;
 
 namespace GraphChatApp.ViewModel;
 
-public class DraftMessageViewModel : MessageViewModelBase
+public class MessageCompositorViewModel : MessageViewModel
 {
 	public ClientChatSystem ChatSystem { get; init; }
 	public Conversation Conversation { get; init; }
@@ -14,7 +14,7 @@ public class DraftMessageViewModel : MessageViewModelBase
 	public override string Author { get; }
 	public override string tempText { get; set; }
 	public ICommand SendMessageCommand { get; set; }
-	internal DraftMessageViewModel(int parentMessageID, Conversation conversation)
+	internal MessageCompositorViewModel(int parentMessageID, Conversation conversation)
 	{
 		ClientChatSystem chatSystem = App.Current.ChatSystem;
 		Author = chatSystem.getUserName();
@@ -24,7 +24,7 @@ public class DraftMessageViewModel : MessageViewModelBase
 		Conversation = conversation;
 		SendMessageCommand = new SendMessageCommand(this);
 	}
-	internal DraftMessageViewModel(int parentMessageID, Conversation conversation, ClientChatSystem chatSystem)
+	internal MessageCompositorViewModel(int parentMessageID, Conversation conversation, ClientChatSystem chatSystem)
 	{
 		Author = chatSystem.getUserName();
 		tempText = "";
@@ -44,9 +44,9 @@ public class DraftMessageViewModel : MessageViewModelBase
 
 internal class SendMessageCommand : ICommand
 {
-	DraftMessageViewModel viewModel;
+	MessageCompositorViewModel viewModel;
 
-	public SendMessageCommand(DraftMessageViewModel viewModel)
+	public SendMessageCommand(MessageCompositorViewModel viewModel)
 	{
 		this.viewModel = viewModel;
 	}

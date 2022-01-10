@@ -44,7 +44,7 @@
 	</Page.Resources>
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="2*" />
+			<RowDefinition Height="2*" MinHeight="50"/>
 			<RowDefinition Height="23*" />
 		</Grid.RowDefinitions>
 		<StackPanel

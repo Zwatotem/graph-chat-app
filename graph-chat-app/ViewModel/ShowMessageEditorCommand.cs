@@ -5,9 +5,9 @@ namespace GraphChatApp.ViewModel
 {
 	public class ShowMessageEditorCommand : ICommand
 	{
-		private readonly MessageViewModelBase viewModel;
+		private readonly MessageViewModel viewModel;
 
-		public ShowMessageEditorCommand(MessageViewModelBase messageViewModel)
+		public ShowMessageEditorCommand(MessageViewModel messageViewModel)
 		{
 			this.viewModel = messageViewModel;
 		}
@@ -20,7 +20,7 @@ namespace GraphChatApp.ViewModel
 
 		public void Execute(object? parameter)
 		{
-			var mvm = viewModel as MessageViewModel;
+			var mvm = viewModel as MessageViewerViewModel;
 			if (mvm == null)
 				return;
 			mvm.AddResponse();

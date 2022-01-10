@@ -23,7 +23,7 @@ namespace GraphChatApp
 		App() : base()
 		{
 			Current = this;
-			Client = new ChatClient("192.168.1.13", 50000, this.Dispatcher);
+			Client = new ChatClient("127.0.0.1", 50000, this.Dispatcher);
 			chatSystem = Client.ChatSystem;
 			Client.workClient();
 			AppDomain.CurrentDomain.UnhandledException += (sender, args) => Unload();

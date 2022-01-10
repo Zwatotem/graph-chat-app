@@ -1,32 +1,31 @@
 ﻿using System.IO;
 using ChatModel.Util;
 
-namespace ChatModel
+namespace ChatModel;
+
+/// <summary>
+/// Interface extending IChatSystem and adding functionality necessary on the client side of the app.
+/// </summary>
+public interface IClientChatSystem : IChatSystem
 {
     /// <summary>
-    /// Interface extending IChatSystem and adding functionality necessary on the client side of the app.
+    /// Name of the currently logged in user.
     /// </summary>
-    public interface IClientChatSystem : IChatSystem
-    {
-        /// <summary>
-        /// Name of the currently logged in user.
-        /// </summary>
-        /// <remarks>Null if no user logged in.</remarks>
-        string LoggedInName { get; }
+    /// <remarks>Null if no user logged in.</remarks>
+    string LoggedInName { get; }
 
-        /// <summary>
-        /// Logs the user in.
-        /// </summary>
-        /// <param name="login">User name under which to log in.</param>
-        /// <returns>True if successful, false otherwise.</returns>
-        bool logIn(string login);
+    /// <summary>
+    /// Logs the user in.
+    /// </summary>
+    /// <param name="login">User name under which to log in.</param>
+    /// <returns>True if successful, false otherwise.</returns>
+    bool logIn(string login);
 
-        /// <summary>
-        /// Updates the state of chat system based on UserUpdates object.
-        /// </summary>
-        /// <param name="updates">Object containig updates to apply</param>
-        void applyUpdates(UserUpdates updates);
-    }
+    /// <summary>
+    /// Updates the state of chat system based on UserUpdates object.
+    /// </summary>
+    /// <param name="updates">Object containig updates to apply</param>
+    void applyUpdates(UserUpdates updates);
 }
 
 /*

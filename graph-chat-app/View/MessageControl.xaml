@@ -10,12 +10,26 @@
 	d:DesignWidth="300"
 	mc:Ignorable="d">
 	<UserControl.Resources>
-		<DataTemplate DataType="{x:Type viewmodel:MessageViewModel}">
+		<DataTemplate DataType="{x:Type viewmodel:MessageViewerViewModel}">
 			<local:MessageViewerControl Content="{Binding}" />
 		</DataTemplate>
-		<DataTemplate DataType="{x:Type viewmodel:DraftMessageViewModel}">
+		<DataTemplate DataType="{x:Type viewmodel:MessageCompositorViewModel}">
 			<local:MessageCompositorControl Content="{Binding}" />
 		</DataTemplate>
 	</UserControl.Resources>
-	<ContentPresenter Content="{Binding}" />
+	<StackPanel>
+		<Line
+			HorizontalAlignment="Left"
+			VerticalAlignment="Top"
+			Stroke="Black"
+			X1="10"
+			X2="10"
+			Y1="0"
+			Y2="10" />
+		<ContentPresenter
+			Width="{Binding MessageWidth}"
+			Height="{Binding MessageHeight}"
+			Margin="{Binding MessageMargin}"
+			Content="{Binding}" />
+	</StackPanel>
 </UserControl>

@@ -12,15 +12,15 @@ internal class ConversationCanvasViewModel : ViewModel
 {
 	public readonly Conversation conversation;
 	private string conversationName;
-	ObservableCollection<MessageViewModelBase> rootMessages;
+	ObservableCollection<MessageViewModel> rootMessages;
 	private ClientChatSystem chatSystem;
 	public ClientChatSystem ChatSystem
 	{
 		get { return chatSystem; }
 	}
 	public string ConversationName => conversationName;
-	private DraftMessageViewModel globalEditor;
-	public DraftMessageViewModel GlobalEditor
+	private MessageCompositorViewModel globalEditor;
+	public MessageCompositorViewModel GlobalEditor
 	{
 		get
 		{
@@ -42,7 +42,7 @@ internal class ConversationCanvasViewModel : ViewModel
 
 	public ICommand ShowGlobalEditorCommand { get; set; }
 
-	public ObservableCollection<MessageViewModelBase> RootMessages
+	public ObservableCollection<MessageViewModel> RootMessages
 	{
 		get { return rootMessages; }
 	}
@@ -51,11 +51,11 @@ internal class ConversationCanvasViewModel : ViewModel
 	{
 		ClientChatSystem chatSystem = App.Current.ChatSystem;
 		this.conversation = conversation;
-		rootMessages = new ObservableCollection<MessageViewModelBase>(
+		rootMessages = new ObservableCollection<MessageViewModel>(
 			this.conversation
 				.Messages
 				.Where(m => m.Parent == null)
-				.Select(m => new MessageViewModel(m, this.conversation, this.chatSystem))
+				.Select(m => new MessageViewerViewModel(m, this.conversation, this.chatSystem))
 				.ToList()
 		);
 		this.conversationName = conversation.Name;
@@ -67,11 +67,11 @@ internal class ConversationCanvasViewModel : ViewModel
 	public ConversationCanvasViewModel(Conversation conversation, ClientChatSystem chatSystem)
 	{
 		this.conversation = conversation;
-		rootMessages = new ObservableCollection<MessageViewModelBase>(
+		rootMessages = new ObservableCollection<MessageViewModel>(
 			this.conversation
 				.Messages
 				.Where(m => m.Parent == null)
-				.Select(m => new MessageViewModel(m, this.conversation, this.chatSystem))
+				.Select(m => new MessageViewerViewModel(m, this.conversation, this.chatSystem))
 				.ToList()
 		);
 		this.conversationName = conversation.Name;
@@ -102,7 +102,7 @@ internal class ConversationCanvasViewModel : ViewModel
 		var newRootMessages = this.conversation
 			.Messages
 			.Where(m => m.Parent == null)
-			.Select(m => new MessageViewModel(m, conversation, this.chatSystem))
+			.Select(m => new MessageViewerViewModel(m, conversation, this.chatSystem))
 			.ToList();
 
 		var oldRootMessages = this.rootMessages.ToList();
@@ -154,6 +154,6 @@ internal class ShowGlobalEditorCommand : ICommand
 
 	public void Execute(object parameter)
 	{
-		viewModel.GlobalEditor = new DraftMessageViewModel(-1 ,viewModel.conversation, viewModel.ChatSystem);
+		viewModel.GlobalEditor = new MessageCompositorViewModel(-1 ,viewModel.conversation, viewModel.ChatSystem);
 	}
 }

@@ -1,23 +1,22 @@
 ﻿
-namespace ChatModel
+namespace ChatModel;
+
+/// <summary>
+/// Interface representing the content of a message.
+/// </summary>
+public interface IMessageContent
 {
 	/// <summary>
-	/// Interface representing the content of a message.
+	/// Returns the content of a message.
 	/// </summary>
-	public interface IMessageContent
-	{
-		/// <summary>
-		/// Returns the content of a message.
-		/// </summary>
-		/// <returns>An object of type dependant on the concrete implementation.</returns>
-		object getData();
+	/// <returns>An object of type dependant on the concrete implementation.</returns>
+	object getData();
 
-		/// <summary>
-		/// Serializes the object.
-		/// </summary>
-		/// <returns>A byte array containing the serialized object.</returns>
-		byte[] serialize();
-	}
+	/// <summary>
+	/// Serializes the object.
+	/// </summary>
+	/// <returns>A byte array containing the serialized object.</returns>
+	byte[] serialize();
 }
 
 /*

@@ -6,9 +6,14 @@
 	xmlns:local="clr-namespace:GraphChatApp.View"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:view="clr-namespace:GraphChatApp.View"
+	xmlns:viewmodel="clr-namespace:GraphChatApp.ViewModel"
+	d:DataContext="{d:DesignInstance Type=viewmodel:MessageViewerViewModel}"
 	d:DesignHeight="450"
 	d:DesignWidth="800"
 	mc:Ignorable="d">
+	<UserControl.Resources>
+		<BooleanToVisibilityConverter x:Key="BoolToVis" />
+	</UserControl.Resources>
 	<StackPanel Orientation="Vertical">
 		<StackPanel Orientation="Horizontal">
 			<TextBlock
@@ -23,17 +28,38 @@
 				+
 			</Button>
 		</StackPanel>
-		<ItemsControl ItemsSource="{Binding DirectChildren}" Visibility="{Binding ChildrenVisibility}">
-			<ItemsControl.ItemsPanel>
-				<ItemsPanelTemplate>
-					<StackPanel Orientation="Horizontal" />
-				</ItemsPanelTemplate>
-			</ItemsControl.ItemsPanel>
-			<ItemsControl.ItemTemplate>
-				<DataTemplate>
-					<view:MessageControl />
-				</DataTemplate>
-			</ItemsControl.ItemTemplate>
-		</ItemsControl>
+		<StackPanel>
+			<Line
+				HorizontalAlignment="Left"
+				VerticalAlignment="Top"
+				Stroke="Black"
+				Visibility="{Binding HasChildren, Converter={StaticResource BoolToVis}}"
+				X1="10"
+				X2="10"
+				Y1="0"
+				Y2="10" />
+			<Line
+				HorizontalAlignment="Left"
+				VerticalAlignment="Top"
+				Stroke="Black"
+				Visibility="{Binding HasChildren, Converter={StaticResource BoolToVis}}"
+				X1="10"
+				X2="{Binding ActualWidth, ElementName=Children, Mode=OneWay}" />
+			<ItemsControl
+				Name="Children"
+				ItemsSource="{Binding DirectChildren}"
+				Visibility="{Binding ChildrenVisibility}">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<StackPanel Orientation="Horizontal" />
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<view:MessageControl />
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</StackPanel>
 	</StackPanel>
 </UserControl>

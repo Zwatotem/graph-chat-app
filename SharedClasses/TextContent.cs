@@ -1,30 +1,29 @@
 using System;﻿
 using System.Text;
 
-namespace ChatModel
+namespace ChatModel;
+
+/// <summary>
+/// Implementation of IMessageContent representing text content.
+/// </summary>
+[Serializable]
+public class TextContent : IMessageContent
 {
-	/// <summary>
-	/// Implementation of IMessageContent representing text content.
-	/// </summary>
-	[Serializable]
-	public class TextContent : IMessageContent
+	private string dataString; //field storing text data
+
+	public TextContent(string dataString)
 	{
-		private string dataString; //field storing text data
+		this.dataString = dataString;
+	}
 
-		public TextContent(string dataString)
-		{
-			this.dataString = dataString;
-		}
+	public object getData()
+	{
+		return dataString;
+	}
 
-		public object getData()
-		{
-			return dataString;
-		}
-
-		public byte[] serialize()
-		{
-			return Encoding.UTF8.GetBytes(dataString); //converts string to byte[] using UTF-8 encoding
-		}
+	public byte[] serialize()
+	{
+		return Encoding.UTF8.GetBytes(dataString); //converts string to byte[] using UTF-8 encoding
 	}
 }
 
