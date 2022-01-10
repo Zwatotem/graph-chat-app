@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ChatModel
+namespace ChatModel;
+
+/// <summary>
+/// Interface extending IChatSystem, adding functionality necessary only on the server side.
+/// </summary>
+public interface IServerChatSystem : IChatSystem
 {
     /// <summary>
-    /// Interface extending IChatSystem, adding functionality necessary only on the server side.
+    /// Returns updates concerning a given user that happened after a given time.
     /// </summary>
-    public interface IServerChatSystem : IChatSystem
-    {
-        /// <summary>
-        /// Returns updates concerning a given user that happened after a given time.
-        /// </summary>
-        /// <param name="userName">User name of user for whom updates are to be returned</param>
-        /// <param name="t">Time from after which we return updates</param>
-        /// <returns>UserUpdates object with updates to user or null if there is no such user.</returns>
-        UserUpdates getUpdatesToUser(string userName, DateTime t);
+    /// <param name="userName">User name of user for whom updates are to be returned</param>
+    /// <param name="t">Time from after which we return updates</param>
+    /// <returns>UserUpdates object with updates to user or null if there is no such user.</returns>
+    UserUpdates getUpdatesToUser(string userName, DateTime t);
 
-        /// <summary>
-        /// Return conversations of a given user.
-        /// </summary>
-        /// <param name="userName">User name of user of whom we get conversations</param>
-        /// <returns>List of conversations or null if there is no user with such user name.</returns>
-        List<Conversation> getConversationsOfUser(string userName);
-    }
+    /// <summary>
+    /// Return conversations of a given user.
+    /// </summary>
+    /// <param name="userName">User name of user of whom we get conversations</param>
+    /// <returns>List of conversations or null if there is no user with such user name.</returns>
+    List<Conversation> getConversationsOfUser(string userName);
 }
 
 /*
