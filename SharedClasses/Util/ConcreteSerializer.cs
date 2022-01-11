@@ -8,12 +8,12 @@ namespace ChatModel.Util
 	/// </summary>
     public class ConcreteSerializer : ISerializer
     {
-		public MemoryStream serialize(object arg)
+		public MemoryStream Serialize(object arg)
 		{
 			MemoryStream stream = new MemoryStream(); //creates MemoryStream
 			var formatter = new BinaryFormatter();
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
-			formatter.Serialize(stream, arg); //uses BinaryFormatter to serialize the object into the stream
+			formatter.Serialize(stream, arg); //uses BinaryFormatter to Serialize the object into the stream
 #pragma warning restore SYSLIB0011 // Type or member is obsolete
 			stream.Flush();
 			stream.Position = 0;

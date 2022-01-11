@@ -10,9 +10,9 @@ namespace ChatModel.Util
         /// <summary>
         /// Serializes the object.
         /// </summary>
-        /// <param name="arg">Object to serialize</param>
+        /// <param name="arg">Object to Serialize</param>
         /// <returns>MemoryStream of serialized object bytes.</returns>
-        MemoryStream serialize(object arg);
+        MemoryStream Serialize(object arg);
     }
 }
 

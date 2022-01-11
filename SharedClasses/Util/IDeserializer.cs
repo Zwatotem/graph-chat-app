@@ -12,7 +12,7 @@ namespace ChatModel.Util
         /// </summary>
         /// <param name="stream">MemoryStream containing serialized object</param>
         /// <returns>Deserialized object.</returns>
-        object deserialize(Stream stream);
+        object Deserialize(Stream stream);
     }
 }
 

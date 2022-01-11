@@ -11,7 +11,7 @@ namespace chatAppTest
 		[TestMethod]
 		public void getIdTest()
 		{
-			IUser user1 = new User("Jaú Kowalski");
+			IUser user1 = new User("Ja≈õ Kowalski");
 			DateTime datetime = DateTime.Now;
 			IMessageContent messageContent1 = new TextContent("Siemka, co tam?");
 			Message message1 = new Message(user1, null, messageContent1, datetime, 1);
@@ -21,7 +21,7 @@ namespace chatAppTest
 		[TestMethod]
 		public void getTimeTest()
 		{
-			IUser user1 = new User("Jaú Kowalski");
+			IUser user1 = new User("Ja≈õ Kowalski");
 			DateTime datetime = DateTime.Now;
 			IMessageContent messageContent1 = new TextContent("Siemka, co tam?");
 			Message message1 = new Message(user1, null, messageContent1, datetime, 1);
@@ -33,21 +33,21 @@ namespace chatAppTest
 		{
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			Conversation conversation2 = new Conversation("Konfa 2", 2);
-			IUser user1 = new User("PszczÛ≥ka Maja");
+			IUser user1 = new User("Pszcz√≥≈Çka Maja");
 			IUser user2 = new User("Stary Trzmiel");
-			conversation1.matchWithUser(user1);
-			conversation2.matchWithUser(user1);
-			conversation1.matchWithUser(user2);
-			conversation2.matchWithUser(user2);
+			conversation1.MatchWithUser(user1);
+			conversation2.MatchWithUser(user1);
+			conversation1.MatchWithUser(user2);
+			conversation2.MatchWithUser(user2);
 			DateTime datetime = DateTime.Now;
 			IMessageContent messageContent1 = new TextContent("Siemka, co tam?");
 			DateTime datetime2 = datetime + TimeSpan.FromSeconds(4);
 			IMessageContent messageContent2 = new TextContent("Ano spoko");
-			Message message1 = conversation1.addMessage(user1, -1, messageContent1, datetime);
-			Message message2 = conversation1.addMessage(user2, 1, messageContent2, datetime2);
+			Message message1 = conversation1.AddMessage(user1, -1, messageContent1, datetime);
+			Message message2 = conversation1.AddMessage(user2, 1, messageContent2, datetime2);
 
-			Message recreatedMessage1 = conversation2.addMessage(message1.serialize(new ConcreteSerializer()), new ConcreteDeserializer());
-			Message recreatedMessage2 = conversation2.addMessage(message2.serialize(new ConcreteSerializer()), new ConcreteDeserializer());
+			Message recreatedMessage1 = conversation2.AddMessage(message1.serialize(new ConcreteSerializer()), new ConcreteDeserializer());
+			Message recreatedMessage2 = conversation2.AddMessage(message2.serialize(new ConcreteSerializer()), new ConcreteDeserializer());
 
 			Assert.AreEqual(recreatedMessage1.ID, message1.ID); // There is no way serialization keeps references
 			Assert.AreEqual(recreatedMessage1.Author.Name, message1.Author.Name);
@@ -65,7 +65,7 @@ namespace chatAppTest
 		[TestMethod]
 		public void getContentTest()
 		{
-			IUser user1 = new User("Jaú Kowalski");
+			IUser user1 = new User("Ja≈õ Kowalski");
 			DateTime datetime = DateTime.Now;
 			IMessageContent messageContent1 = new TextContent("Siemka, co tam?");
 			Message message1 = new Message(user1, null, messageContent1, datetime, 1);

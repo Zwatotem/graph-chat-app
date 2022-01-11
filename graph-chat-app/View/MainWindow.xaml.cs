@@ -43,15 +43,32 @@ public partial class MainWindow : Window
 
 	}
 
+	internal void DoOpenUserPanel(object s, SuccessfullyLoggededEventArgs a)
+	{
+		OpenUserPanel();
+	}
+	
 	internal void OpenLoginPage()
 	{
 		MainFrame.NavigationService.Navigate(logInPage);
-		app.Client.SuccessfullyLogged += (object s, SuccessfullyLoggededEventArgs a) => OpenUserPanel();
+		app.Client.SuccessfullyLogged += DoOpenUserPanel;
+		app.Client.UnSuccessfullyLogged += DoShowFailMonit;
+	}
+
+	private void DoShowFailMonit(object? sender, EventArgs e)
+	{
+		ShowFailMonit();
+	}
+
+	private void ShowFailMonit()
+	{
+		this.logInPage.ShowBadUserError();
 	}
 
 	private void OpenUserPanel()
 	{
-		app.Client.SuccessfullyLogged -= (object s, SuccessfullyLoggededEventArgs a) => OpenUserPanel();
+		app.Client.SuccessfullyLogged -= DoOpenUserPanel;
+		app.Client.UnSuccessfullyLogged -= DoShowFailMonit;
 		MainFrame.NavigationService.Navigated += ClearNavigationHistory;
 		MainFrame.NavigationService.Navigate(userPanel);
 		registrationPage = null;

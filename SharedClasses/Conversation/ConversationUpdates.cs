@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ChatModel.Util;
 
 namespace ChatModel;
@@ -9,13 +11,20 @@ namespace ChatModel;
 /// </summary>
 public class ConversationUpdates : BaseConversation
 {
-	public ConversationUpdates(string name, int id) : base(name, id) { }
+	private List<IUser> users;
+
+	public override IEnumerable<IUser> Users
+	{
+		get => users;
+		set => users = value.ToList();
+	}
+	public ConversationUpdates(string name, Guid id) : base(name, id) { }
 
 	/// <summary>
 	/// Gets the list of "double references to users".
 	/// </summary>
 	/// <returns>List of Refrence objects referencing users.</returns>
-	public List<Refrence<IUser>> getUsersFull()
+	public IEnumerable<IUser> getUsersFull()
 	{
 		return users;
 	}
@@ -24,7 +33,7 @@ public class ConversationUpdates : BaseConversation
 	/// Gets the dictionary of messages.
 	/// </summary>
 	/// <returns>Dictionary of messages indexed by their ids.</returns>
-	public Dictionary<int, Message> getMessagesFull()
+	public Dictionary<Guid, Message> getMessagesFull()
 	{
 		return messages;
 	}
@@ -40,23 +49,7 @@ public class ConversationUpdates : BaseConversation
 	internal Message addMessageUnsafe(Message m)
 	{
 		var result = messages.TryAdd(m.ID, m);
-		if (result)
-		{
-			m.AuthorRef = users.Find(u => u.Reference.Name == m.Author.Name);
-		}
-		m.setParentUnsafe(messages.GetValueOrDefault(m.TargetId, null));
 		return result ? m : null;
-	}
-
-	/// <summary>
-	/// Fixes the internal structure of messages.
-	/// </summary>
-	public void converge()
-	{
-		foreach (Message message in messages.Values) //for all messages sets the parent message
-		{
-			message.setParentUnsafe(messages.GetValueOrDefault(message.TargetId, null));
-		}
 	}
 
 	/// <summary>
@@ -66,7 +59,7 @@ public class ConversationUpdates : BaseConversation
 	/// <returns>MemoryStream containing serialized conversation.</returns>
 	public MemoryStream serialize(ISerializer serializer)
 	{
-		return serializer.serialize(this);
+		return serializer.Serialize(this);
 	}
 }
 

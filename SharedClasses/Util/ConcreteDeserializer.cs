@@ -8,11 +8,11 @@ namespace ChatModel.Util
     /// </summary>
     public class ConcreteDeserializer : IDeserializer
     {
-        public object deserialize(Stream stream)
+        public object Deserialize(Stream stream)
         {
             BinaryFormatter formatter = new BinaryFormatter();
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
-			return formatter.Deserialize(stream); //uses a BinaryFormatter to deserialize
+			return formatter.Deserialize(stream); //uses a BinaryFormatter to Deserialize
 #pragma warning restore SYSLIB0011 // Type or member is obsolete
 		}
     }

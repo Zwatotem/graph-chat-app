@@ -21,7 +21,7 @@ public interface IServerChatSystem : IChatSystem
     /// </summary>
     /// <param name="userName">User name of user of whom we get conversations</param>
     /// <returns>List of conversations or null if there is no user with such user name.</returns>
-    List<Conversation> getConversationsOfUser(string userName);
+    IEnumerable<Conversation> getConversationsOfUser(string userName);
 }
 
 /*

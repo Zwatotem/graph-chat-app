@@ -10,23 +10,23 @@ public class MessageCompositorViewModel : MessageViewModel
 {
 	public ClientChatSystem ChatSystem { get; init; }
 	public Conversation Conversation { get; init; }
-	private int parentMessageID;
+	private Guid parentMessageID;
 	public override string Author { get; }
 	public override string tempText { get; set; }
 	public ICommand SendMessageCommand { get; set; }
-	internal MessageCompositorViewModel(int parentMessageID, Conversation conversation)
+	internal MessageCompositorViewModel(Guid parentMessageID, Conversation conversation)
 	{
 		ClientChatSystem chatSystem = App.Current.ChatSystem;
-		Author = chatSystem.getUserName();
+		Author = chatSystem.LoggedUserName;
 		tempText = "";
 		this.parentMessageID = parentMessageID;
 		ChatSystem = chatSystem;
 		Conversation = conversation;
 		SendMessageCommand = new SendMessageCommand(this);
 	}
-	internal MessageCompositorViewModel(int parentMessageID, Conversation conversation, ClientChatSystem chatSystem)
+	internal MessageCompositorViewModel(Guid parentMessageID, Conversation conversation, ClientChatSystem chatSystem)
 	{
-		Author = chatSystem.getUserName();
+		Author = chatSystem.LoggedUserName;
 		tempText = "";
 		this.parentMessageID = parentMessageID;
 		ChatSystem = chatSystem;
@@ -36,7 +36,7 @@ public class MessageCompositorViewModel : MessageViewModel
 
 	public void SendMessage()
 	{
-		var currentUser = ChatSystem.getUser(ChatSystem.getUserName());
+		var currentUser = ChatSystem.GetUser(ChatSystem.LoggedUserName);
 		App.Current.Client
 			.requestSendTextMessage(this, new(currentUser, Conversation.ID, parentMessageID, tempText));
 	}

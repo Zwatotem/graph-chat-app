@@ -73,7 +73,7 @@ internal class MessageViewerViewModel : MessageViewModel
 
 	private void Conversation_PropertyChanged(object sender, PropertyChangedEventArgs e)
 	{
-		if (e.PropertyName == nameof(Conversation.observableMessages) ||
+		if (e.PropertyName == nameof(Conversation.ObservableMessages) ||
 			e.PropertyName == nameof(Conversation.Messages))
 		{
 			updateDirectChildren();

@@ -79,7 +79,7 @@ class ConversationCreatorViewModel : ViewModel
 	{
 		get
 		{
-			var currentUser = window.app.Client.ChatSystem.getUserName();
+			var currentUser = window.app.Client.ChatSystem.LoggedUserName;
 			var users = CSVUsers
 				.Split(new char[] { ',', '\n' }, StringSplitOptions.RemoveEmptyEntries)
 				.Select(user => user.Trim())

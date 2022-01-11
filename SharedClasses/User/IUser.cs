@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using ChatModel.Util;
 
 namespace ChatModel;
 
@@ -7,29 +10,34 @@ namespace ChatModel;
 /// </summary>
 public interface IUser
 {
+	Guid ID { get; }
 	/// <summary>
 	/// User name of the user.
 	/// </summary>
 	string Name { get; }
+	
+	public ChatSystem ChatSystem { get; set; }
 
 	/// <summary>
 	/// List of conversations in which the user takes part.
 	/// </summary>
-	List<Conversation> Conversations { get; }
+	IEnumerable<Conversation> Conversations { get; }
 
 	/// <summary>
 	/// Adds a conversation to the list of conversations in which the user takes part.
 	/// </summary>
 	/// <param name="conversation">Conversation to match</param>
 	/// <returns>True if successful, false otherwise.</returns>
-	bool matchWithConversation(Conversation conversation);
+	bool MatchWithConversation(Conversation conversation);
 
 	/// <summary>
 	/// Removes a conversation from the list of all in which the user takes part.
 	/// </summary>
 	/// <param name="conversation1"></param>
 	/// <returns>True if successful, false otherwise.</returns>
-	bool unmatchWithConversation(Conversation conversation1);
+	bool UnmatchWithConversation(Conversation conversation1);
+
+	public MemoryStream Serialize(ISerializer serializer);
 }
 
 /*

@@ -24,12 +24,12 @@ namespace chatAppTest
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
 			IMessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;
-			Message addedMessage1 = conversation1.addMessage(user1, -1, msgContent1, datetime);
+			Message addedMessage1 = conversation1.AddMessage(user1, -1, msgContent1, datetime);
 			Assert.IsNull(addedMessage1);
-			conversation1.matchWithUser(user1);
-			Message addedMessage2 = conversation1.addMessage(user1, 2, msgContent1, datetime);
+			conversation1.MatchWithUser(user1);
+			Message addedMessage2 = conversation1.AddMessage(user1, 2, msgContent1, datetime);
 			Assert.IsNull(addedMessage2);
-			Message addedMessage3 = conversation1.addMessage(user1, -1, msgContent1, datetime);
+			Message addedMessage3 = conversation1.AddMessage(user1, -1, msgContent1, datetime);
 			Assert.IsNotNull(addedMessage3);
 			Assert.IsTrue(user1 == addedMessage3.Author);
 			Assert.IsNull(addedMessage3.Parent);
@@ -37,10 +37,10 @@ namespace chatAppTest
 			Assert.IsTrue(datetime == addedMessage3.SentTime);
 			Assert.IsTrue(1 == addedMessage3.ID);
 
-			conversation1.matchWithUser(user2);
+			conversation1.MatchWithUser(user2);
 			IMessageContent msgContent2 = new TextContent("Heeejoooo");
 			DateTime datetime2 = DateTime.Now;
-			Message nextMessage = conversation1.addMessage(user2, 1, msgContent2, datetime2);
+			Message nextMessage = conversation1.AddMessage(user2, 1, msgContent2, datetime2);
 			Assert.IsNotNull(nextMessage);
 			Assert.IsTrue(user2 == nextMessage.Author);
 			Assert.IsTrue(addedMessage3 == nextMessage.Parent);
@@ -70,11 +70,11 @@ namespace chatAppTest
 		{
 			IUser user1 = new User("Roch Lancel");
 			Conversation conversation1 = new Conversation("Konfa 1", 1);
-			conversation1.matchWithUser(user1);
+			conversation1.MatchWithUser(user1);
 			Assert.IsNull(conversation1.getMessage(1));
 			IMessageContent msgContent1 = new TextContent("Heeejoooo");
 			DateTime datetime = DateTime.Now;
-			Message addedMessage = conversation1.addMessage(user1, -1, msgContent1, datetime);
+			Message addedMessage = conversation1.AddMessage(user1, -1, msgContent1, datetime);
 			Assert.IsTrue(addedMessage == conversation1.getMessage(1));
 			Assert.IsNull(conversation1.getMessage(2));
 		}
@@ -104,11 +104,11 @@ namespace chatAppTest
 			hasWrongUser = false;
 
 			bool methodResult;
-			methodResult = conversation1.matchWithUser(user1);
+			methodResult = conversation1.MatchWithUser(user1);
 			Assert.IsTrue(methodResult);
-			methodResult = conversation1.matchWithUser(user2);
+			methodResult = conversation1.MatchWithUser(user2);
 			Assert.IsTrue(methodResult);
-			methodResult = conversation2.matchWithUser(user1);
+			methodResult = conversation2.MatchWithUser(user1);
 			Assert.IsTrue(methodResult);
 
 			foreach (var user in conversation1.Users)
@@ -136,7 +136,7 @@ namespace chatAppTest
 			Assert.IsTrue(hasUser1);
 			Assert.IsFalse(hasWrongUser);
 
-			methodResult = conversation2.matchWithUser(user1);
+			methodResult = conversation2.MatchWithUser(user1);
 			Assert.IsFalse(methodResult);
 		}
 
@@ -155,7 +155,7 @@ namespace chatAppTest
 			Assert.IsFalse(hasWrongUser);
 			hasWrongUser = false;
 
-			conversation1.matchWithUser(user1);
+			conversation1.MatchWithUser(user1);
 
 			foreach (var user in conversation1.Users)
 			{
@@ -170,7 +170,7 @@ namespace chatAppTest
 			hasWrongUser = false;
 
 			bool methodResult;
-			methodResult = conversation1.unmatchWithUser(user1);
+			methodResult = conversation1.UnMatchWithUser(user1);
 			Assert.IsTrue(methodResult);
 
 			foreach (var user in conversation1.Users)
@@ -180,7 +180,7 @@ namespace chatAppTest
 			Assert.IsFalse(hasWrongUser);
 			hasWrongUser = false;
 
-			methodResult = conversation1.unmatchWithUser(user1);
+			methodResult = conversation1.UnMatchWithUser(user1);
 			Assert.IsFalse(methodResult);
 		}
 
@@ -216,9 +216,9 @@ namespace chatAppTest
 			Assert.IsFalse(hasWrongUser);
 			hasWrongUser = false;
 
-			conversation1.matchWithUser(user1);
-			conversation1.matchWithUser(user2);
-			conversation2.matchWithUser(user1);
+			conversation1.MatchWithUser(user1);
+			conversation1.MatchWithUser(user2);
+			conversation2.MatchWithUser(user1);
 
 			foreach (var user in conversation1.Users)
 			{
@@ -259,19 +259,19 @@ namespace chatAppTest
 		public void serializeTest()
 		{
 			IServerChatSystem chatSystem = new ServerChatSystem();
-			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
-			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
-			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
+			IUser user1 = chatSystem.AddNewUser("Ja≈õ Kowalski");
+			IUser user2 = chatSystem.AddNewUser("Kasia ≈πd≈∫b≈Ço");
+			Conversation savedConversation = chatSystem.AddConversation("Konfa 1", user1, user2);
 			IMessageContent msgContent1 = new TextContent("Heeejoooo");
 			IMessageContent msgContent2 = new TextContent("Heeej");
 			DateTime datetime = DateTime.Now;
-			Message sentMessage1 = chatSystem.sendMessage(savedConversation.ID, "Jaú Kowalski", -1, msgContent1, datetime);
-			Message sentMessage2 = chatSystem.sendMessage(savedConversation.ID, "Kasia èdüb≥o", sentMessage1.ID, msgContent2, datetime);
+			Message sentMessage1 = chatSystem.SendMessage(savedConversation.ID, "Ja≈õ Kowalski", -1, msgContent1, datetime);
+			Message sentMessage2 = chatSystem.SendMessage(savedConversation.ID, "Kasia ≈πd≈∫b≈Ço", sentMessage1.ID, msgContent2, datetime);
 
 			ClientChatSystem clientChatSystem = new ClientChatSystem();
-			IUser userClient1 = clientChatSystem.addNewUser("Jaú Kowalski");
-			IUser userClient2 = clientChatSystem.addNewUser("Kasia èdüb≥o");
-			Conversation savedClientConversation = clientChatSystem.addConversation(savedConversation.serialize(new ConcreteSerializer()), new ConcreteDeserializer());
+			IUser userClient1 = clientChatSystem.AddNewUser("Ja≈õ Kowalski");
+			IUser userClient2 = clientChatSystem.AddNewUser("Kasia ≈πd≈∫b≈Ço");
+			Conversation savedClientConversation = clientChatSystem.AddConversation(savedConversation.Serialize(new ConcreteSerializer()), new ConcreteDeserializer());
 
 			bool msg1Present = false;
 			bool msg2Present = false;
@@ -315,30 +315,30 @@ namespace chatAppTest
 			IUser user1 = new User("Mr. X");
 			IUser user2 = new User("Ms. Y");
 			// Matching
-			conversation1.matchWithUser(user1);
-			conversation1.matchWithUser(user2);
-			user1.matchWithConversation(conversation1);
-			user2.matchWithConversation(conversation1);
+			conversation1.MatchWithUser(user1);
+			conversation1.MatchWithUser(user2);
+			user1.MatchWithConversation(conversation1);
+			user2.MatchWithConversation(conversation1);
 
 			// Messages
 			//  Content
 			IMessageContent msgContent1 = new TextContent("Heeejoooo");
-			IMessageContent msgContent2 = new TextContent("No czeúÊ");
-			IMessageContent msgContent3 = new TextContent("Co tam s≥ychaÊ?");
+			IMessageContent msgContent2 = new TextContent("No cze≈õƒá");
+			IMessageContent msgContent3 = new TextContent("Co tam s≈Çychaƒá?");
 			//  Timestamps
 			DateTime datetime = DateTime.Now;
 			DateTime datetime2 = datetime + TimeSpan.FromSeconds(5);
 			DateTime datetime3 = datetime + TimeSpan.FromSeconds(19);
 			//  Sending
-			Message sentMessage1 = conversation1.addMessage(user1, -1, msgContent1, datetime);
-			Message sentMessage2 = conversation1.addMessage(user2, 1, msgContent2, datetime2);
-			Message sentMessage3 = conversation1.addMessage(user1, 2, msgContent3, datetime3);
+			Message sentMessage1 = conversation1.AddMessage(user1, -1, msgContent1, datetime);
+			Message sentMessage2 = conversation1.AddMessage(user2, 1, msgContent2, datetime2);
+			Message sentMessage3 = conversation1.AddMessage(user1, 2, msgContent3, datetime3);
 
 			// Checks
 			bool hasMessage2 = false;
 			bool hasMessage3 = false;
 			bool hasWrongMessage = false;
-			foreach (var message in conversation1.getUpdates(1).Messages)
+			foreach (var message in conversation1.GetUpdates(1).Messages)
 			{
 				if (message.ID == sentMessage2.ID)
 				{

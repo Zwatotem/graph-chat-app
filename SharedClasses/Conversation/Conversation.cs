@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using ChatModel.Util;
 
@@ -16,27 +17,30 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 {
 	[field: NonSerialized] public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
 	private void OnPropertyChanged(object sender, PropertyChangedEventArgs args) => PropertyChanged(sender, args);
-	private int smallestFreeId; //smallest id available to be assigned to a new message (as ids are unique and strictly increasing)
 
-	public Conversation(string name, int id) : base(name, id)
+	public Conversation(string name) : base(name)
 	{
-		this.smallestFreeId = 1;
+	}
+
+	public Conversation(string name, Guid id) : base(name, id)
+	{
 	}
 
 
-	public ObservableCollection<IUser> observableUsers
+	public ObservableCollection<IUser> ObservableUsers
 	{
 		get
 		{
 			var oc = new ObservableCollection<IUser>();
-			foreach (Refrence<IUser> user in users)
+			foreach (IUser user in Users)
 			{
-				oc.Add(user.Reference);
+				oc.Add(user);
 			}
 			return oc;
 		}
 	}
-	public ObservableCollection<Message> observableMessages
+
+	public ObservableCollection<Message> ObservableMessages
 	{
 		get
 		{
@@ -60,29 +64,6 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 		this.name = conv.Name;
 		this.Users = conv.Users;
 		this.messages = conv.getMessagesFull();
-		this.smallestFreeId = 1;
-		foreach (var k in messages.Keys)
-		{
-			smallestFreeId = (k > smallestFreeId) ? k : smallestFreeId;
-		}
-		smallestFreeId++;
-		foreach (var message in messages.Values)
-		{
-			message.AuthorRef = users.Find(u => u.Reference.Name == message.Author.Name); //sets messages' references to their authors
-		}
-		converge(); //fixes messages' references to their parent messages
-	}
-
-	/// <summary>
-	/// Fixes the internal structure of messages by setting references to parent messages.
-	/// </summary>
-	internal void converge()
-	{
-		foreach (Message message in messages.Values)
-		{
-			message.Parent = messages.GetValueOrDefault(message.TargetId, null); //set reference to the message with the correct id
-																				 //if there is no such message, set it to null
-		}
 	}
 
 	/// <summary>
@@ -90,9 +71,9 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 	/// </summary>
 	/// <param name="user">User to find</param>
 	/// <returns>IUser wrapped in Refrence object from users list.</returns>
-	public Refrence<IUser> getUserRef(IUser user)
+	public Guid GetUserID(IUser user)
 	{
-		return users.Find(r => r.Reference == user);
+		return users.FirstOrDefault(id => id == user.ID, Guid.Empty);
 	}
 
 	/// <summary>
@@ -100,31 +81,12 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 	/// </summary>
 	/// <param name="user">User to match with the conversation</param>
 	/// <returns>True if successful, false otherwise.</returns>
-	public bool matchWithUser(IUser user)
+	public bool MatchWithUser(IUser user)
 	{
 		if (Users.Contains(user))
 			return false;
-		users.Add(new Refrence<IUser>(user));
+		users.Add(user.ID);
 		return true;
-	}
-
-	/// <summary>
-	/// Changes the references inside the conversation to an actuall user of the system.
-	/// </summary>
-	/// <remarks>Used after deserialization.</remarks>
-	/// <param name="user">User of the system.</param>
-	/// <returns>Returns true if rematched, false otherwise.</returns>
-	internal bool reMatchWithUser(IUser user)
-	{
-		var internalUser = Users.Find(u => u.Name == user.Name); //finds the same user as parameter but as different object - relic of serialization
-		if (internalUser != null)
-		{
-			var userRef = getUserRef(internalUser); //gets the Refrence object from the list of users
-			internalUser.unmatchWithConversation(this); //unmatches the relic user - it is to be garbage collected
-			userRef.Reference = user; //sets the reference to the actuall user of the system
-			return true;
-		}
-		return false;
 	}
 
 	/// <summary>
@@ -132,81 +94,62 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 	/// </summary>
 	/// <param name="user">User to unmatch from conversation</param>
 	/// <returns>True if successful, false otherwise.</returns>
-	public bool unmatchWithUser(IUser user)
+	public bool UnMatchWithUser(IUser user)
 	{
 		if (Users.Contains(user))
 		{
-			users.RemoveAll(r => r.Reference == user);
+			users.RemoveAll(id => id == user.ID);
 			return true;
 		}
-		else
-		{
-			return false;
-		}
-	}
-
-	/// <summary>
-	/// Gets a message with the given id.
-	/// </summary>
-	/// <param name="id">Id of the message to retrieve</param>
-	/// <returns>Found message or null if no such message.</returns>
-	public Message getMessage(int id)
-	{
-		if (messages.ContainsKey(id))
-			return messages[id];
-		return null;
+		return false;
 	}
 
 	/// <summary>
 	/// Adds a message to conversation.
 	/// </summary>
 	/// <param name="user">Message's author</param>
-	/// <param name="parentID">ID of message to which the new one is replying. -1 indicates not replying to any other message</param>
+	/// <param name="parentID">id of message to which the new one is replying. -1 indicates not replying to any other message</param>
 	/// <param name="messageContent">Content of the message</param>
 	/// <param name="datetime">Sent time of the message</param>
 	/// <returns>Reference to added message, null if unsuccessful.</returns>
-	public Message addMessage(IUser user, int parentID, IMessageContent messageContent, DateTime datetime)
+	public Message AddMessage(IUser user, Guid parentID, IMessageContent messageContent, DateTime datetime)
 	{
-		int newID = smallestFreeId;
-		if ((messages.ContainsKey(parentID) || parentID == -1) && Users.Contains(user) && !messages.ContainsKey(newID))
-		{
-			//can add only if the message isn't replying to anything or targeted message exists and the author exists in the system
-			//and there is no other message with this id
-			Message message = new Message(getUserRef(user), (parentID == -1) ? null : messages[parentID], messageContent, datetime, newID);
-			messages.Add(newID, message);
-			smallestFreeId++;
-			return message;
-		}
-		else
-		{
-			return null;
-		}
+		//can add only if the message isn't replying to anything or targeted message exists and the author exists in the system
+		//and there is no other message with this id
+
+		var message = new Message(user.ID, parentID, messageContent, datetime);
+		messages.Add(message.ID, message);
+		return message;
 	}
+
+
+	public Message FindMessage(Guid id)
+	{
+		return id != Guid.Empty ? messages[id] : null;
+	}
+
 
 	/// <summary>
 	/// Deserializes and adds message from stream.
 	/// </summary>
-	/// <param name="stream">Stream from which to deserialize</param>
+	/// <param name="stream">Stream from which to Deserialize</param>
 	/// <param name="deserializer">Deserializer which is to be used</param>
 	/// <returns>Reference to added message, null if unsuccessful.</returns>
-	public Message addMessage(Stream stream, IDeserializer deserializer)
+	public Message AddMessage(Stream stream, IDeserializer deserializer)
 	{
-		Message mess = (Message)deserializer.deserialize(stream);
-		if (mess != null)
+		var mess = deserializer.Deserialize(stream) as Message;
+		if (mess == null) return null;
+		if (!messages.ContainsKey(mess.ID) && (messages.ContainsKey(mess.TargetId) || mess.TargetId == Guid.Empty))
 		{
-			if (mess.ID >= smallestFreeId && (mess.TargetId == -1 || messages.ContainsKey(mess.TargetId)))
-			{
-				//as in previous method, these conditions had to be checked
-				messages.Add(mess.ID, mess);
-				mess.Parent = (mess.TargetId == -1) ? null : messages[mess.TargetId];
-				smallestFreeId = mess.ID;
-				OnPropertyChanged(this, new(nameof(observableMessages)));
-			}
-			else
-			{
-				mess = null;
-			}
+			//as in previous method, these conditions had to be checked
+			messages.Add(mess.ID, mess);
+			OnPropertyChanged(this, new(nameof(ObservableMessages)));
 		}
+		else
+		{
+			mess = null;
+		}
+
 		return mess;
 	}
 
@@ -216,38 +159,36 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 	/// <remarks>
 	/// <strong>The specified message will be added despite not matching a valid parent.</strong>
 	/// </remarks>
-	/// <param name="m">Message object to add</param>
+	/// <param name="mess">Message object to add</param>
 	/// <returns>Message that was added, or <c>null</c> in case of error.</returns>
-	internal Message addMessageUnsafe(Message m)
+	internal Message addMessageUnsafe(Message mess)
 	{
-		var result = messages.TryAdd(m.ID, m);
+		var result = messages.TryAdd(mess.ID, mess);
 		if (result)
 		{
-			OnPropertyChanged(this, new(nameof(observableMessages)));
-			m.AuthorRef = users.Find(u => u.Reference.Name == m.Author.Name);
+			OnPropertyChanged(this, new(nameof(ObservableMessages)));
 		}
-		m.Parent = messages.GetValueOrDefault(m.TargetId, null);
-		return result ? m : null;
+
+		mess.Parent = messages.GetValueOrDefault(mess.TargetId, null);
+		return result ? mess : null;
 	}
 
 	/// <summary>
 	/// Updates the conversation based on received object.
 	/// </summary>
 	/// <param name="updt">Received update</param>
-	public void applyUpdates(ConversationUpdates updt)
+	public void ApplyUpdates(ConversationUpdates updt)
 	{
-		users.AddRange(updt.getUsersFull());
-		List<int> newMssgIDs = new List<int>(); //saving ids of all newly added messages
+		this.ChatSystem.Users = ChatSystem.Users.Union(updt.getUsersFull());
+		users.AddRange(updt.getUsersFull().Select(u => u.ID));
+		foreach (var user in updt.Users)
+		{
+			user.ChatSystem = ChatSystem;
+		}
 		foreach (var mess in updt.Messages)
 		{
-			addMessageUnsafe(mess); //first adding messages without properly setting their parent messages and authors
-									//as they could possibly be added in an order that would make it impossible
-			newMssgIDs.Add(mess.ID);
-		}
-		foreach (int id in newMssgIDs) //so these references are fixed later on
-		{
-			messages[id].Parent = (messages[id].TargetId == -1) ? null : messages[messages[id].TargetId]; //setting parent references
-			messages[id].AuthorRef = users.Find(u => u.Reference.Name == messages[id].Author.Name); //setting author references
+			addMessageUnsafe(mess);
+			mess.Conversation = this;
 		}
 	}
 
@@ -256,10 +197,10 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 	/// </summary>
 	/// <param name="lastMessageId">Last known messsage id</param>
 	/// <returns>Updates to conversation.</returns>
-	public ConversationUpdates getUpdates(int lastMessageId)
+	public ConversationUpdates GetUpdates(Guid lastMessageId)
 	{
-		var lastMessageTime = getMessage(lastMessageId)?.SentTime;
-		return getUpdates(lastMessageTime);
+		var lastMessageTime = FindMessage(lastMessageId)?.SentTime;
+		return GetUpdates(lastMessageTime);
 	}
 
 	/// <summary>
@@ -267,7 +208,7 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 	/// </summary>
 	/// <param name="time">Time of last known conversation state</param>
 	/// <returns>Updates to conversation.</returns>
-	public ConversationUpdates getUpdates(DateTime? time)
+	public ConversationUpdates GetUpdates(DateTime? time)
 	{
 		var updates = new ConversationUpdates(Name, ID); //creates new updates object
 		updates.Users = Users; //adds to it all users
@@ -275,10 +216,10 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 		{
 			if (message.SentTime > time) //and all messages sent after specified time
 			{
-				updates.addMessageUnsafe(new Message(message)); //must use unsafe version as messages can be added in wrong order
+				//must use unsafe version as messages can be added in wrong order
+				updates.addMessageUnsafe(new Message(message));
 			}
 		}
-		updates.converge(); //fixes references that might be bad after unsafe adding
 		return updates;
 	}
 
@@ -287,11 +228,10 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 	/// </summary>
 	/// <param name="serializer">Serializer which is to be used.</param>
 	/// <returns>MemoryStream containing serialized conversation.</returns>
-	public MemoryStream serialize(ISerializer serializer)
+	public MemoryStream Serialize(ISerializer serializer)
 	{
-		return serializer.serialize(this);
+		return serializer.Serialize(this);
 	}
-
 }
 
 /*

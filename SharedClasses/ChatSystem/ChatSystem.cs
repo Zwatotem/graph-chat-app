@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 
 namespace ChatModel;
 
@@ -16,13 +17,22 @@ public abstract class ChatSystem : IChatSystem, INotifyPropertyChanged
 	public event PropertyChangedEventHandler PropertyChanged = (obj, e) => { };
 	protected void OnPropertyChanged(object sender, PropertyChangedEventArgs args) => PropertyChanged(sender, args);
 
-	protected Dictionary<int, Conversation> conversations; //dictionary of all conversations in the chat system, indexed by their unique id
-	protected List<IUser> users; //list of all users in the chat system, each has an unique user name
-	protected int smallestFreeId; //smallest unique id available to be assigned to a new conversation
-	protected Stack<int> freedIds; //stack of conversation ids smaller than current smallest available that were freed be deleting conversations
+	protected Dictionary<Guid, Conversation>
+		conversations; //dictionary of all conversations in the chat system, indexed by their unique id
 
-	public List<IUser> Users { get => users; }
-	public Dictionary<int, Conversation> Conversations { get => conversations; }
+	protected Dictionary<Guid, IUser> users; //list of all users in the chat system, each has an unique user name
+
+	public IEnumerable<IUser> Users
+	{
+		get => users.Select(x => x.Value);
+		set => users = value.ToDictionary(u => u.ID, u => u);
+	}
+
+	public Dictionary<Guid, Conversation> Conversations
+	{
+		get => conversations;
+	}
+
 	public ObservableCollection<Conversation> ObservableConversations
 	{
 		get
@@ -32,38 +42,40 @@ public abstract class ChatSystem : IChatSystem, INotifyPropertyChanged
 			{
 				oc.Add(c.Value);
 			}
+
 			return oc;
 		}
 	}
 
 	public ChatSystem()
 	{
-		this.conversations = new Dictionary<int, Conversation>();
-		this.users = new List<IUser>();
-		this.smallestFreeId = 1;
-		this.freedIds = new Stack<int>();
+		this.conversations = new Dictionary<Guid, Conversation>();
+		this.users = new Dictionary<Guid, IUser>();
 	}
 
-	public IUser getUser(string userName)
+	public IUser GetUser(string userName)
 	{
-		return users.Find(u => u.Name == userName); //returns first found user with specific name (there's at most one as names are unique)
+		//returns first found user with specific name (there's at most one as names are unique)
+		return users
+			.FirstOrDefault(kvp => kvp.Value.Name == userName, new KeyValuePair<Guid, IUser>(Guid.Empty, null))
+			.Value;
 	}
 
-	public IUser addNewUser(string newUserName)
+	public IUser AddNewUser(string newUserName)
 	{
-		if (users.Exists(u => u.Name == newUserName)) //checking if the proposed user name would be unique
+		if (users.Any(u => u.Value.Name == newUserName)) //checking if the proposed user name would be unique
 		{
 			return null;
 		}
 		else
 		{
-			IUser newUser = new User(newUserName);
-			users.Add(newUser);
+			IUser newUser = new User(newUserName, this);
+			users.Add(newUser.ID, newUser);
 			return newUser;
 		}
 	}
 
-	public Conversation getConversation(int id)
+	public Conversation GetConversation(Guid id)
 	{
 		if (conversations.ContainsKey(id))
 		{
@@ -75,123 +87,120 @@ public abstract class ChatSystem : IChatSystem, INotifyPropertyChanged
 		}
 	}
 
-	public Conversation addConversation(string conversationName, params string[] ownersNames)
+	public Conversation AddConversation(string conversationName, params string[] ownersNames)
 	{
-		IUser[] owners = new User[ownersNames.Length]; //creates an array to be filled with references to the new conversation's users
+		//creates an array to be filled with references to the new conversation's users
+		IUser[] owners = new User[ownersNames.Length];
 		int index = 0; //index of first free position in the array
 		foreach (var userName in ownersNames) //finding all users in a loop
 		{
-			IUser userReference = users.Find(u => u.Name == userName); //finds user with a specific name
+			//finds user with a specific name
+			IUser userReference = GetUser(userName);
 			if (userReference == null) //if there's no such user conversation cannot be created
 			{
 				return null;
 			}
-			else
-			{
-				owners[index++] = userReference; //if user found stores the reference in the array
-			}
+
+			owners[index++] = userReference; //if user found, stores the reference in the array
 		}
-		return addConversation(conversationName, owners); //calling overloaded method to do next steps
+
+		return AddConversation(conversationName, owners); //calling overloaded method to do next steps
 	}
 
-	public Conversation addConversation(string conversationName, params IUser[] owners)
+	public Conversation AddConversation(string conversationName, params IUser[] owners)
 	{
-		int newId;
-		if (freedIds.Count > 0) //if there are any freed ids on the stack, one of the is going to be reused
-		{
-			newId = freedIds.Pop();
-		}
-		else
-		{
-			newId = smallestFreeId++; //else we take current smallest available id and set smallestFreeId to next integer
-		}
-		foreach (var owner in owners) //check if all owners are indeed part of the chat system
-		{
-			if (!users.Contains(owner))
-			{
-				return null;
-			}
-		}
-		Conversation newConversation = new Conversation(conversationName, newId);
-		conversations.Add(newId, newConversation);
+		Conversation newConversation = new Conversation(conversationName);
+		newConversation.ChatSystem = this;
+		conversations.Add(newConversation.ID, newConversation);
 		foreach (var owner in owners)
 		{
-			newConversation.matchWithUser(owner);
-			owner.matchWithConversation(newConversation);
+			newConversation.MatchWithUser(owner);
+			owner.MatchWithConversation(newConversation);
 		}
+
 		PropertyChanged(this, new(nameof(Conversations)));
 		PropertyChanged(this, new(nameof(ObservableConversations)));
 		return newConversation;
 	}
 
-	public bool addUserToConversation(string userName, int id)
+	public bool AddUserToConversation(string userName, Guid id)
 	{
-		IUser userToAdd = getUser(userName);
+		IUser userToAdd = GetUser(userName);
 		if (userToAdd == null)
 		{
 			return false; //if there is no such user, indicate failure of the operation
 		}
-		Conversation conversationToAdd = getConversation(id);
+
+		Conversation conversationToAdd = GetConversation(id);
 		if (conversationToAdd == null)
 		{
 			return false; //if there is no such conversation, indicate failure of the operation
 		}
-		userToAdd.matchWithConversation(conversationToAdd); //assigning the conversation to the user
-		return conversationToAdd.matchWithUser(userToAdd); //assigning the user to the conversation. If they are already assigned
+
+		userToAdd.MatchWithConversation(conversationToAdd); //assigning the conversation to the user
+		//assigning the user to the conversation. If they are already assigned
 		//a false value is returned
+		return conversationToAdd.MatchWithUser(userToAdd);
 	}
 
-	public bool leaveConversation(string userName, int id)
+	public bool LeaveConversation(string userName, Guid id)
 	{
-		IUser userToRemove = getUser(userName);
+		IUser userToRemove = GetUser(userName);
 		if (userToRemove == null)
 		{
 			return false; //if there is no such user, indicate failure of the operation
 		}
-		Conversation conversation = getConversation(id);
+
+		Conversation conversation = GetConversation(id);
 		if (conversation == null)
 		{
 			return false; //if there is no such conversation, indicate failure of the operation
 		}
-		userToRemove.unmatchWithConversation(conversation); //removes the conversation from user
-		bool result = conversation.unmatchWithUser(userToRemove); //and user from conversation
+
+		userToRemove.UnmatchWithConversation(conversation); //removes the conversation from user
+		bool result = conversation.UnMatchWithUser(userToRemove); //and user from conversation
 		if (!result) //if the user was not assigned to the conversation in the first place
 		{
 			return false; //indicate failure of the operation
 		}
-		else
+
+		if (!conversation.Users.Any()) //if there would be no users in the conversation left
 		{
-			if (conversation.Users.Count == 0) //if there would be no users in the conversation left
-			{
-				conversations.Remove(id); //deletes the conversation
-				if (id == smallestFreeId - 1) //if the id of deleted conversation was only one smaller than smallestFreeId
-				{
-					smallestFreeId--; //decrement the variable
-				}
-				else
-				{
-					freedIds.Push(id); //push the id to the stack for reuse
-				}
-			}
-			return true;
+			conversations.Remove(id); //deletes the conversation
 		}
+
+		return true;
 	}
 
 
-	public Message sendMessage(int convId, string userName, int targetId, IMessageContent messageContent, DateTime sentTime)
+	public Message? SendMessage(Guid convId, string userName, Guid targetId, IMessageContent messageContent,
+		DateTime sentTime)
 	{
-		Conversation conversation = getConversation(convId);
+		Conversation conversation = FindConversation(convId);
 		if (conversation == null)
 		{
 			return null; //if there is no such conversation, indicate failure of the operation
 		}
-		IUser author = conversation.Users.Find(u => u.Name == userName);
+
+		IUser author = conversation.Users.FirstOrDefault(u => u.Name == userName, null);
 		if (author == null)
 		{
 			return null; //if there is no such user, indicate failure of the operation
 		}
-		return conversation.addMessage(author, targetId, messageContent, sentTime); //calls the conversation method responsible for
+
+		//calls the conversation method responsible for
 		//creating a message. Returns it's returned value. True if operation successful, else false.
+		return conversation.AddMessage(author, targetId, messageContent, sentTime);
+	}
+
+	public Conversation FindConversation(Guid id)
+	{
+		return id != Guid.Empty ? conversations[id] : null;
+	}
+
+	public IUser FindUser(Guid id)
+	{
+		return id != Guid.Empty ? users[id] : null;
 	}
 }
 

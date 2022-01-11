@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChatModel;
 
@@ -8,30 +9,35 @@ namespace ChatModel;
 /// </summary>
 public class ServerChatSystem : ChatSystem, IServerChatSystem
 {
-	public ServerChatSystem() : base() { }
+	public ServerChatSystem() : base()
+	{
+	}
 
 	public UserUpdates getUpdatesToUser(string userName, DateTime t)
 	{
-		var user = users.Find(u => u.Name == userName);
+		var user = users.FirstOrDefault(u => u.Value.Name == userName, new(Guid.Empty, null)).Value;
 		if (user == null)
 		{
 			return null; //cannot be done if there is no such user
 		}
+
 		var updates = new UserUpdates();
 		foreach (var conv in user.Conversations)
 		{
-			updates.addConversation(conv.getUpdates(t)); //get updates to all of users conversations
+			updates.addConversation(conv.GetUpdates(t)); //get updates to all of users conversations
 		}
+
 		return updates;
 	}
 
-	public List<Conversation> getConversationsOfUser(string userName)
+	public IEnumerable<Conversation> getConversationsOfUser(string userName)
 	{
-		IUser user = getUser(userName);
+		IUser user = GetUser(userName);
 		if (user == null)
 		{
 			return null; //if there is no such user, return null
 		}
+
 		return user.Conversations;
 	}
 }

@@ -33,7 +33,7 @@ namespace ChatServer.HandleStrategies
             byte[] reply = new byte[1];
             lock (allHandlers)
             {
-                Conversation newConversation = chatSystem.addConversation(proposedConversationName, namesOfParticipants.ToArray());
+                Conversation newConversation = chatSystem.AddConversation(proposedConversationName, namesOfParticipants.ToArray());
                 if (newConversation == null)
                 {
                     reply[0] = 0; //conversation could not be created
@@ -41,7 +41,7 @@ namespace ChatServer.HandleStrategies
                 else
                 {
                     reply[0] = 1;
-                    byte[] msg = newConversation.serialize(new ConcreteSerializer()).ToArray();
+                    byte[] msg = newConversation.Serialize(new ConcreteSerializer()).ToArray();
                     //if conversation created successfully, send it to all participating users that are currently connected
                     foreach (var handler in allHandlers.FindAll(h => namesOfParticipants.Contains(h.HandledUserName)))
                     {

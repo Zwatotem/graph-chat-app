@@ -89,7 +89,7 @@ internal class ConversationCanvasViewModel : ViewModel
 			OnPropertyChanged(this, new(nameof(ConversationName)));
 		}
 
-		if (e.PropertyName == nameof(Conversation.observableMessages) ||
+		if (e.PropertyName == nameof(Conversation.ObservableMessages) ||
 			e.PropertyName == nameof(Conversation.Messages))
 		{
 			updateRootMessages();
@@ -154,6 +154,6 @@ internal class ShowGlobalEditorCommand : ICommand
 
 	public void Execute(object parameter)
 	{
-		viewModel.GlobalEditor = new MessageCompositorViewModel(-1 ,viewModel.conversation, viewModel.ChatSystem);
+		viewModel.GlobalEditor = new MessageCompositorViewModel(Guid.Empty, viewModel.conversation, viewModel.ChatSystem);
 	}
 }

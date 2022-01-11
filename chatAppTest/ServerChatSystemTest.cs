@@ -11,17 +11,17 @@ namespace chatAppTest
 		public void getUpdatesToUserTest()
 		{
 			IServerChatSystem chatSystem = new ServerChatSystem();
-			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
-			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
-			IUser user3 = chatSystem.addNewUser("Roch Kowal");
-			Conversation savedConversation = chatSystem.addConversation("Konfa 1", user1, user2);
-			Conversation savedConversation2 = chatSystem.addConversation("Konfa 2", user1, user3);
+			IUser user1 = chatSystem.AddNewUser("Ja≈õ Kowalski");
+			IUser user2 = chatSystem.AddNewUser("Kasia ≈πd≈∫b≈Ço");
+			IUser user3 = chatSystem.AddNewUser("Roch Kowal");
+			Conversation savedConversation = chatSystem.AddConversation("Konfa 1", user1, user2);
+			Conversation savedConversation2 = chatSystem.AddConversation("Konfa 2", user1, user3);
 			IMessageContent msgContent1 = new TextContent("Heeejoooo");
 			IMessageContent msgContent2 = new TextContent("Heeej");
 			DateTime datetime = DateTime.Now;
-			Message sentMessage1 = chatSystem.sendMessage(savedConversation.ID, "Jaú Kowalski", -1, msgContent1, datetime);
-			Message sentMessage2 = chatSystem.sendMessage(savedConversation2.ID, "Jaú Kowalski", -1, msgContent2, datetime);
-			UserUpdates updates = chatSystem.getUpdatesToUser("Kasia èdüb≥o", datetime - TimeSpan.FromSeconds(3));
+			Message sentMessage1 = chatSystem.SendMessage(savedConversation.ID, "Ja≈õ Kowalski", -1, msgContent1, datetime);
+			Message sentMessage2 = chatSystem.SendMessage(savedConversation2.ID, "Ja≈õ Kowalski", -1, msgContent2, datetime);
+			UserUpdates updates = chatSystem.getUpdatesToUser("Kasia ≈πd≈∫b≈Ço", datetime - TimeSpan.FromSeconds(3));
 			bool containsConversation = false;
 			bool containsWrongConversation = false;
 			foreach (var conversation in updates)
@@ -62,11 +62,11 @@ namespace chatAppTest
 		public void getConversationsOfUserTest()
 		{
 			IServerChatSystem chatSystem = new ServerChatSystem();
-			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
-			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
-			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
-			IUser user3 = chatSystem.addNewUser("Johannes von Neustadt");
-			Conversation savedConversation2 = chatSystem.addConversation("Ziomki", user1, user3);
+			IUser user1 = chatSystem.AddNewUser("Ja≈õ Kowalski");
+			IUser user2 = chatSystem.AddNewUser("Kasia ≈πd≈∫b≈Ço");
+			Conversation savedConversation1 = chatSystem.AddConversation("Konfa 1", user1, user2);
+			IUser user3 = chatSystem.AddNewUser("Johannes von Neustadt");
+			Conversation savedConversation2 = chatSystem.AddConversation("Ziomki", user1, user3);
 			bool hasConversation1 = false;
 			bool hasConversation2 = false;
 			bool hasWrongConversation = false;
@@ -86,7 +86,7 @@ namespace chatAppTest
 			hasConversation1 = false;
 			hasConversation2 = false;
 			hasWrongConversation = false;
-			foreach (var conversation in chatSystem.getConversationsOfUser("Jaú Kowalski"))
+			foreach (var conversation in chatSystem.getConversationsOfUser("Ja≈õ Kowalski"))
 			{
 				if (conversation == savedConversation1)
 				{
@@ -107,7 +107,7 @@ namespace chatAppTest
 			hasConversation1 = false;
 			hasConversation2 = false;
 			hasWrongConversation = false;
-			foreach (var conversation in chatSystem.getConversationsOfUser("Kasia èdüb≥o"))
+			foreach (var conversation in chatSystem.getConversationsOfUser("Kasia ≈πd≈∫b≈Ço"))
 			{
 				if (conversation == savedConversation1)
 				{

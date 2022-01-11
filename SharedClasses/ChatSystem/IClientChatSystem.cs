@@ -12,14 +12,14 @@ public interface IClientChatSystem : IChatSystem
     /// Name of the currently logged in user.
     /// </summary>
     /// <remarks>Null if no user logged in.</remarks>
-    string LoggedInName { get; }
+    string LoggedUserName { get; }
 
     /// <summary>
     /// Logs the user in.
     /// </summary>
     /// <param name="login">User name under which to log in.</param>
     /// <returns>True if successful, false otherwise.</returns>
-    bool logIn(string login);
+    bool logIn(IUser user);
 
     /// <summary>
     /// Updates the state of chat system based on UserUpdates object.

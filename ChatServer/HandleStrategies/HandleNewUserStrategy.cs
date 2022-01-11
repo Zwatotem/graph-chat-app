@@ -19,7 +19,7 @@ namespace ChatServer.HandleStrategies
             IUser newUser = null;
             lock (allHandlers)
             {
-                newUser = chatSystem.addNewUser(proposedName);
+                newUser = chatSystem.AddNewUser(proposedName);
             }
             byte[] reply = new byte[1];
             reply[0] = (newUser == null) ? (byte)0 : (byte)1; //if user was not created (eg. user name taken) indicate failure 

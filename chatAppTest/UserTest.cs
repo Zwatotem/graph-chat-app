@@ -9,7 +9,7 @@ namespace chatAppTest
 		[TestMethod]
 		public void getNameTest()
 		{
-			string name = "Jaú Kowalski";
+			string name = "Ja≈õ Kowalski";
 			IUser user1 = new User(name);
 			Assert.IsTrue(name == user1.Name);
 		}
@@ -18,12 +18,12 @@ namespace chatAppTest
 		public void getConversationsTest()
 		{
 			IChatSystem chatSystem = new ServerChatSystem();
-			IUser user1 = chatSystem.addNewUser("Jaú Kowalski");
-			IUser user2 = chatSystem.addNewUser("Kasia èdüb≥o");
-			IUser user3 = chatSystem.addNewUser("Claus Somersby");
-			IUser user4 = chatSystem.addNewUser("Hania Kot");
-			Conversation savedConversation1 = chatSystem.addConversation("Konfa 1", user1, user2);
-			Conversation savedConversation2 = chatSystem.addConversation("Konfa 2", user2, user3);
+			IUser user1 = chatSystem.AddNewUser("Ja≈õ Kowalski");
+			IUser user2 = chatSystem.AddNewUser("Kasia ≈πd≈∫b≈Ço");
+			IUser user3 = chatSystem.AddNewUser("Claus Somersby");
+			IUser user4 = chatSystem.AddNewUser("Hania Kot");
+			Conversation savedConversation1 = chatSystem.AddConversation("Konfa 1", user1, user2);
+			Conversation savedConversation2 = chatSystem.AddConversation("Konfa 2", user2, user3);
 
 			bool hasConversation1 = false;
 			bool hasConversation2 = false;
@@ -77,7 +77,7 @@ namespace chatAppTest
 		[TestMethod]
 		public void matchWithConversationTest()
 		{
-			Conversation conversation1 = new Conversation("Konfa 1", 1); //dopuszczamy moøliwoúÊ stworzenia samodzielnej konwersacji do testÛw
+			Conversation conversation1 = new Conversation("Konfa 1", 1); //dopuszczamy mo≈ºliwo≈õƒá stworzenia samodzielnej konwersacji do test√≥w
 			Conversation conversation2 = new Conversation("Konfa 2", 2);
 			IUser user1 = new User("Pan A");
 			IUser user2 = new User("Pani B");
@@ -99,11 +99,11 @@ namespace chatAppTest
 			hasWrongConversation = false;
 
 			bool methodResult;
-			methodResult = user1.matchWithConversation(conversation1);
+			methodResult = user1.MatchWithConversation(conversation1);
 			Assert.IsTrue(methodResult);
-			methodResult = user1.matchWithConversation(conversation2);
+			methodResult = user1.MatchWithConversation(conversation2);
 			Assert.IsTrue(methodResult);
-			methodResult = user2.matchWithConversation(conversation1);
+			methodResult = user2.MatchWithConversation(conversation1);
 			Assert.IsTrue(methodResult);
 
 			foreach (var conversation in user1.Conversations)
@@ -131,7 +131,7 @@ namespace chatAppTest
 			Assert.IsTrue(hasConversation1);
 			Assert.IsFalse(hasWrongConversation);
 
-			methodResult = user2.matchWithConversation(conversation1);
+			methodResult = user2.MatchWithConversation(conversation1);
 			Assert.IsFalse(methodResult);
 		}
 
@@ -150,7 +150,7 @@ namespace chatAppTest
 			Assert.IsFalse(hasWrongConversation);
 			hasWrongConversation = false;
 
-			user1.matchWithConversation(conversation1);
+			user1.MatchWithConversation(conversation1);
 
 			foreach (var conversation in user1.Conversations)
 			{
@@ -165,7 +165,7 @@ namespace chatAppTest
 			hasWrongConversation = false;
 
 			bool methodResult;
-			methodResult = user1.unmatchWithConversation(conversation1);
+			methodResult = user1.UnmatchWithConversation(conversation1);
 			Assert.IsTrue(methodResult);
 
 			foreach (var conversation in user1.Conversations)
@@ -175,7 +175,7 @@ namespace chatAppTest
 			Assert.IsFalse(hasWrongConversation);
 			hasWrongConversation = false;
 
-			methodResult = user1.unmatchWithConversation(conversation1);
+			methodResult = user1.UnmatchWithConversation(conversation1);
 			Assert.IsFalse(methodResult);
 		}
 	}

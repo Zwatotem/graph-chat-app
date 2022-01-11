@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ChatModel.Util;
 
 namespace ChatModel;
@@ -11,58 +12,61 @@ namespace ChatModel;
 public abstract class BaseConversation
 {
 	protected string name; //name of conversation - doesn't have to be unique
-	protected int id; //unique id
-	protected List<Refrence<IUser>> users; //list of "double references" to users participating (single reference is problematic to serialize)
-	protected Dictionary<int, Message> messages; //messages indexed by their unique id
+	protected Guid id;
 
-	protected BaseConversation() { }
+	protected List<Guid> users; //list of users' ids
 
-	public BaseConversation(string name, int id)
+	protected Dictionary<Guid, Message> messages; //messages indexed by their unique id
+
+	protected BaseConversation()
+	{
+	}
+
+	public BaseConversation(string name)
 	{
 		this.name = name;
-		this.id = id;
-		this.users = new List<Refrence<IUser>>();
-		this.messages = new Dictionary<int, Message>();
+		this.id = Guid.NewGuid();
+		this.users = new List<Guid>();
+		this.messages = new Dictionary<Guid, Message>();
 	}
+
+	public BaseConversation(string name, Guid id)
+	{
+		this.name = name;
+		this.id = Guid.NewGuid();
+		this.users = new List<Guid>();
+		this.messages = new Dictionary<Guid, Message>();
+	}
+	
+	[field: NonSerialized]
+	public ChatSystem ChatSystem { get; set; }
 
 	/// <summary>
 	/// Conversation's name (not unique).
 	/// </summary>
-	public string Name { get => name; }
+	public string Name => name;
 
 	/// <summary>
 	/// Conversation's ID (unique).
 	/// </summary>
-	public int ID { get => id; }
+	public Guid ID => id;
 
 	/// <summary>
 	/// List of all participating users.
 	/// </summary>
-	public List<IUser> Users
+	public virtual IEnumerable<IUser> Users
 	{
-		get
-		{
-			var list = new List<IUser>();
-			foreach (var user in users)
-			{
-				list.Add(user.Reference);
-			}
-			return list;
-		}
-		set
-		{
-			users = new List<Refrence<IUser>>();
-			foreach (var user in value)
-			{
-				users.Add(new Refrence<IUser>(user));
-			}
-		}
+		get { return users.Select(id => ChatSystem.FindUser(id)); }
+		set { users = value.Select(u => u.ID).ToList(); }
 	}
 
 	/// <summary>
 	/// Collection of all messages in the converastion.
 	/// </summary>
-	public ICollection<Message> Messages { get => messages.Values; }
+	public IEnumerable<Message> Messages
+	{
+		get => messages.Values;
+	}
 }
 
 /*

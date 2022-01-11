@@ -43,5 +43,15 @@ namespace GraphChatApp
 				window.OnUserLogged(Namebox.Text.Trim());
 			}
 		}
+		
+		public void ClearError()
+		{
+			ErrorDisplay.Text = "";
+		}
+		
+		public void ShowBadUserError()
+		{
+			ErrorDisplay.Text = $"User name {Namebox.Text} does not exist";
+		}
 	}
 }
