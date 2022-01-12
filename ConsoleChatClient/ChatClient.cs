@@ -16,10 +16,10 @@ namespace ChatClient
         internal IIOSocketFacade socketFacade; //facade simplifying the use of the socket
         internal ReaderWriterLock readWriteLock; //used to secure data of the local chat system
         internal int lockTimeout; //fixed value to set as readWriteLock's timeout
-        internal IClientChatSystem chatSystem; //local chat system
+        internal ClientChatSystem chatSystem; //local chat system
         internal bool responseReady; //used by listener thread to communicate to main thread that response to request is ready
         internal bool responseStatus; //used to access this response
-        internal int displayedConversationId; //id of currently displayed conversation
+        internal Guid displayedConversationId; //id of currently displayed conversation
         internal bool displayingConversation; //true if a conversation is being displayed and thus updates are to be printed if received
         internal bool displayingConversationsList; //true if a conversations' list is being displayed and thus updates are to be printed if received
         private bool goOn; //true while working, set to false to stop
@@ -31,7 +31,7 @@ namespace ChatClient
             lockTimeout = 10000;
             chatSystem = new ClientChatSystem();
             responseReady = false;
-            displayedConversationId = -1; //unimportant for now
+            displayedConversationId = Guid.Empty; //unimportant for now
             displayingConversationsList = false;
             displayingConversation = false;
             goOn = true;

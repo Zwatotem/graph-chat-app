@@ -205,7 +205,6 @@ public abstract class ChatSystem : IChatSystem, INotifyPropertyChanged
 }
 
 /*
-This class is seemingly too big for modern standards, but project documentation and diagrams from business analysis department forced it to be 
-implemented that way. Nevertheless: comliant with Liskov Substitution as it properly implements all interface methods, realizes dependency inversion
-by referencing IUser rather that user and has no responsibility other than implementing logic necessary for handling of users and conversations.
+Compliant with Liskov Substitution as it properly implements all interface methods, realizes dependency inversion
+by referencing IUser rather than user and has no responsibility other than implementing logic necessary for handling of users and conversations.
 */

@@ -7,7 +7,7 @@ namespace ChatClient.HandlePanelStrategies
         public int handle(ChatClient client)
         {
             if(!Console.IsOutputRedirected) {Console.Clear(); }
-            Console.WriteLine("Welcome to GraphChatApp!");
+            Console.WriteLine("Welcome to GUIChatClient!");
             Console.WriteLine("Type in a number to proceed:");
             Console.WriteLine("1 - register new user\t2 - log in\t0 - quit");
             int decision;

@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ChatModel\ChatModel.csproj" />
     <ProjectReference Include="..\SharedClasses\ChatModel.csproj" />
   </ItemGroup>
 

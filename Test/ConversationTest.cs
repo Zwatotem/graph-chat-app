@@ -3,7 +3,7 @@ using ChatModel.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace chatAppTest
+namespace Test
 {
 	[TestClass]
 	public class ConversationTest

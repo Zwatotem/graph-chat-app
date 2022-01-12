@@ -1,7 +1,7 @@
 using ChatModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace chatAppTest
+namespace Test
 {
 	[TestClass]
 	public class UserTest
