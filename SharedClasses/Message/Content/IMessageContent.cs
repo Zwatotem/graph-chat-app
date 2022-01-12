@@ -1,4 +1,7 @@
 ﻿
+using System;
+using ChatModel.Util;
+
 namespace ChatModel;
 
 /// <summary>
@@ -6,17 +9,15 @@ namespace ChatModel;
 /// </summary>
 public interface IMessageContent
 {
-	/// <summary>
-	/// Returns the content of a message.
-	/// </summary>
-	/// <returns>An object of type dependant on the concrete implementation.</returns>
-	object getData();
-
-	/// <summary>
-	/// Serializes the object.
-	/// </summary>
-	/// <returns>A byte array containing the serialized object.</returns>
-	byte[] serialize();
+	public IContentViewModelProvider ContentViewModelProvider { get; set; }
+	public ViewModel? getCompositorViewModel()
+	{
+		return ContentViewModelProvider.getCompositorViewModel(this);
+	}
+	public ViewModel? getViewerViewModel()
+	{
+		return ContentViewModelProvider.getViewerViewModel(this);
+	}
 }
 
 /*

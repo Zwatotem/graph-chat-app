@@ -36,6 +36,7 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 			{
 				oc.Add(user);
 			}
+
 			return oc;
 		}
 	}
@@ -49,6 +50,7 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 			{
 				oc.Add(message.Value);
 			}
+
 			return oc;
 		}
 	}
@@ -101,6 +103,7 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 			users.RemoveAll(id => id == user.ID);
 			return true;
 		}
+
 		return false;
 	}
 
@@ -117,7 +120,7 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 		//can add only if the message isn't replying to anything or targeted message exists and the author exists in the system
 		//and there is no other message with this id
 
-		var message = new Message(user.ID, parentID, messageContent, datetime);
+		var message = new Message(user.ID, parentID, messageContent, datetime) { Conversation = this };
 		messages.Add(message.ID, message);
 		return message;
 	}
@@ -143,6 +146,7 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 		{
 			//as in previous method, these conditions had to be checked
 			messages.Add(mess.ID, mess);
+			mess.Conversation = this;
 			OnPropertyChanged(this, new(nameof(ObservableMessages)));
 		}
 		else
@@ -185,6 +189,7 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 		{
 			user.ChatSystem = ChatSystem;
 		}
+
 		foreach (var mess in updt.Messages)
 		{
 			addMessageUnsafe(mess);
@@ -220,6 +225,7 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 				updates.addMessageUnsafe(new Message(message));
 			}
 		}
+
 		return updates;
 	}
 

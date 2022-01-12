@@ -173,7 +173,7 @@ public abstract class ChatSystem : IChatSystem, INotifyPropertyChanged
 	}
 
 
-	public Message? SendMessage(Guid convId, string userName, Guid targetId, IMessageContent messageContent,
+	public Message? SendMessage(Guid convId, Guid userID, Guid targetId, IMessageContent messageContent,
 		DateTime sentTime)
 	{
 		Conversation conversation = FindConversation(convId);
@@ -182,7 +182,7 @@ public abstract class ChatSystem : IChatSystem, INotifyPropertyChanged
 			return null; //if there is no such conversation, indicate failure of the operation
 		}
 
-		IUser author = conversation.Users.FirstOrDefault(u => u.Name == userName, null);
+		IUser author = conversation.Users.FirstOrDefault(u => u.ID == userID, null);
 		if (author == null)
 		{
 			return null; //if there is no such user, indicate failure of the operation

@@ -6,7 +6,7 @@ using System.Windows.Data;
 
 namespace GraphChatApp.ViewModel
 {
-	public abstract class MessageViewModel : ViewModel
+	public abstract class MessageViewModel : ChatModel.Util.ViewModel
 	{
 		protected ObservableCollection<MessageViewModel> childrenMessages;
 		protected const float messageWidth = 100;
@@ -18,7 +18,6 @@ namespace GraphChatApp.ViewModel
 		public Visibility EditorVisibility => !IsWrite ? Visibility.Collapsed : Visibility.Visible;
 
 		public abstract string Author { get; }
-		public abstract string tempText { get; set; }
 
 		public virtual bool CanShowMessageEditor
 		{

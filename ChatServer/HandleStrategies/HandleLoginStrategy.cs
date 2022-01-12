@@ -18,7 +18,7 @@ namespace ChatServer.HandleStrategies
 			//decoding request - all bytes are user name under which they want to log in
 			string userName = Encoding.UTF8.GetString(messageBytes);
 			Console.WriteLine("DEBUG: requested logIn");
-			byte[] reply = new byte[1024*1024];
+			byte[] reply = new byte[1024*256];
 			lock (allHandlers)
 			{
 				IUser user = chatSystem.GetUser(userName);

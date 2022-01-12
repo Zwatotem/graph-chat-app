@@ -12,22 +12,38 @@ public class MessageCompositorViewModel : MessageViewModel
 	public Conversation Conversation { get; init; }
 	private Guid parentMessageID;
 	public override string Author { get; }
-	public override string tempText { get; set; }
-	public ICommand SendMessageCommand { get; set; }
-	internal MessageCompositorViewModel(Guid parentMessageID, Conversation conversation)
+	private readonly IMessageContent content;
+	public IMessageContent Content
 	{
+		get => content;
+		init => content = value;
+	}
+
+	public ChatModel.Util.ViewModel ContentCompositor
+	{
+		get => content.getCompositorViewModel();
+		set => OnPropertyChanged(this, new(nameof(ContentCompositor)));
+	}
+
+	public ICommand SendMessageCommand { get; set; }
+	internal MessageCompositorViewModel(Guid parentMessageID, IMessageContent contentToBuild , Conversation conversation)
+	{
+		this.Content = contentToBuild;
+		this.Content.ContentViewModelProvider = App.Current.ContentViewModelProvider;
+		this.ContentCompositor = content.getCompositorViewModel();
 		ClientChatSystem chatSystem = App.Current.ChatSystem;
 		Author = chatSystem.LoggedUserName;
-		tempText = "";
 		this.parentMessageID = parentMessageID;
 		ChatSystem = chatSystem;
 		Conversation = conversation;
 		SendMessageCommand = new SendMessageCommand(this);
 	}
-	internal MessageCompositorViewModel(Guid parentMessageID, Conversation conversation, ClientChatSystem chatSystem)
+	internal MessageCompositorViewModel(Guid parentMessageID, IMessageContent contentToBuild , Conversation conversation, ClientChatSystem chatSystem)
 	{
+		this.Content = contentToBuild;
+		this.Content.ContentViewModelProvider = App.Current.ContentViewModelProvider;
+		this.ContentCompositor = content.getCompositorViewModel();
 		Author = chatSystem.LoggedUserName;
-		tempText = "";
 		this.parentMessageID = parentMessageID;
 		ChatSystem = chatSystem;
 		Conversation = conversation;
@@ -38,7 +54,7 @@ public class MessageCompositorViewModel : MessageViewModel
 	{
 		var currentUser = ChatSystem.GetUser(ChatSystem.LoggedUserName);
 		App.Current.Client
-			.requestSendTextMessage(this, new(currentUser, Conversation.ID, parentMessageID, tempText));
+			.requestSendMessage(this, new(currentUser.ID, Conversation.ID, parentMessageID, this.content));
 	}
 }
 

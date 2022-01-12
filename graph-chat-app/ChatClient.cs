@@ -10,6 +10,7 @@ using System.IO;
 using ChatModel;
 using ChatModel.Util;
 using System.Windows.Threading;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace GraphChatApp
 {
@@ -41,7 +42,7 @@ namespace GraphChatApp
 		}
 
 		public event EventHandler<SuccessfullyRegisteredEventArgs> SuccessfullyRegistered = (sender, e) => { };
-		public event EventHandler<SuccessfullyLoggededEventArgs> SuccessfullyLogged = (sender, e) => { };	
+		public event EventHandler<SuccessfullyLoggededEventArgs> SuccessfullyLogged = (sender, e) => { };
 		public event EventHandler<EventArgs> UnSuccessfullyLogged = (sender, e) => { };
 
 		public event EventHandler<SuccessfullyAddedConversationEventArgs> SuccessfullyAddedConversation =
@@ -191,9 +192,10 @@ namespace GraphChatApp
 						else if (type == (byte)6)
 						{
 							Console.WriteLine("DEBUG: listener received serialized message");
-							Guid conversationId = new Guid(inBuffer[0..16]);
-							MemoryStream memStream = new MemoryStream(inBuffer, 16, messageLength - 16);
-							Conversation conversation = ChatSystem.GetConversation(conversationId);
+							var memStream1 = new MemoryStream(inBuffer);
+							var memStream2 = new MemoryStream(inBuffer);
+							var message = new Message(memStream1, new ConcreteDeserializer());
+							Conversation conversation = ChatSystem.GetConversation(message.ConversationId);
 							Message result = null;
 							if (conversation != null)
 							{
@@ -202,7 +204,7 @@ namespace GraphChatApp
 										try
 										{
 											readWriteLock.AcquireWriterLock(lockTimeout);
-											result = conversation.AddMessage(memStream, new ConcreteDeserializer());
+											result = conversation.AddMessage(memStream2, new ConcreteDeserializer());
 										}
 										finally
 										{
@@ -274,7 +276,7 @@ namespace GraphChatApp
 					responseReady = false;
 					if (rsp)
 					{
-						addedUser = ChatSystem.AddNewUser(proposedName);
+						// Yay DO NOT ADD ANYTHING YET PEPEGA!!!!
 					}
 
 					Monitor.Pulse(this);
@@ -562,24 +564,30 @@ namespace GraphChatApp
 			}
 		}
 
-		public async void requestSendTextMessage(object sender, SendMessageEventArgs args)
+		public async void requestSendMessage(object sender, SendMessageEventArgs args)
 		{
 			Console.WriteLine("DEBUG: attempt to {0}", "send message");
-			string yourName = args.MessageSender.Name;
+			Guid messageSenderId = args.MessageSender;
 			Guid conversationId = args.ConversationID;
-			Guid messageId = args.ParentMessageID;
-			string text = args.MessageContent;
-			int contentLength = 33 + Encoding.UTF8.GetByteCount(text);
-			byte[] content = new byte[contentLength];
-			Array.Copy(conversationId.ToByteArray(), 0, content, 0, 16);
-			Array.Copy(messageId.ToByteArray(), 0, content, 16, 16);
-			content[8] = 1;
-			Array.Copy(Encoding.UTF8.GetBytes(text), 0, content, 9, contentLength - 33);
+			Guid parentMessageId = args.ParentMessageID;
+			IMessageContent text = args.MessageContent;
+			var modelMessage = new Message(messageSenderId, parentMessageId, text, DateTime.Now)
+				{ ConversationId = conversationId };
+			modelMessage.ConversationId = conversationId;
+			var netMessage = modelMessage.Serialize(new ConcreteSerializer()).ToArray();
+			// {
+			// 	var deserializedMessage = new Message(new MemoryStream(netMessage), new ConcreteDeserializer());
+			// 	Assert.Equals(modelMessage.ID, deserializedMessage.ID);
+			// 	Assert.Equals(modelMessage.ConversationId, deserializedMessage.ConversationId);
+			// 	Assert.Equals(modelMessage.TargetId, deserializedMessage.TargetId);
+			// 	Assert.Equals(modelMessage.AuthorID, deserializedMessage.AuthorID);
+			// 	Assert.Equals(modelMessage.Content, deserializedMessage.Content);
+			// }
 			byte[] header = new byte[5];
 			header[0] = 6;
-			Array.Copy(BitConverter.GetBytes(content.Length), 0, header, 1, 4);
+			Array.Copy(BitConverter.GetBytes(netMessage.Length), 0, header, 1, 4);
 			socket.Send(header);
-			socket.Send(content);
+			socket.Send(netMessage);
 			Console.WriteLine("DEBUG: sending {0} request", "send message");
 			bool response = await Task.Run(() =>
 			{
@@ -620,12 +628,12 @@ namespace GraphChatApp
 
 	public class SendMessageEventArgs
 	{
-		public IUser MessageSender;
+		public Guid MessageSender;
 		public Guid ConversationID;
 		public Guid ParentMessageID;
-		public string MessageContent;
+		public IMessageContent MessageContent;
 
-		public SendMessageEventArgs(IUser user, Guid conv, string content)
+		public SendMessageEventArgs(Guid user, Guid conv, IMessageContent content)
 		{
 			MessageSender = user;
 			ConversationID = conv;
@@ -633,7 +641,7 @@ namespace GraphChatApp
 			MessageContent = content;
 		}
 
-		public SendMessageEventArgs(IUser user, Guid conv, Guid target, string content)
+		public SendMessageEventArgs(Guid user, Guid conv, Guid target, IMessageContent content)
 			: this(user, conv, content)
 		{
 			ParentMessageID = target;

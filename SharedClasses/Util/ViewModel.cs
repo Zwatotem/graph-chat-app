@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace GraphChatApp.ViewModel
+namespace ChatModel.Util
 {
 	public class ViewModel : INotifyPropertyChanged
 	{

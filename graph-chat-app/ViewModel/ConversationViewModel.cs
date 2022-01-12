@@ -15,7 +15,7 @@ class EnterConversationCommand : ICommand
 	public bool CanExecute(object parameter) => true;
 	public void Execute(object parameter) => execute();
 }
-class ConversationViewModel : ViewModel
+class ConversationViewModel : ChatModel.Util.ViewModel
 {
 	private Conversation conversation;
 	private Action<Conversation> enteringMethod;

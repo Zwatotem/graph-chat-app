@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace GraphChatApp.ViewModel;
 
-internal class ConversationCanvasViewModel : ViewModel
+internal class ConversationCanvasViewModel : ChatModel.Util.ViewModel
 {
 	public readonly Conversation conversation;
 	private string conversationName;
@@ -154,6 +154,6 @@ internal class ShowGlobalEditorCommand : ICommand
 
 	public void Execute(object parameter)
 	{
-		viewModel.GlobalEditor = new MessageCompositorViewModel(Guid.Empty, viewModel.conversation, viewModel.ChatSystem);
+		viewModel.GlobalEditor = new MessageCompositorViewModel(Guid.Empty, new TextContent() ,viewModel.conversation, viewModel.ChatSystem);
 	}
 }

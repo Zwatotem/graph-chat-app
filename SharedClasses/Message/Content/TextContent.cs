@@ -1,5 +1,6 @@
-using System;﻿
+using System;
 using System.Text;
+using ChatModel.Util;
 
 namespace ChatModel;
 
@@ -10,21 +11,28 @@ namespace ChatModel;
 public class TextContent : IMessageContent
 {
 	private string dataString; //field storing text data
+	public TextContent()
+	{
+		dataString = String.Empty;
+	}
 
 	public TextContent(string dataString)
 	{
 		this.dataString = dataString;
 	}
 
-	public object getData()
+	public string TextData
+	{
+		get => dataString;
+		set => dataString = value;
+	}
+
+	public string getData()
 	{
 		return dataString;
 	}
-
-	public byte[] serialize()
-	{
-		return Encoding.UTF8.GetBytes(dataString); //converts string to byte[] using UTF-8 encoding
-	}
+	[field: NonSerialized]
+	public IContentViewModelProvider ContentViewModelProvider { get; set; }
 }
 
 /*

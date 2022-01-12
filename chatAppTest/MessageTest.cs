@@ -46,8 +46,8 @@ namespace chatAppTest
 			Message message1 = conversation1.AddMessage(user1, -1, messageContent1, datetime);
 			Message message2 = conversation1.AddMessage(user2, 1, messageContent2, datetime2);
 
-			Message recreatedMessage1 = conversation2.AddMessage(message1.serialize(new ConcreteSerializer()), new ConcreteDeserializer());
-			Message recreatedMessage2 = conversation2.AddMessage(message2.serialize(new ConcreteSerializer()), new ConcreteDeserializer());
+			Message recreatedMessage1 = conversation2.AddMessage(message1.Serialize(new ConcreteSerializer()), new ConcreteDeserializer());
+			Message recreatedMessage2 = conversation2.AddMessage(message2.Serialize(new ConcreteSerializer()), new ConcreteDeserializer());
 
 			Assert.AreEqual(recreatedMessage1.ID, message1.ID); // There is no way serialization keeps references
 			Assert.AreEqual(recreatedMessage1.Author.Name, message1.Author.Name);

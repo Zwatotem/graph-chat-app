@@ -6,17 +6,24 @@
 	xmlns:local="clr-namespace:GraphChatApp.View"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:view="clr-namespace:GraphChatApp.View"
+	xmlns:viewmodel="clr-namespace:GraphChatApp.ViewModel"
+	xmlns:graphChatApp="clr-namespace:GraphChatApp"
 	d:DesignHeight="450"
 	d:DesignWidth="800"
 	mc:Ignorable="d">
-	<StackPanel Orientation="Vertical">
-		<StackPanel Orientation="Horizontal">
+	<UserControl.Resources>
+		<DataTemplate DataType="{x:Type viewmodel:TextContentCompositorViewModel}">
 			<TextBox MinWidth="120" Text="{Binding tempText, Mode=OneWayToSource}">
 				<TextBox.InputBindings>
 					<KeyBinding Key="Return" Command="{Binding SendMessageCommand}" />
 					<KeyBinding Key="Enter" Command="{Binding SendMessageCommand}" />
 				</TextBox.InputBindings>
 			</TextBox>
+		</DataTemplate>
+	</UserControl.Resources>
+	<StackPanel Orientation="Vertical">
+		<StackPanel Orientation="Horizontal">
+			<ContentPresenter Content="{Binding ContentCompositor}"/>
 			<Button Height="20" Command="{Binding SendMessageCommand}">
 				Send
 			</Button>

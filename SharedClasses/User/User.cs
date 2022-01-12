@@ -31,9 +31,9 @@ public class User : IUser
 		this.ChatSystem = chatSystem;
 	}
 	
-	public User(MemoryStream memoryStream, IDeserializer deserializer)
+	public User(Stream stream, IDeserializer deserializer)
 	{
-		User user = deserializer.Deserialize(memoryStream) as User;
+		User user = deserializer.Deserialize(stream) as User;
 		this.guid = user.guid;
 		this.userName = user.userName;
 		this.conversations = user.conversations;

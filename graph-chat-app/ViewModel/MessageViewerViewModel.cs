@@ -1,12 +1,7 @@
 ﻿using ChatModel;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace GraphChatApp.ViewModel;
@@ -22,10 +17,7 @@ internal class MessageViewerViewModel : MessageViewModel
 
 	public bool HasChildren
 	{
-		get
-		{
-			return DirectChildren.Count > 0;
-		}
+		get { return DirectChildren.Count > 0; }
 	}
 
 	private bool isResponseOpened = false;
@@ -41,10 +33,16 @@ internal class MessageViewerViewModel : MessageViewModel
 	{
 		get { return showMessageEditorCommand ?? (showMessageEditorCommand = new ShowMessageEditorCommand(this)); }
 	}
+
 	public MessageViewerViewModel(Message message, Conversation conversation)
 	{
 		ClientChatSystem chatSystem = App.Current.ChatSystem;
 		this.message = message;
+		if (this.message != null && this.message.Content != null)
+		{
+			this.message.Content.ContentViewModelProvider = App.Current.ContentViewModelProvider;
+		}
+
 		this.conversation = conversation;
 		this.chatSystem = chatSystem;
 		childrenMessages = new ObservableCollection<MessageViewModel>(
@@ -56,9 +54,14 @@ internal class MessageViewerViewModel : MessageViewModel
 		);
 		this.conversation.PropertyChanged += Conversation_PropertyChanged;
 	}
+
 	public MessageViewerViewModel(Message message, Conversation conversation, ClientChatSystem chatSystem)
 	{
 		this.message = message;
+		if (this.message != null && this.message.Content != null)
+		{
+			this.message.Content.ContentViewModelProvider = App.Current.ContentViewModelProvider;
+		}
 		this.conversation = conversation;
 		this.chatSystem = chatSystem;
 		childrenMessages = new ObservableCollection<MessageViewModel>(
@@ -120,13 +123,11 @@ internal class MessageViewerViewModel : MessageViewModel
 		get { return message.Author.Name; }
 	}
 
-	public string Content
+	public ChatModel.Util.ViewModel Content
 	{
-		get { return (message.Content as TextContent).getData() as string; }
-		set {; }
+		get { return message.Content.getViewerViewModel(); }
+		set { ; }
 	}
-
-	public override string tempText { get; set; }
 
 	public ObservableCollection<MessageViewModel> DirectChildren
 	{
@@ -135,7 +136,7 @@ internal class MessageViewerViewModel : MessageViewModel
 
 	public void AddResponse()
 	{
-		var dmvm = new MessageCompositorViewModel(this.message.ID, this.conversation);
+		var dmvm = new MessageCompositorViewModel(this.message.ID, new TextContent(), this.conversation);
 		DirectChildren.Add(dmvm);
 		isResponseOpened = true;
 	}

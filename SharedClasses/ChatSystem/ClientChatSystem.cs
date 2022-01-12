@@ -61,6 +61,7 @@ public class ClientChatSystem : ChatSystem, IClientChatSystem
 		{
 			return null; //if there is already a conversation with this id
 		}
+		conv.ChatSystem = this;
 
 		var newUsers = new List<IUser>(); // List of overlapping IUser objects
 		Users = Users.Union(newUsers);
@@ -69,6 +70,11 @@ public class ClientChatSystem : ChatSystem, IClientChatSystem
 		{
 			//fix references in the conversation that point to users already present in the system so that they point to correct objects
 			user.MatchWithConversation(conv);
+		}
+
+		foreach (var message in conv.Messages)
+		{
+			message.Conversation = conv;
 		}
 
 		conversations.Add(conv.ID, conv); //add the conversation to the chat system

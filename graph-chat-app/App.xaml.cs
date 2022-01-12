@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Windows;
+using GraphChatApp.ViewModel;
 
 namespace GraphChatApp
 {
@@ -25,12 +26,14 @@ namespace GraphChatApp
 			Current = this;
 			Client = new ChatClient("127.0.0.1", 50000, this.Dispatcher);
 			chatSystem = Client.ChatSystem;
+			ContentViewModelProvider = new WPFContentViewModelProvider();
 			Client.workClient();
 			AppDomain.CurrentDomain.UnhandledException += (sender, args) => Unload();
 		}
 
 		public ChatClient Client { get => client; set => client = value; }
 		public ClientChatSystem ChatSystem { get => chatSystem; }
+		public IContentViewModelProvider ContentViewModelProvider { get; set; }
 
 		public void InitializeWithGUI()
 		{

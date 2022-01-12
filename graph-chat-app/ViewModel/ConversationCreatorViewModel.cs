@@ -33,7 +33,7 @@ class CreateConversationCommand : ICommand
 		execute();
 	}
 }
-class ConversationCreatorViewModel : ViewModel
+class ConversationCreatorViewModel : ChatModel.Util.ViewModel
 {
 	MainWindow window;
 

@@ -10,27 +10,46 @@ namespace ChatModel;
 [Serializable]
 public class Message
 {
-	private Guid authorRef; // Double reference is useful for merging user lists after Conversation deserialization
+	private Guid authorID; // Double reference is useful for merging user lists after Conversation deserialization
 	private IMessageContent content; //content of the message
 	private DateTime sentTime;
 	private Guid targetId; // Redundant value used to recover the message structure after deserialization
 	private Guid id; //unique id of the message
-	[field: NonSerialized]
-	public Conversation Conversation { get; set; }
+	private Guid conversationID;
+	[NonSerialized] private Conversation conversation;
 
-	public Message(IUser user, Guid targeted, IMessageContent messageContent, DateTime datetime) //this constructor is mainly for the unit tests
+	public Guid ConversationId
+	{
+		get => conversationID;
+		set => conversationID = value;
+	} //id of the conversation the message belongs to 
+
+
+	public Conversation Conversation
+	{
+		get => conversation;
+		set
+		{
+			conversation = value;
+			conversationID = value.ID;
+		}
+	}
+
+	public Message(IUser user, Guid targeted, IMessageContent messageContent,
+		DateTime datetime) //this constructor is mainly for the unit tests
 		: this(targeted, messageContent, datetime)
 	{
-		this.authorRef = user.ID;
+		this.authorID = user.ID;
 	}
 
 	public Message(Guid userID, Guid targeted, IMessageContent messageContent, DateTime datetime)
 		: this(targeted, messageContent, datetime)
 	{
-		this.authorRef = userID;
+		this.authorID = userID;
 	}
 
-	private Message(Guid targeted, IMessageContent messageContent, DateTime datetime) //private as it doesn't make sense on its own
+	private Message(Guid targeted, IMessageContent messageContent,
+		DateTime datetime) //private as it doesn't make sense on its own
 	{
 		this.content = messageContent;
 		this.sentTime = datetime;
@@ -44,20 +63,32 @@ public class Message
 	/// <param name="other">Template message for construction.</param>
 	public Message(Message other)
 	{
-		this.authorRef = other.authorRef;
+		this.authorID = other.authorID;
 		this.content = other.content;
 		this.sentTime = other.sentTime;
 		this.id = other.id;
 		this.targetId = other.targetId;
+		this.conversationID = other.conversationID;
+	}
+
+	public Message(Stream stream, IDeserializer deserializer)
+	{
+		Message mssg = deserializer.Deserialize(stream) as Message;
+		this.authorID = mssg.authorID;
+		this.content = mssg.content;
+		this.sentTime = mssg.sentTime;
+		this.id = mssg.id;
+		this.targetId = mssg.targetId;
+		this.conversationID = mssg.conversationID;
 	}
 
 	/// <summary>
 	/// Refrence object containing a reference to message's author.
 	/// </summary>
-	public Guid AuthorRef
+	public Guid AuthorID
 	{
-		get => authorRef;
-		set => authorRef = value;
+		get => authorID;
+		set => authorID = value;
 	}
 
 	/// <summary>
@@ -65,7 +96,7 @@ public class Message
 	/// </summary>
 	public IUser Author
 	{
-		get { return Conversation.ChatSystem.FindUser(this.authorRef); }
+		get { return Conversation.ChatSystem.FindUser(this.authorID); }
 	}
 
 	/// <summary>
@@ -117,7 +148,7 @@ public class Message
 	/// </summary>
 	/// <param name="serializer">ISerializer instance which is to be used</param>
 	/// <returns>MemoryStream containing serialized message.</returns>
-	public MemoryStream serialize(ISerializer serializer)
+	public MemoryStream Serialize(ISerializer serializer)
 	{
 		Message copy = new Message(this); //we Serialize the copy
 		return serializer.Serialize(copy); //to avoid serializing the whole chain of parent messages

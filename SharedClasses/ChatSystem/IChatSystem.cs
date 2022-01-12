@@ -72,7 +72,7 @@ public interface IChatSystem
 	/// <param name="messageContent">Content of the message to send</param>
 	/// <param name="sentTime">Sent time of the message</param>
 	/// <returns>Reference to created message if successful, null otherwise</returns>
-	Message SendMessage(Guid convId, string userName, Guid targetId, IMessageContent messageContent, DateTime sentTime);
+	Message SendMessage(Guid convId, Guid userID, Guid targetId, IMessageContent messageContent, DateTime sentTime);
 }
 
 /*

@@ -6,7 +6,7 @@ using System.Windows.Input;
 
 namespace GraphChatApp.ViewModel;
 
-class ConversationCollectionViewModel : ViewModel
+class ConversationCollectionViewModel : ChatModel.Util.ViewModel
 {
 	private ObservableCollection<ConversationViewModel> conversations;
 	private ChatSystem chatSystem;
