@@ -351,3 +351,7 @@ MigrationBackup/
 
 # Functional test temporary files
 functionalTests/*/*.out
+
+# JetBrains Rider working folder
+.rider/
+.idea/
