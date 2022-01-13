@@ -14,12 +14,12 @@
 	<UserControl.Resources>
 		<DataTemplate DataType="{x:Type viewmodel:TextContentCompositorViewModel}">
 			<TextBox MinWidth="120" Text="{Binding TextData}">
-				<TextBox.InputBindings>
+				<!--<TextBox.InputBindings>
 					<KeyBinding Key="Return" Command="{Binding RelativeSource={RelativeSource FindAncestor, 
 						AncestorType={x:Type UserControl}}, Path=DataContext.SendMessageCommand}" />
 					<KeyBinding Key="Enter" Command="{Binding RelativeSource={RelativeSource FindAncestor, 
 						AncestorType={x:Type UserControl}}, Path=DataContext.SendMessageCommand}" />
-				</TextBox.InputBindings>
+				</TextBox.InputBindings>-->
 			</TextBox>
 		</DataTemplate>
 	</UserControl.Resources>
