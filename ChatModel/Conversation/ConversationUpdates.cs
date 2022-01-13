@@ -9,6 +9,7 @@ namespace ChatModel;
 /// <summary>
 /// Class representing an update to a conversation.
 /// </summary>
+[Serializable]
 public class ConversationUpdates : BaseConversation
 {
 	private List<IUser> users;
@@ -19,6 +20,15 @@ public class ConversationUpdates : BaseConversation
 		set => users = value.ToList();
 	}
 	public ConversationUpdates(string name, Guid id) : base(name, id) { }
+	
+	public ConversationUpdates(MemoryStream memStream, IDeserializer deserializer)
+	{
+		var @new = deserializer.Deserialize(memStream) as ConversationUpdates;
+		this.messages = @new.messages;
+		this.name = @new.name;
+		this.id = @new.id;
+		this.users = @new.users;
+	}
 
 	/// <summary>
 	/// Gets the list of "double references to users".
@@ -57,7 +67,7 @@ public class ConversationUpdates : BaseConversation
 	/// </summary>
 	/// <param name="serializer">Serializer which is to be used.</param>
 	/// <returns>MemoryStream containing serialized conversation.</returns>
-	public MemoryStream serialize(ISerializer serializer)
+	public MemoryStream Serialize(ISerializer serializer)
 	{
 		return serializer.Serialize(this);
 	}

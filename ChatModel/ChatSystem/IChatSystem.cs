@@ -24,12 +24,11 @@ public interface IChatSystem
 	/// <returns>Reference to created user or null if user name already taken.</returns>
 	IUser AddNewUser(string newUserName);
 
-	/// <summary>
-	/// Gets a conversation with a specified id.
-	/// </summary>
-	/// <param name="id">Conversation id to find</param>
-	/// <returns>Reference to found conversation or null if there isn't a conversation with given id.</returns>
-	Conversation GetConversation(Guid id);
+	public Conversation FindConversation(Guid id);
+
+	public IUser FindUser(Guid id);
+	
+	bool AddConversation(Conversation conversation);
 
 	/// <summary>
 	/// Creates new conversation.

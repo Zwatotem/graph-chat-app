@@ -33,7 +33,7 @@ public abstract class BaseConversation
 	public BaseConversation(string name, Guid id)
 	{
 		this.name = name;
-		this.id = Guid.NewGuid();
+		this.id = id;
 		this.users = new List<Guid>();
 		this.messages = new Dictionary<Guid, Message>();
 	}

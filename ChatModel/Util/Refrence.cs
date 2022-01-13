@@ -1,30 +1,41 @@
 ﻿using System;
 
-namespace ChatModel.Util
+namespace ChatModel.Util;
+
+/// <summary>
+/// Generic util class for storing a reference to an object.
+/// </summary>
+/// <remarks>
+/// Basically a pointer to a pointer in C terms.
+/// </remarks>
+/// <typeparam name="T">Type to which a reference is stored.</typeparam>
+[Serializable]
+public class Refrence<T>
 {
 	/// <summary>
-	/// Generic util class for storing a reference to an object.
+	/// Reference to an object.
 	/// </summary>
-	/// <remarks>
-	/// Basically a pointer to a pointer in C terms.
-	/// </remarks>
-	/// <typeparam name="T">Type to which a reference is stored.</typeparam>
-	[Serializable]
-	public class Refrence<T>
+	public T Reference { get; set; }
+
+	public Refrence(T reference)
 	{
-		/// <summary>
-		/// Reference to an object.
-		/// </summary>
-		public T Reference { get; set; }
+		Reference = reference;
+	}
 
-		public Refrence(T reference) { Reference = reference; }
+	//the following are some basic conversion operators
+	public static implicit operator T(Refrence<T> x)
+	{
+		return x.Reference;
+	}
 
-		//the following are some basic conversion operators
-		public static implicit operator T(Refrence<T> x) { return x.Reference; }
+	public static implicit operator Refrence<T>(T x)
+	{
+		return new Refrence<T>(x);
+	}
 
-		public static implicit operator Refrence<T>(T x) { return new Refrence<T>(x); }
-
-		public static T operator ~(Refrence<T> x) { return x.Reference; }
+	public static T operator ~(Refrence<T> x)
+	{
+		return x.Reference;
 	}
 }
 

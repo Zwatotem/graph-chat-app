@@ -1,19 +1,18 @@
 ﻿using System.IO;
 
-namespace ChatModel.Util
+namespace ChatModel.Util;
+
+/// <summary>
+/// Interface representing binary serializer concept.
+/// </summary>
+public interface ISerializer
 {
-    /// <summary>
-    /// Interface representing binary serializer concept.
-    /// </summary>
-    public interface ISerializer
-    {
-        /// <summary>
-        /// Serializes the object.
-        /// </summary>
-        /// <param name="arg">Object to Serialize</param>
-        /// <returns>MemoryStream of serialized object bytes.</returns>
-        MemoryStream Serialize(object arg);
-    }
+	/// <summary>
+	/// Serializes the object.
+	/// </summary>
+	/// <param name="arg">Object to Serialize</param>
+	/// <returns>MemoryStream of serialized object bytes.</returns>
+	MemoryStream Serialize(object arg);
 }
 
 /*

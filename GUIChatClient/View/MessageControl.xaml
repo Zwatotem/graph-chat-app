@@ -27,9 +27,6 @@
 			Y1="0"
 			Y2="10" />
 		<ContentPresenter
-			Width="{Binding MessageWidth}"
-			Height="{Binding MessageHeight}"
-			Margin="{Binding MessageMargin}"
 			Content="{Binding}" />
 	</StackPanel>
 </UserControl>

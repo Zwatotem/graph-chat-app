@@ -26,6 +26,7 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 	{
 	}
 
+	public IEnumerable<Guid> UserIDs => users;
 
 	public ObservableCollection<IUser> ObservableUsers
 	{
@@ -66,6 +67,19 @@ public class Conversation : BaseConversation, INotifyPropertyChanged
 		this.name = conv.Name;
 		this.Users = conv.Users;
 		this.messages = conv.getMessagesFull();
+		foreach (var (guid,message) in messages)
+		{
+			message.Conversation = this;
+		}
+	}
+
+	public Conversation(MemoryStream memStream, IDeserializer deserializer)
+	{
+		var @new = deserializer.Deserialize(memStream) as Conversation;
+		this.messages = @new.messages;
+		this.name = @new.name;
+		this.id = @new.id;
+		this.users = @new.users;
 	}
 
 	/// <summary>

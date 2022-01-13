@@ -87,6 +87,31 @@ public abstract class ChatSystem : IChatSystem, INotifyPropertyChanged
 		}
 	}
 
+	public bool AddConversation(Conversation conversation)
+	{
+		if (conversations.ContainsKey(conversation.ID))
+		{
+			return false;
+		}
+		else
+		{
+			conversations.Add(conversation.ID, conversation);
+			conversation.ChatSystem = this;
+			foreach (var userID in conversation.UserIDs)
+			{
+				var user = FindUser(userID);
+				if (user != null)
+				{
+					user.MatchWithConversation(conversation);
+				}
+			}
+
+			PropertyChanged(this, new(nameof(Conversations)));
+			PropertyChanged(this, new(nameof(ObservableConversations)));
+			return true;
+		}
+	}
+
 	public Conversation AddConversation(string conversationName, params string[] ownersNames)
 	{
 		//creates an array to be filled with references to the new conversation's users
@@ -169,7 +194,22 @@ public abstract class ChatSystem : IChatSystem, INotifyPropertyChanged
 			conversations.Remove(id); //deletes the conversation
 		}
 
+		OnPropertyChanged(this, new(nameof(Conversations)));
+		OnPropertyChanged(this, new(nameof(ObservableConversations)));
 		return true;
+	}
+
+	public bool AddUser(IUser user)
+	{
+		if (users.ContainsKey(user.ID) || users.Any(kv => kv.Value.Name == user.Name))
+		{
+			return false;
+		}
+		else
+		{
+			users.Add(user.ID, user);
+			return true;
+		}
 	}
 
 
@@ -195,12 +235,12 @@ public abstract class ChatSystem : IChatSystem, INotifyPropertyChanged
 
 	public Conversation FindConversation(Guid id)
 	{
-		return id != Guid.Empty ? conversations[id] : null;
+		return id != Guid.Empty ? conversations.ContainsKey(id) ? conversations[id] : null : null;
 	}
 
 	public IUser FindUser(Guid id)
 	{
-		return id != Guid.Empty ? users[id] : null;
+		return id != Guid.Empty ? users.ContainsKey(id) ? users[id] : null : null;
 	}
 }
 

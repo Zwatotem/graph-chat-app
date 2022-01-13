@@ -7,39 +7,40 @@ using ChatModel.Util;
 
 namespace ChatServer.HandleStrategies;
 
-class HandleSendMessageStrategy : IHandleStrategy
+class HandleRequestUserStrategy : IHandleStrategy
 {
 	/// <summary>
-	/// Class handling request to send message to conversation.
+	/// Class handling request to send info about particular user.
 	/// </summary>
 	public void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem,
 		IClientHandler handlerThread, byte[] messageBytes)
 	{
 		Console.WriteLine("DEBUG: {0} request received", "send message");
 		//decoding request - first 4 bytes are id of conversation, next 4 are id of message to which we reply the rest are message content bytes
-		Message message = new Message(new MemoryStream(messageBytes), new ConcreteDeserializer());
+		Guid requestedUserId = new Guid(messageBytes);
 		Console.WriteLine("DEBUG: trying to send message");
 		byte[] reply = new byte[1];
 		lock (allHandlers)
 		{
-			Message sentMessage =
-				chatSystem.SendMessage(
-					message.ConversationId,
-					message.AuthorID,
-					message.TargetId,
-					message.Content,
-					DateTime.Now);
-			if (sentMessage != null)
+			IUser requestingUser = chatSystem.GetUser(handlerThread.HandledUserName);
+			IUser user =
+				chatSystem.FindUser(requestedUserId);
+			if (user != null)
 			{
-				//if successful conversation id with serialized message are broadcasted to all connected users from this conversation
-				var conversationId = sentMessage.ConversationId;
-				reply[0] = 1;
-				byte[] msg = sentMessage.Serialize(new ConcreteSerializer()).ToArray();
-				Conversation conversation = chatSystem.FindConversation(conversationId);
-				foreach (var handler in allHandlers.FindAll(h =>
-							conversation.Users.Any(u => u.Name == h.HandledUserName)))
+				// Check if exists at least one common conversation of these two users
+				IEnumerable<Conversation> commonConversations =
+					chatSystem.getConversationsOfUser(handlerThread.HandledUserName);
+				bool canRespond =
+					commonConversations.Any(conversation => conversation.Users.Any(u => u.ID == requestedUserId));
+				if (canRespond)
 				{
-					handler.sendMessage(6, msg); //sent message - type 6
+					reply[0] = 1;
+					byte[] msg = user.Serialize(new ConcreteSerializer()).ToArray();
+					handlerThread.sendMessage(7, msg); //sent message - type 7
+				}
+				else
+				{
+					reply[0] = 0;
 				}
 			}
 			else

@@ -1,27 +1,28 @@
 ﻿using System.Collections.Generic;
 using ChatModel;
 
-namespace ChatServer
+namespace ChatServer;
+
+/// <summary>
+/// Class representing handler of client's requests.
+/// </summary>
+public class ConcreteRequestHandler : IRequestHandler
 {
-    /// <summary>
-    /// Class representing handler of client's requests.
-    /// </summary>
-    public class ConcreteRequestHandler : IRequestHandler
-    {
-        private IHandleStrategy handleStrategy; //currently used handling strategy
-
-        public ConcreteRequestHandler(IHandleStrategy handleStrategy) //conctructs new instance with given strategy
-        {
-            this.handleStrategy = handleStrategy;
-        }
-
-        public IHandleStrategy HandleStrategy { get => handleStrategy; set => handleStrategy = value; } 
-
-        public void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
-        {
-            handleStrategy.handleRequest(allHandlers, chatSystem, handlerThread, messageBytes);
-        }
-    }
+	private IHandleStrategy handleStrategy; //currently used handling strategy
+	public ConcreteRequestHandler(IHandleStrategy handleStrategy) //conctructs new instance with given strategy
+	{
+		this.handleStrategy = handleStrategy;
+	}
+	public IHandleStrategy HandleStrategy
+	{
+		get => handleStrategy;
+		set => handleStrategy = value;
+	}
+	public void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem,
+		IClientHandler handlerThread, byte[] messageBytes)
+	{
+		handleStrategy.handleRequest(allHandlers, chatSystem, handlerThread, messageBytes);
+	}
 }
 
 /*

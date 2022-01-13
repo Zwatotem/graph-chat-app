@@ -20,6 +20,8 @@ internal class ConversationCanvasViewModel : ChatModel.Util.ViewModel
 	}
 	public string ConversationName => conversationName;
 	private MessageCompositorViewModel globalEditor;
+	private ICommand addUsersCommand;
+
 	public MessageCompositorViewModel GlobalEditor
 	{
 		get
@@ -29,7 +31,7 @@ internal class ConversationCanvasViewModel : ChatModel.Util.ViewModel
 		set
 		{
 			globalEditor = value;
-			if(globalEditor != null)
+			if (globalEditor != null)
 			{
 				rootMessages.Add(GlobalEditor);
 			}
@@ -42,9 +44,33 @@ internal class ConversationCanvasViewModel : ChatModel.Util.ViewModel
 
 	public ICommand ShowGlobalEditorCommand { get; set; }
 
+	private string cSVNames;
+	public string CSVNames
+	{
+		get => cSVNames;
+		set
+		{
+			cSVNames = value;
+			OnPropertyChanged(this, new(nameof(CSVNames)));
+			(AddUsersCommand as AddUsersCommand).InvokeCanExecuteChanged();
+		}
+	}
+
 	public ObservableCollection<MessageViewModel> RootMessages
 	{
 		get { return rootMessages; }
+	}
+
+	public ICommand AddUsersCommand
+	{
+		get
+		{
+			if (addUsersCommand == null)
+			{
+				addUsersCommand = new AddUsersCommand(this);
+			}
+			return addUsersCommand;
+		}
 	}
 
 	public ConversationCanvasViewModel(Conversation conversation)
@@ -137,6 +163,42 @@ internal class ConversationCanvasViewModel : ChatModel.Util.ViewModel
 	}
 }
 
+internal class AddUsersCommand : ICommand
+{
+	private ConversationCanvasViewModel vm;
+	public AddUsersCommand(ConversationCanvasViewModel conversationCanvasViewModel)
+	{
+		vm = conversationCanvasViewModel;
+	}
+
+
+	public void InvokeCanExecuteChanged()
+	{
+		CanExecuteChanged(this, new());
+	}
+
+	public bool CanExecute(object? parameter)
+	{
+		return !String.IsNullOrWhiteSpace(vm.CSVNames);
+	}
+
+	public void Execute(object? parameter)
+	{
+		string csv = vm.CSVNames;
+		var users = csv
+				.Split(new char[] { ',', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+				.Select(user => user.Trim())
+				.Where(user => !String.IsNullOrWhiteSpace(user))
+				.ToList();
+		foreach (var user in users)
+		{
+			App.Current.Client.requestAddUserToConversation(vm.conversation.ID, user);
+		}
+	}
+
+	public event EventHandler? CanExecuteChanged;
+}
+
 internal class ShowGlobalEditorCommand : ICommand
 {
 	private ConversationCanvasViewModel viewModel;
@@ -154,6 +216,6 @@ internal class ShowGlobalEditorCommand : ICommand
 
 	public void Execute(object parameter)
 	{
-		viewModel.GlobalEditor = new MessageCompositorViewModel(Guid.Empty, new TextContent() ,viewModel.conversation, viewModel.ChatSystem);
+		viewModel.GlobalEditor = new MessageCompositorViewModel(Guid.Empty, new TextContent(), viewModel.conversation, viewModel.ChatSystem);
 	}
 }

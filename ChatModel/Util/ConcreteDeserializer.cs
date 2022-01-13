@@ -1,21 +1,20 @@
 ﻿using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace ChatModel.Util
+namespace ChatModel.Util;
+
+/// <summary>
+/// Concrete implementation of IDeserializer.
+/// </summary>
+public class ConcreteDeserializer : IDeserializer
 {
-    /// <summary>
-    /// Concrete implementation of IDeserializer.
-    /// </summary>
-    public class ConcreteDeserializer : IDeserializer
-    {
-        public object Deserialize(Stream stream)
-        {
-            BinaryFormatter formatter = new BinaryFormatter();
+	public object Deserialize(Stream stream)
+	{
+		BinaryFormatter formatter = new BinaryFormatter();
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
-			return formatter.Deserialize(stream); //uses a BinaryFormatter to Deserialize
+		return formatter.Deserialize(stream); //uses a BinaryFormatter to Deserialize
 #pragma warning restore SYSLIB0011 // Type or member is obsolete
-		}
-    }
+	}
 }
 
 /*

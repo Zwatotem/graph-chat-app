@@ -45,8 +45,43 @@ class ConversationViewModel : ChatModel.Util.ViewModel
 		}
 	}
 	public EnterConversationCommand EnterCommand { get; set; }
+
+	private ICommand leaveCommand;
+	public ICommand LeaveCommand
+	{
+		get
+		{
+			if (leaveCommand == null)
+			{
+				leaveCommand = new LeaveConversationCommand(conversation);
+			}
+			return leaveCommand;
+		}
+	}
+
 	void EnterConversation()
 	{
 		enteringMethod(conversation);
 	}
+}
+
+internal class LeaveConversationCommand : ICommand
+{
+	private Conversation conversation;
+	public LeaveConversationCommand(Conversation conversation)
+	{
+		this.conversation = conversation;
+	}
+
+	public bool CanExecute(object? parameter)
+	{
+		return true;
+	}
+
+	public void Execute(object? parameter)
+	{
+		App.Current.Client.requestLeaveConversation(conversation);
+	}
+
+	public event EventHandler? CanExecuteChanged;
 }

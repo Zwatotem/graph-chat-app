@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -53,6 +54,22 @@ public partial class MainWindow : Window
 		MainFrame.NavigationService.Navigate(logInPage);
 		app.Client.SuccessfullyLogged += DoOpenUserPanel;
 		app.Client.UnSuccessfullyLogged += DoShowFailMonit;
+		app.Client.SuccessfullyRemovedConversation += DoCleanViewModel;
+	}
+
+	private void DoCleanViewModel(object? sender, SuccessfullyRemovedConversationEventArgs e)
+	{
+		CleanViewModel(e.ConversationID);
+	}
+
+	private void CleanViewModel(Guid eConversationId)
+	{
+		var nav = MainFrame;
+		do
+		{
+			nav.RemoveBackEntry();
+		}
+		while (nav.CanGoBack);
 	}
 
 	private void DoShowFailMonit(object? sender, EventArgs e)

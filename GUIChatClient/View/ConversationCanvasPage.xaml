@@ -60,9 +60,21 @@
 				Text="{Binding ConversationName}" />
 			<Button
 				x:Name="NewMessage"
+				Margin="10"
 				HorizontalAlignment="Right"
 				Command="{Binding ShowGlobalEditorCommand}"
 				Content="Send new message" />
+			<Button
+				x:Name="AddUsers"
+				Margin="10"
+				HorizontalAlignment="Right"
+				Command="{Binding AddUsersCommand}"
+				Content="Add new members" />
+			<TextBox 
+				x:Name="UserBox"
+				MinWidth="200"
+				Margin="10"
+				Text="{Binding CSVNames}" />
 		</StackPanel>
 		<ScrollViewer Grid.Row="1">
 			<ItemsControl ItemsSource="{Binding RootMessages}">
