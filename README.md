@@ -6,18 +6,18 @@ See the instructions provided above, under the "Code" button.
 ### With Visual Studio
 Required: Visual Studio 2019, with "classic applications for .NET" features installed.
 
-Clone the repository. Open the solution, by double clicking on the solution file (graph-chat-app.sln).
+Clone the repository. Open the solution, by double clicking on the solution file (GraphChatApp.sln).
 When project is loaded locate the dropdown on the top, saying "Debug" or "Release" and make sure it's in Release.
-Locate Solution 'graph-chat-app' in Solution Explorer, right click it and select Build Solution.
+Locate Solution 'GraphChatApp' in Solution Explorer, right click it and select Build Solution.
 Your binaries should now be located in: 
-- Server under `.\graph-chat-app\ChatServer\bin\Release\net5.0-windows\ChatServer.exe`.
-- Client under `.\graph-chat-app\ChatClient\bin\Release\net5.0-windows\ChatClient.exe`.
+- Server under `.\GraphChatApp\ChatServer\bin\Release\net6.0-windows\ChatServer.exe`.
+- Client under `.\GraphChatApp\GUIChatClient\bin\Release\net6.0-windows\GUIChatClient.exe`.
 ### With `dotnet` cli
 Navigate to project root. 
 Type: `dotnet build --configuration Release`. 
 Your binaries should now be located in:
-- Server under `.\graph-chat-app\ChatServer\bin\Release\net5.0-windows\ChatServer.exe`
-- Client under `.\graph-chat-app\ChatClient\bin\Release\net5.0-windows\ChatClient.exe`
+- Server under `.\GraphChatApp\ChatServer\bin\Release\net6.0-windows\ChatServer.exe`
+- Client under `.\GraphChatApp\GUIChatClient\bin\Release\net6.0-windows\GUIChatClient.exe`
 ## Running the application
 ### Server
 Open the application in any terminal. 
