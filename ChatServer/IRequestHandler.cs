@@ -1,27 +1,26 @@
 ﻿using System.Collections.Generic;
 using ChatModel;
 
-namespace ChatServer
-{
-    /// <summary>
-    /// Interface representing abstract request handler.
-    /// </summary>
-    public interface IRequestHandler
-    {
-        /// <summary>
-        /// Strategy currently held in the context.
-        /// </summary>
-        IHandleStrategy HandleStrategy { get; set; }
+namespace ChatServer;
 
-        /// <summary>
-        /// Handles a resquest from the client in a way dependant on the strategy field.
-        /// </summary>
-        /// <param name="allHandlers">List of all active handlers</param>
-        /// <param name="chatSystem">Server chat system instance</param>
-        /// <param name="handlerThread">Handler receiving the request</param>
-        /// <param name="messageBytes">Request in form of byte array</param>
-        void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes);
-    }
+/// <summary>
+/// Interface representing abstract request handler.
+/// </summary>
+public interface IRequestHandler
+{
+	/// <summary>
+	/// Strategy currently held in the context.
+	/// </summary>
+	IHandleStrategy HandleStrategy { get; set; }
+
+	/// <summary>
+	/// Handles a resquest from the client in a way dependant on the strategy field.
+	/// </summary>
+	/// <param name="allHandlers">List of all active handlers</param>
+	/// <param name="chatSystem">Server chat system instance</param>
+	/// <param name="handlerThread">Handler receiving the request</param>
+	/// <param name="messageBytes">Request in form of byte array</param>
+	void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes);
 }
 
 /*

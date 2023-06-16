@@ -1,18 +1,17 @@
 ﻿
-namespace ChatServer
+namespace ChatServer;
+
+/// <summary>
+/// Interface representing factory of request handlers.
+/// </summary>
+public interface IRequestHandlerCreator
 {
     /// <summary>
-    /// Interface representing factory of request handlers.
+    /// Factory method creating new request handler.
     /// </summary>
-    public interface IRequestHandlerCreator
-    {
-        /// <summary>
-        /// Factory method creating new request handler.
-        /// </summary>
-        /// <param name="typeByte">Type of the request for which a handler is needed</param>
-        /// <returns>Concrete instance of class implementing IRequestHandler</returns>
-        IRequestHandler createRequestHandler(byte typeByte);
-    }
+    /// <param name="typeByte">Type of the request for which a handler is needed</param>
+    /// <returns>Concrete instance of class implementing IRequestHandler</returns>
+    IRequestHandler createRequestHandler(byte typeByte);
 }
 
 /*

@@ -1,26 +1,25 @@
 ﻿
-namespace ChatServer
+namespace ChatServer;
+
+/// <summary>
+/// Interface representing the server side of the chat system and conducting interactions with clients.
+/// </summary>
+public interface IChatServer
 {
     /// <summary>
-    /// Interface representing the server side of the chat system and conducting interactions with clients.
+    /// True is the server is currently working, false otherwise.
     /// </summary>
-    public interface IChatServer
-    {
-        /// <summary>
-        /// True is the server is currently working, false otherwise.
-        /// </summary>
-        bool Working { get; }
+    bool Working { get; }
 
-        /// <summary>
-        /// Starts the server.
-        /// </summary>
-        void startServer();
+    /// <summary>
+    /// Starts the server.
+    /// </summary>
+    void startServer();
 
-        /// <summary>
-        /// Shuts the server down.
-        /// </summary>
-        void shutdown();
-    }
+    /// <summary>
+    /// Shuts the server down.
+    /// </summary>
+    void shutdown();
 }
 
 /*

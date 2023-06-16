@@ -1,30 +1,29 @@
 ﻿
-namespace ChatServer
+namespace ChatServer;
+
+/// <summary>
+/// Interface representing basic input-output net socket functionality.
+/// </summary>
+public interface IIOSocketFacade
 {
     /// <summary>
-    /// Interface representing basic input-output net socket functionality.
+    /// Reads a given number of bytes from the socket.
     /// </summary>
-    public interface IIOSocketFacade
-    {
-        /// <summary>
-        /// Reads a given number of bytes from the socket.
-        /// </summary>
-        /// <param name="length">Number of bytes to read</param>
-        /// <returns>Byte array of read bytes.</returns>
-        byte[] receiveMessage(int length);
+    /// <param name="length">Number of bytes to read</param>
+    /// <returns>Byte array of read bytes.</returns>
+    byte[] receiveMessage(int length);
 
-        /// <summary>
-        /// Sends a message via the socket, preceded by a header with a type byte and message's length.
-        /// </summary>
-        /// <param name="typeByte">Type byte indicating the kind of content in the message.</param>
-        /// <param name="message">Message to send</param>
-        void sendMessage(byte typeByte, byte[] message);
+    /// <summary>
+    /// Sends a message via the socket, preceded by a header with a type byte and message's length.
+    /// </summary>
+    /// <param name="typeByte">Type byte indicating the kind of content in the message.</param>
+    /// <param name="message">Message to send</param>
+    void sendMessage(byte typeByte, byte[] message);
 
-        /// <summary>
-        /// Closes the socket and releases all resources.
-        /// </summary>
-        void shutdown();
-    }
+    /// <summary>
+    /// Closes the socket and releases all resources.
+    /// </summary>
+    void shutdown();
 }
 
 /*

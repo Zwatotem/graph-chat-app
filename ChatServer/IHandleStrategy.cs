@@ -1,22 +1,21 @@
 ﻿using System.Collections.Generic;
 using ChatModel;
 
-namespace ChatServer
+namespace ChatServer;
+
+/// <summary>
+/// Interface representing a strategy of handling a request from the client.
+/// </summary>
+public interface IHandleStrategy
 {
     /// <summary>
-    /// Interface representing a strategy of handling a request from the client.
+    /// Handles a resquest from the client in a way dependant on the concrete implementation
     /// </summary>
-    public interface IHandleStrategy
-    {
-        /// <summary>
-        /// Handles a resquest from the client in a way dependant on the concrete implementation
-        /// </summary>
-        /// <param name="allHandlers">List of all active handlers</param>
-        /// <param name="chatSystem">Server chat system instance</param>
-        /// <param name="handlerThread">Handler receiving the request</param>
-        /// <param name="messageBytes">Request in form of byte array</param>
-        void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes);
-    }
+    /// <param name="allHandlers">List of all active handlers</param>
+    /// <param name="chatSystem">Server chat system instance</param>
+    /// <param name="handlerThread">Handler receiving the request</param>
+    /// <param name="messageBytes">Request in form of byte array</param>
+    void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes);
 }
 
 /*

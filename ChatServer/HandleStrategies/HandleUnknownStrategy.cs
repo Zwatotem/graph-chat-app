@@ -2,17 +2,16 @@
 using System.Collections.Generic;
 using ChatModel;
 
-namespace ChatServer.HandleStrategies
+namespace ChatServer.HandleStrategies;
+
+/// <summary>
+/// Class handling an unknown request.
+/// </summary>
+class HandleUnknownStrategy : IHandleStrategy
 {
-    /// <summary>
-    /// Class handling an unknown request.
-    /// </summary>
-    class HandleUnknownStrategy : IHandleStrategy
+    public void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
     {
-        public void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
-        {
-            Console.WriteLine("DEBUG: unknown request receive");
-        }
+        Console.WriteLine("DEBUG: unknown request receive");
     }
 }
 

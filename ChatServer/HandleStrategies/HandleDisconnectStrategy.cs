@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using ChatModel;
 
-namespace ChatServer.HandleStrategies
+namespace ChatServer.HandleStrategies;
+
+class HandleDisconnectStrategy : IHandleStrategy
 {
-    class HandleDisconnectStrategy : IHandleStrategy
+    /// <summary>
+    /// Class handling request to disconnect.
+    /// </summary>
+    public void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
     {
-        /// <summary>
-        /// Class handling request to disconnect.
-        /// </summary>
-        public void handleRequest(List<IClientHandler> allHandlers, IServerChatSystem chatSystem, IClientHandler handlerThread, byte[] messageBytes)
-        {
-            Console.WriteLine("DEBUG: {0} request received", "disconnect");
-            handlerThread.shutdown(); //shutdown the handler
-        }
+        Console.WriteLine("DEBUG: {0} request received", "disconnect");
+        handlerThread.shutdown(); //shutdown the handler
     }
 }
 
